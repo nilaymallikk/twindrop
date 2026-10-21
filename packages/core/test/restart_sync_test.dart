@@ -68,6 +68,9 @@ void main() {
         tokenStore: tokenStore,
         logger: log,
         enableDiscovery: false,
+        // A dedicated port: the other test files run in parallel and also start
+        // a host, and a shared port would make this test order-dependent.
+        preferredPort: 47421,
       );
       phone = await openPhone();
 

@@ -90,11 +90,16 @@ rather than only the flattering one.
 ## Artifacts
 | Artifact | Path | Bytes | SHA-256 | Launched/installed? |
 |---|---|---:|---|---|
-| AppImage | `dist/TwinDrop-x86_64.AppImage` | 44 680 384 | `a5f131224bf946172b39af780c155e84d62aaf1d9a7c2f43c0735a4d7deab71a` | **yes** — see below |
-| APK | `dist/twindrop.apk` | 81 169 578 | `2d943206ad2083e31a0a29e997172e1ff87343720ac5c815cb1960f59968a92f` | **no** — no device attached |
-| Release bundle | `dist/TwinDrop-v1.0.0-linux-x86_64.tar.gz` | 81 393 417 | `e6cbb0941300a9a301a8998e55779cb8aff6dd8623fd26a9a886f6db6b56e159` | — |
-| Release APK copy | `dist/TwinDrop-v1.0.0-android.apk` | 81 169 578 | `2d943206ad2083e31a0a29e997172e1ff87343720ac5c815cb1960f59968a92f` | — |
+| AppImage | `dist/TwinDrop-x86_64.AppImage` | 44 680 384 | `646cdc20877e2463b2d7f315725ced6f0581fb7cfbfeadd39edf55588f249926` | **yes** — see below |
+| APK | `dist/twindrop.apk` | 81 169 578 | `7b0241c89caf4a5af4079ee5118f430bb08df92809a9add49dc0bec9e4294cf9` | **no** — no device attached |
+| Release bundle | `dist/TwinDrop-v1.0.0-linux-x86_64.tar.gz` | 81 393 417 | `746fbede80b472ca74f911bcc1c3841a269dde3cddfcd0d86553c56cf15f36ac` | — |
+| Release APK copy | `dist/TwinDrop-v1.0.0-android.apk` | 81 169 578 | `7b0241c89caf4a5af4079ee5118f430bb08df92809a9add49dc0bec9e4294cf9` | — |
 | Checksum list | `dist/SHA256SUMS` | — | — | `sha256sum -c SHA256SUMS` → all 4 **OK** |
+
+Published as the GitHub release **v1.0.0**:
+<https://github.com/nilaymallikk/twindrop/releases/tag/v1.0.0>
+(The AppImage was downloaded back from that release and re-verified: the checksum
+matches and it launches with its tray icon registered.)
 
 ### APK contents verified with `aapt2 dump badging` / `aapt2 dump xmltree`
 - `package app.twindrop`, versionName `1.0.0`, minSdk **26**, targetSdk **36** (docs/06 §1).
@@ -114,13 +119,13 @@ rather than only the flattering one.
 ### AppImage launch evidence (Fedora GNOME, Wayland, `DISPLAY=:0`)
 ```
 $ ./dist/TwinDrop-x86_64.AppImage --hidden
-(app.twindrop:234203): Atk-CRITICAL **: atk_socket_embed: assertion 'plug_id != NULL' failed
+(app.twindrop:245967): Atk-CRITICAL **: atk_socket_embed: assertion 'plug_id != NULL' failed
 [IMPORTANT:flutter/shell/platform/embedder/embedder_surface_gl_impeller.cc(126)] Using the Impeller rendering backend (OpenGLESSDF).
 ```
 - The image mounted through FUSE and ran `/tmp/.mount_TwinDr*/usr/lib/twindrop/twindrop --hidden`.
 - The process was still alive 12 s after launch (no crash, no missing-library error).
 - The tray icon registered with the GNOME StatusNotifierWatcher:
-  `org.kde.StatusNotifierItem-234203-1` (PID 234203 = TwinDrop) in
+  `org.kde.StatusNotifierItem-245967-1` (PID 245967 = TwinDrop) in
   `RegisteredStatusNotifierItems`.
 - The replica was created and initialised: `~/.local/share/app.twindrop/twindrop.db`
   with 15 tables, `categories = [('inbox','Inbox',1)]`, `change_log = [(1,'category','inbox')]`,
@@ -218,6 +223,11 @@ $ wmctrl -l
   its hash. The hash is now kept **on purpose** — `docs/05` needs it to answer 403 for
   a revoked token and 401 for an unknown one — and `copyWith` grew an explicit
   `clearTokenHash` flag (D-014).
+- **The phone could never reconnect if the desktop's port changed.** The desktop binds
+  the next free port when 47321 is taken, but the phone only ever dialled the stored
+  address; mDNS was only consulted when no address was stored. The connection manager
+  now asks mDNS when the stored address stops working, and a failed dial no longer
+  leaves the phone dialing a dead port forever.
 
 ## Next concrete task
 - Sign the release APK with a real keystore (needs a human: the keystore and its

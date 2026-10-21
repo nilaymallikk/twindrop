@@ -197,7 +197,17 @@ class ConnectionManager {
         continue;
       }
       _setStatus(ConnectionStatus.connecting);
-      final session = await _connect(peer, token, locator);
+      var session = await _connect(peer, token, locator);
+      if (session == null && !_pinnedFailure) {
+        // The stored address may be stale - the desktop binds the next free
+        // port when the preferred one is taken. Ask mDNS before giving up.
+        final discovered = await _discover(peer);
+        if (discovered != null &&
+            (discovered.host != locator.host ||
+                discovered.port != locator.port)) {
+          session = await _connect(peer, token, discovered);
+        }
+      }
       if (session == null) {
         if (_pinnedFailure) {
           // Blocking: never retry a pin mismatch automatically.
@@ -385,6 +395,15 @@ class ConnectionManager {
     if (peer.lastHost != null && peer.lastPort != null) {
       return (host: peer.lastHost!, port: peer.lastPort!);
     }
+    return _discover(peer);
+  }
+
+  /// Ask mDNS where the desktop is.
+  ///
+  /// This is also the fallback when the stored address stops working: the
+  /// desktop binds the next free port when 47321 is taken, so a phone that only
+  /// ever dials the stored address would never reconnect (`docs/05` §Transport).
+  Future<({String host, int port})?> _discover(Peer peer) async {
     final discovery = _discovery;
     if (discovery == null) return null;
     await _multicastLock.acquire();

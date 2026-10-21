@@ -255,7 +255,6 @@ class MergeEngine {
           ? remote.copyWith(
               name: Category.inboxName,
               normalizedName: Category.inboxName.toLowerCase(),
-              isInbox: true,
               deleted: false,
             )
           : remote;

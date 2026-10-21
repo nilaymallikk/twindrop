@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- docs/06 §4: the only traffic is pinned TLS to the paired desktop. Cleartext is denied
+         for every domain. The certificate pin check lives in Dart; this config never adds
+         trust for user-installed CAs. -->
+    <base-config cleartextTrafficPermitted="false" />
+</network-security-config>

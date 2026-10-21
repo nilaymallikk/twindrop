@@ -60,11 +60,11 @@ extension StoreOps on AppDatabase {
     if (beforeCreatedAt != null) {
       if (beforeId != null) {
         q.where((t) =>
-            t.createdAt.lessThan(beforeCreatedAt) |
+            t.createdAt.isSmallerThanValue(beforeCreatedAt) |
             (t.createdAt.equals(beforeCreatedAt) &
-                t.id.lessThan(beforeId)));
+                t.id.isSmallerThanValue(beforeId)));
       } else {
-        q.where((t) => t.createdAt.lessThan(beforeCreatedAt));
+        q.where((t) => t.createdAt.isSmallerThanValue(beforeCreatedAt));
       }
     }
     q
@@ -175,7 +175,7 @@ extension StoreOps on AppDatabase {
   Future<int> changeSeqForEntity(String entityType, String entityId) async {
     final row = await customSelect(
       'SELECT COALESCE(MAX(seq), 0) AS m FROM change_log '
-      'WHERE entityType = ? AND entityId = ?',
+      'WHERE entity_type = ? AND entity_id = ?',
       variables: [Variable(entityType), Variable(entityId)],
       readsFrom: {changeLogs},
     ).getSingle();
@@ -186,7 +186,7 @@ extension StoreOps on AppDatabase {
   Future<int> changeSeqForItemAtMost(String itemId, int upToSeq) async {
     final row = await customSelect(
       'SELECT COALESCE(MAX(seq), 0) AS m FROM change_log '
-      "WHERE entityType = 'item' AND entityId = ? AND seq <= ?",
+      "WHERE entity_type = 'item' AND entity_id = ? AND seq <= ?",
       variables: [Variable(itemId), Variable(upToSeq)],
       readsFrom: {changeLogs},
     ).getSingle();
@@ -380,7 +380,7 @@ extension StoreOps on AppDatabase {
   Future<void> saveHlcValue(String value) => setSetting('hlc.last', value);
 }
 
-Companion<Item> _itemCompanion(Item i) => ItemsCompanion.insert(
+Insertable<ItemRow> _itemCompanion(Item i) => ItemsCompanion.insert(
       id: i.id,
       type: i.type.wire,
       kind: i.kind.wire,

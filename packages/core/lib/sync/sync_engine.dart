@@ -4,6 +4,7 @@ import 'dart:math';
 import '../db/database.dart';
 import '../db/store_ops.dart';
 import '../models/category.dart';
+import '../models/change.dart';
 import '../models/enums.dart';
 import '../models/errors.dart';
 import '../models/item.dart';
@@ -284,7 +285,12 @@ class SyncEngine {
     } on Object catch (e) {
       throw StorageError('failed to apply change page', cause: e);
     }
-    _bus.notify();
+    // Only a page that actually changed something may wake the local UI and
+    // the peer. Notifying on an empty page would make the two peers ping-pong
+    // forever: apply -> notify -> peer pulls -> empty page -> apply -> notify.
+    if (applied > 0 || quarantined > 0) {
+      _bus.notify();
+    }
     _logger.debug('sync: applied page', fields: {
       'applied': applied,
       'quarantined': quarantined,
@@ -349,11 +355,11 @@ class SyncEngine {
       await _db.deleteItemRow(item.id);
       await _db.ftsRemove(item.id);
       await _db.customStatement(
-        "DELETE FROM change_log WHERE entityType = 'item' AND entityId = ?",
+        "DELETE FROM change_log WHERE entity_type = 'item' AND entity_id = ?",
         [item.id],
       );
       await _db.customStatement(
-          'DELETE FROM peer_delivery WHERE itemId = ?', [item.id]);
+          'DELETE FROM peer_delivery WHERE item_id = ?', [item.id]);
       removed++;
     }
     if (removed > 0) {

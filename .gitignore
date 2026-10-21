@@ -58,3 +58,6 @@ app.dill.track.dill
 .DS_Store
 Thumbs.db
 /tmp/
+
+# ---- Imported foreign-agent session archives (local reference only) ----
+.imports/

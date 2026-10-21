@@ -106,7 +106,8 @@ final class NotFoundError extends TwinDropError {
 
 /// Pairing/invalid-action rate limit or lockout (`PAIR-010`).
 final class RateLimitedError extends TwinDropError {
-  const RateLimitedError({this.retryAfterSeconds = 60});
+  const RateLimitedError({this.retryAfterSeconds = 60})
+      : super('too many attempts');
 
   final int retryAfterSeconds;
 
@@ -119,8 +120,6 @@ final class RateLimitedError extends TwinDropError {
   @override
   int get httpStatus => 429;
 
-  @override
-  String get message => 'too many attempts';
 }
 
 /// Pairing failed. Deliberately generic so failures are not distinguishable

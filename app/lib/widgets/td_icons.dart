@@ -121,6 +121,18 @@ abstract final class TdIcons {
   static const TdIconData grip = TdIconData(
     'M9 5h.01 M9 12h.01 M9 19h.01 M15 5h.01 M15 12h.01 M15 19h.01',
   );
+
+  /// Viewfinder corners plus a scan line — used by the pairing scanner.
+  static const TdIconData scan = TdIconData(
+    'M3 7V5a2 2 0 0 1 2-2h2 M17 3h2a2 2 0 0 1 2 2v2 '
+    'M21 17v2a2 2 0 0 1-2 2h-2 M7 21H5a2 2 0 0 1-2-2v-2 M7 12h10',
+  );
+
+  /// Torch for the camera preview.
+  static const TdIconData flashlight = TdIconData(
+    'M6 9h6 M6 12h6 M13 5h4a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-4Z '
+    'M6 15h6 M13 15v6 M11 15v6 M9 15v6 M7 15v6',
+  );
 }
 
 /// Renders a [TdIconData] with the design-system stroke.

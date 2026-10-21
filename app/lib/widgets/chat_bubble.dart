@@ -22,7 +22,7 @@ class TdChatBubble extends StatelessWidget {
     this.delivery,
     this.linkUrl,
     this.onOpenLink,
-    this.onLongPress,
+    this.onMenuRequested,
     this.selected = false,
     this.selectionMode = false,
     this.animateIn = false,
@@ -39,8 +39,8 @@ class TdChatBubble extends StatelessWidget {
   final VoidCallback? onOpenLink;
 
   /// Long-press / right-click opens the message menu (Copy · Save to Notepad ·
-  /// Delete · Select).
-  final VoidCallback? onLongPress;
+  /// Delete · Select). The pointer position lets desktop anchor a popup menu.
+  final ValueChanged<Offset>? onMenuRequested;
   final bool selected;
   final bool selectionMode;
 
@@ -178,10 +178,10 @@ class TdChatBubble extends StatelessWidget {
       child: content,
     );
 
-    if (onLongPress == null) return labelled;
+    if (onMenuRequested == null) return labelled;
     return GestureDetector(
-      onLongPress: onLongPress,
-      onSecondaryTap: onLongPress,
+      onLongPressStart: (details) => onMenuRequested!(details.globalPosition),
+      onSecondaryTapUp: (details) => onMenuRequested!(details.globalPosition),
       child: labelled,
     );
   }

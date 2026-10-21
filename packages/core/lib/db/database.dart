@@ -68,19 +68,19 @@ class AppDatabase extends _$AppDatabase {
   Future<void> _createIndexes() async {
     await customStatement(
       'CREATE INDEX IF NOT EXISTS idx_items_type_deleted '
-      'ON items(type, deleted, createdAt)',
+      'ON items(type, deleted, created_at)',
     );
     await customStatement(
       'CREATE INDEX IF NOT EXISTS idx_items_category '
-      'ON items(categoryId, deleted)',
+      'ON items(category_id, deleted)',
     );
     await customStatement(
       'CREATE INDEX IF NOT EXISTS idx_change_log_entity '
-      'ON change_log(entityType, entityId)',
+      'ON change_log(entity_type, entity_id)',
     );
     await customStatement(
       'CREATE INDEX IF NOT EXISTS idx_peer_delivery_item '
-      'ON peer_delivery(itemId)',
+      'ON peer_delivery(item_id)',
     );
   }
 

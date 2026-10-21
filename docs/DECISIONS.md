@@ -141,3 +141,27 @@ actionable copy in `AppController._messageFor`.
 **Reason:** `docs/03` §Error boundary and `docs/02` ("every error says what to do
 next"). The raw exception told the user "invalid category name" instead of "use a name
 of 1 to 60 letters that is not already used".
+
+## D-016 | 2026-10-21 | Only the plugins the app uses
+**Question:** `app/pubspec.yaml` carried `flutter_riverpod`, `share_plus`,
+`package_info_plus` and `cupertino_icons`, none of which the code imports. The app has
+its own `ShareReceiverActivity`, its own `AppController` (a `ChangeNotifier`) and its
+own `twindrop/app` channel for the version.
+**Choice:** Those four are removed. `flutter_local_notifications` stays: it is the
+Linux implementation of the desktop notifications.
+**Reason:** Every Android plugin in the dependency list is registered at process start,
+whether or not the app calls it. An unused plugin is startup surface for nothing — and
+`share_plus` also added a `FileProvider` to the manifest. Cutting the surface is the
+difference between "the app starts" and "the app starts unless a plugin I never use
+misbehaves on your device".
+
+## D-017 | 2026-10-21 | A startup failure must be visible
+**Question:** The first Android build quits immediately on a real phone, with nothing
+on screen. A silent exit is the worst possible failure: the user cannot tell a crash
+from a mis-tap, and there is nothing in logcat to go on.
+**Choice:** `main()` catches everything, shows a `StartupFailureApp` with the error
+text, and `runZonedGuarded` logs uncaught asynchronous errors. On the native side
+`TwindropApp` installs a default uncaught-exception handler and logs every startup
+milestone under the `TwinDrop` logcat tag.
+**Reason:** A failure that cannot be seen cannot be diagnosed. The native markers also
+make `adb logcat -s TwinDrop` enough to tell how far the startup got.

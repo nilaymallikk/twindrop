@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:ui';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:twindrop_core/core.dart';
@@ -18,25 +18,48 @@ import 'platform/android/android_platform.dart';
 import 'share_panel_main.dart';
 import 'state/app_controller.dart';
 
-Future<void> main(List<String> args) async {
+/// Application entry point.
+///
+/// The parameter is optional on purpose: the engine calls the entrypoint with
+/// the command-line arguments on Linux and with an empty list on Android, and
+/// an optional parameter works with both without depending on how the platform
+/// embedding invokes it.
+Future<void> main([List<String>? args]) async {
   WidgetsFlutterBinding.ensureInitialized();
-  if (Platform.isAndroid) {
-    await _runAndroid();
-    return;
-  }
-  if (Platform.isLinux) {
-    await _runLinux(args);
-    return;
-  }
-  // Desktop builds other than Linux are not part of v1; still show the app
-  // rather than failing silently.
-  await _runAndroid();
+
+  // A failure before the first frame must not take the app down silently:
+  // the user would only see the launcher bounce back. Everything is caught
+  // and shown instead.
+  runZonedGuarded(
+    () async {
+      try {
+        final list = args ?? const <String>[];
+        if (Platform.isAndroid) {
+          await _runAndroid();
+          return;
+        }
+        if (Platform.isLinux) {
+          await _runLinux(list);
+          return;
+        }
+        // Desktop builds other than Linux are not part of v1; still show the
+        // app rather than failing silently.
+        await _runAndroid();
+      } on Object catch (error, stack) {
+        debugPrint('TwinDrop failed to start: $error\n$stack');
+        runApp(StartupFailureApp(error: '$error'));
+      }
+    },
+    (error, stack) {
+      // An uncaught asynchronous error must at least be visible in the log.
+      debugPrint('TwinDrop uncaught error: $error\n$stack');
+    },
+  );
 }
 
 Future<void> _runAndroid() async {
   final paths = await AppPaths.resolve();
-  late final AppController controller;
-  controller = AppController(
+  final controller = AppController(
     paths: paths,
     platform: CorePlatform.phone,
     notifier: AndroidNotifier(),
@@ -198,6 +221,50 @@ class _DesktopNotifier implements CoreNotifier {
 
   @override
   Future<void> clear() async {}
+}
+
+/// Shown instead of the app when the startup itself failed. A silent exit is
+/// the worst possible outcome: the user cannot tell a crash from a mis-tap.
+class StartupFailureApp extends StatelessWidget {
+  const StartupFailureApp({super.key, required this.error});
+
+  final String error;
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'TwinDrop',
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                const Text(
+                  'TwinDrop could not start',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  error,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 13),
+                ),
+                const SizedBox(height: 20),
+                const Text(
+                  'Restart the app. If it keeps happening, reinstall it.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 13),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 /// Headless Android entrypoint. The foreground service owns the connection

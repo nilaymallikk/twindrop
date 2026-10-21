@@ -90,10 +90,10 @@ rather than only the flattering one.
 ## Artifacts
 | Artifact | Path | Bytes | SHA-256 | Launched/installed? |
 |---|---|---:|---|---|
-| AppImage | `dist/TwinDrop-x86_64.AppImage` | 44 680 384 | `646cdc20877e2463b2d7f315725ced6f0581fb7cfbfeadd39edf55588f249926` | **yes** — see below |
-| APK | `dist/twindrop.apk` | 81 169 578 | `7b0241c89caf4a5af4079ee5118f430bb08df92809a9add49dc0bec9e4294cf9` | **no** — no device attached |
-| Release bundle | `dist/TwinDrop-v1.0.0-linux-x86_64.tar.gz` | 81 395 070 | `2e2a78ecdf7124939d2a62942bf89f3302a67c12ccae5129d8a9a1833b4e9d7e` | — |
-| Release APK copy | `dist/TwinDrop-v1.0.0-android.apk` | 81 169 578 | `7b0241c89caf4a5af4079ee5118f430bb08df92809a9add49dc0bec9e4294cf9` | — |
+| AppImage | `dist/TwinDrop-x86_64.AppImage` | 44 561 600 | `f134134c39fa84874d55b3af9aaf9b9c0b044a4cef0e31816bd653dfb46eb490` | **yes** — see below |
+| APK | `dist/twindrop.apk` | 81 052 436 | `9c06cb1561edb2a8a379537dde8764851c08f203bf82a2cde885c1b251efbf33` | **no** — no device attached |
+| Release bundle | `dist/TwinDrop-v1.0.0-linux-x86_64.tar.gz` | 81 356 470 | `61e13ec5d05787f7d104175be12320bd719c390b805ead3834b2a044e47b6ee6` | — |
+| Release APK copy | `dist/TwinDrop-v1.0.0-android.apk` | 81 052 436 | `9c06cb1561edb2a8a379537dde8764851c08f203bf82a2cde885c1b251efbf33` | — |
 | Checksum list | `dist/SHA256SUMS` | — | — | `sha256sum -c SHA256SUMS` → all 3 published files **OK** |
 
 Published as the GitHub release **v1.0.0**:
@@ -119,13 +119,13 @@ matches and it launches with its tray icon registered.)
 ### AppImage launch evidence (Fedora GNOME, Wayland, `DISPLAY=:0`)
 ```
 $ ./dist/TwinDrop-x86_64.AppImage --hidden
-(app.twindrop:245967): Atk-CRITICAL **: atk_socket_embed: assertion 'plug_id != NULL' failed
+(app.twindrop:284086): Atk-CRITICAL **: atk_socket_embed: assertion 'plug_id != NULL' failed
 [IMPORTANT:flutter/shell/platform/embedder/embedder_surface_gl_impeller.cc(126)] Using the Impeller rendering backend (OpenGLESSDF).
 ```
 - The image mounted through FUSE and ran `/tmp/.mount_TwinDr*/usr/lib/twindrop/twindrop --hidden`.
 - The process was still alive 12 s after launch (no crash, no missing-library error).
 - The tray icon registered with the GNOME StatusNotifierWatcher:
-  `org.kde.StatusNotifierItem-245967-1` (PID 245967 = TwinDrop) in
+  `org.kde.StatusNotifierItem-284086-1` (PID 284086 = TwinDrop) in
   `RegisteredStatusNotifierItems`.
 - The replica was created and initialised: `~/.local/share/app.twindrop/twindrop.db`
   with 15 tables, `categories = [('inbox','Inbox',1)]`, `change_log = [(1,'category','inbox')]`,
@@ -163,6 +163,22 @@ $ wmctrl -l
 ## Blockers / limitations
 - No sudo on the host; system packages cannot be installed. Mitigation: userland
   sysroot + toolchain under `/data/toolchain` (D-002).
+- **The Android APK quits immediately on a real phone** (reported 2026-10-21 after the
+  v1.0.0 release). The Dart phone startup path is proven good by
+  `app/test/phone_startup_test.dart` (the controller initialises, the replica opens,
+  the Inbox is created, no error), the manifest and the native libraries were inspected
+  and are correct, and the `main(List<String> args)` entrypoint was verified against
+  the engine's own trampoline (`dart:isolate._delayEntrypointInvocation`) — the engine
+  does call it with an empty list, so the entrypoint is not the problem. The remaining
+  suspects are native or plugin-side, and this environment cannot run an Android
+  emulator (the emulator's own graphics stack segfaults here, see below), so the cause
+  is not yet identified.
+  Mitigations shipped in the next build: the four unused Android plugins
+  (`flutter_riverpod`, `share_plus`, `package_info_plus`, `cupertino_icons`) are
+  removed — every plugin in the dependency list is registered at process start — and a
+  startup failure can no longer be silent: `main()` shows the error, and the native
+  side logs every milestone and any uncaught crash under the `TwinDrop` logcat tag.
+  `tool/crashlog.sh` captures the evidence from a device in one command.
 - No physical Android device attached. Every device-only check (share sheet, keep-alive
   foreground service, real-device pairing) is **BLOCKED**, not merely untested.
 - Only one Linux desktop session is available (Fedora GNOME Wayland), so the Ubuntu GNOME
@@ -171,6 +187,9 @@ $ wmctrl -l
   `adb install` only after signing, or as a debug-signed build for local checks.
 - `net/discovery.dart` (mDNS) has no unit coverage: it needs a real multicast socket
   on a real interface.
+- The Android emulator cannot be run on this host: `qemu-system-x86_64-headless`
+  segfaults during startup in the Mesa/Vulkan stack, with `-gpu off`, `-gpu guest`,
+  `-gpu swiftshader_indirect` and with `ANDROID_EMULATOR_USE_SYSTEM_LIBS=1` alike.
 
 ## Fixes made in this session
 - **Runaway sync ping-pong.** `SyncEngine.applyPage` notified the change bus on *every*

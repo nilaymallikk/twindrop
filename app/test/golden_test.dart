@@ -249,6 +249,17 @@ Widget _popup() => ChatPopup(
 void _noop() {}
 
 void main() {
+  // The chat bubble renders a wall-clock label, so the goldens depend on the
+  // machine's timezone. They are pinned to UTC. Outside UTC the comparison is
+  // meaningless, so the golden tests skip themselves loudly instead of
+  // recording a different picture; `tool/goldens.sh` is the authoritative
+  // check and always runs with TZ=UTC.
+  final tzOffset = DateTime.now().timeZoneOffset;
+  final skipReason = tzOffset == Duration.zero
+      ? null
+      : 'the goldens are pinned to UTC (the chat bubble shows a local clock '
+            'label); this machine is at $tzOffset. Run tool/goldens.sh.';
+
   setUpAll(_loadBundledFonts);
 
   for (final theme in const <AppThemeChoice>[
@@ -259,6 +270,10 @@ void main() {
 
     group('$label theme', () {
       testWidgets('chat — desktop 1280x800', (tester) async {
+        if (skipReason != null) {
+          markTestSkipped(skipReason);
+          return;
+        }
         await _pumpAt(tester, _chat(), size: desktopSize, choice: theme);
         await expectLater(
           find.byType(ChatScreen),
@@ -267,6 +282,10 @@ void main() {
       });
 
       testWidgets('chat — phone 393x852', (tester) async {
+        if (skipReason != null) {
+          markTestSkipped(skipReason);
+          return;
+        }
         await _pumpAt(tester, _chat(), size: phoneSize, choice: theme);
         await expectLater(
           find.byType(ChatScreen),
@@ -275,6 +294,10 @@ void main() {
       });
 
       testWidgets('notepad — desktop 1280x800', (tester) async {
+        if (skipReason != null) {
+          markTestSkipped(skipReason);
+          return;
+        }
         await _pumpAt(tester, _notepad(), size: desktopSize, choice: theme);
         await expectLater(
           find.byType(NotepadScreen),
@@ -283,6 +306,10 @@ void main() {
       });
 
       testWidgets('settings — desktop 1280x800', (tester) async {
+        if (skipReason != null) {
+          markTestSkipped(skipReason);
+          return;
+        }
         await _pumpAt(tester, _settings(), size: desktopSize, choice: theme);
         await expectLater(
           find.byType(SettingsScreen),
@@ -291,6 +318,10 @@ void main() {
       });
 
       testWidgets('diagnostics — desktop 1280x800', (tester) async {
+        if (skipReason != null) {
+          markTestSkipped(skipReason);
+          return;
+        }
         await _pumpAt(tester, _diagnostics(), size: desktopSize, choice: theme);
         await expectLater(
           find.byType(DiagnosticsScreen),
@@ -299,6 +330,10 @@ void main() {
       });
 
       testWidgets('pairing — desktop 1280x800', (tester) async {
+        if (skipReason != null) {
+          markTestSkipped(skipReason);
+          return;
+        }
         await _pumpAt(tester, _pairing(), size: desktopSize, choice: theme);
         await expectLater(
           find.byType(DesktopPairingScreen),
@@ -307,6 +342,10 @@ void main() {
       });
 
       testWidgets('onboarding — phone 393x852', (tester) async {
+        if (skipReason != null) {
+          markTestSkipped(skipReason);
+          return;
+        }
         await _pumpAt(tester, _onboarding(), size: phoneSize, choice: theme);
         await expectLater(
           find.byType(PhoneOnboardingScreen),
@@ -315,6 +354,10 @@ void main() {
       });
 
       testWidgets('share panel — phone 393x852', (tester) async {
+        if (skipReason != null) {
+          markTestSkipped(skipReason);
+          return;
+        }
         await _pumpAt(tester, _sharePanel(), size: phoneSize, choice: theme);
         await expectLater(
           find.byType(SharePanelView),
@@ -323,6 +366,10 @@ void main() {
       });
 
       testWidgets('popup — desktop 1280x800', (tester) async {
+        if (skipReason != null) {
+          markTestSkipped(skipReason);
+          return;
+        }
         await _pumpAt(tester, _popup(), size: desktopSize, choice: theme);
         await expectLater(
           find.byType(ChatPopup),

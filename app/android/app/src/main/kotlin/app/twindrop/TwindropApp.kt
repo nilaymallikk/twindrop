@@ -2,6 +2,7 @@ package app.twindrop
 
 import android.app.Application
 import android.content.Context
+import android.util.Log
 import io.flutter.FlutterInjector
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.embedding.engine.FlutterEngineGroup
@@ -22,8 +23,29 @@ class TwindropApp : Application() {
     override fun onCreate() {
         super.onCreate()
         instance = this
-        // Channels must exist before the first notification is built, whichever engine starts first.
-        NotificationHelper.ensureChannels(this)
+        installCrashHandler()
+        Log.i(TAG, "application created")
+        try {
+            // Channels must exist before the first notification is built, whichever engine starts first.
+            NotificationHelper.ensureChannels(this)
+            Log.i(TAG, "notification channels ready")
+        } catch (t: Throwable) {
+            // A missing notification channel must never stop the app from starting.
+            Log.e(TAG, "could not create the notification channels", t)
+        }
+        Log.i(TAG, "application onCreate done")
+    }
+
+    /**
+     * Logs any uncaught native crash with the app's own tag, so `logcat` shows
+     * where the app died instead of only a stack trace with no context.
+     */
+    private fun installCrashHandler() {
+        val previous = Thread.getDefaultUncaughtExceptionHandler()
+        Thread.setDefaultUncaughtExceptionHandler { thread, error ->
+            Log.e(TAG, "uncaught exception on ${thread.name}", error)
+            previous?.uncaughtException(thread, error)
+        }
     }
 
     /**
@@ -78,5 +100,8 @@ class TwindropApp : Application() {
 
         const val ENTRYPOINT_SHARE_PANEL = "sharePanelMain"
         const val ENTRYPOINT_KEEP_ALIVE = "keepAliveMain"
+
+        /** Logcat tag for every startup milestone and crash. */
+        const val TAG = "TwinDrop"
     }
 }

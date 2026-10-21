@@ -2,6 +2,7 @@ package app.twindrop
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
@@ -18,6 +19,7 @@ class MainActivity : FlutterActivity() {
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
+        Log.i(TwindropApp.TAG, "configureFlutterEngine: start")
         val registration = TwindropChannels.registerCore(
             flutterEngine,
             applicationContext,
@@ -35,12 +37,15 @@ class MainActivity : FlutterActivity() {
         pendingShare()?.let { pending ->
             shareQueueChannel?.invokeMethod("onShareReceived", pending)
         }
+        Log.i(TwindropApp.TAG, "configureFlutterEngine: channels ready")
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.i(TwindropApp.TAG, "MainActivity.onCreate")
         NotificationHelper.ensureChannels(this)
         if (savedInstanceState == null) handleShareIntent(intent)
+        Log.i(TwindropApp.TAG, "MainActivity.onCreate done")
     }
 
     override fun onNewIntent(intent: Intent) {

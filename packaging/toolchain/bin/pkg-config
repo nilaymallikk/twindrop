@@ -1,0 +1,12 @@
+#!/bin/sh
+# TwinDrop toolchain shim.
+# Flutter's native-asset build hooks run the Dart hook in a sanitized environment
+# that drops PKG_CONFIG_PATH/PKG_CONFIG_SYSROOT_DIR, so point pkg-config at the
+# userland Fedora sysroot here instead (tool/env.sh does the same for CMake).
+SYSROOT="${TWINDROP_TOOLCHAIN:-/data/toolchain}/sysroot"
+if [ -d "$SYSROOT/usr" ]; then
+  : "${PKG_CONFIG_PATH:=$SYSROOT/usr/lib64/pkgconfig:$SYSROOT/usr/share/pkgconfig:$SYSROOT/usr/lib/pkgconfig}"
+  : "${PKG_CONFIG_SYSROOT_DIR:=$SYSROOT}"
+  export PKG_CONFIG_PATH PKG_CONFIG_SYSROOT_DIR
+fi
+exec /usr/bin/pkg-config "$@"

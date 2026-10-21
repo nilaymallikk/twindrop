@@ -1,0 +1,3 @@
+#!/bin/sh
+# TwinDrop toolchain shim: see clang.
+exec g++ "$@"

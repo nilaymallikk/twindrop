@@ -158,20 +158,3 @@ class TdFadePageTransitionsBuilder extends PageTransitionsBuilder {
   }
 }
 
-/// Icon sizes used by the design system (outline icons; docs/13 §4).
-abstract final class TdIconSizes {
-  /// Delivery ticks (chat bubbles).
-  static const double delivery = 14;
-
-  /// Inline icons (buttons, meta rows).
-  static const double sm = 16;
-
-  /// Desktop action icons.
-  static const double md = 20;
-
-  /// Phone navigation icons.
-  static const double lg = 24;
-
-  /// Empty-state logo mark (docs/13 §6).
-  static const double emptyMark = 24;
-}

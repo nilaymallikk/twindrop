@@ -5,10 +5,13 @@
 #   source tool/env.sh
 #
 # Override TWINDROP_TOOLCHAIN if the toolchain lives elsewhere.
+# Flutter hard-codes clang/clang++ for Linux desktop builds; packaging/toolchain/bin
+# provides thin wrappers to gcc/g++ because the host has no clang (no sudo).
 
 export TWINDROP_TOOLCHAIN="${TWINDROP_TOOLCHAIN:-/data/toolchain}"
 
-export PATH="$TWINDROP_TOOLCHAIN/flutter/bin:$TWINDROP_TOOLCHAIN/dart/dart-sdk/bin:$TWINDROP_TOOLCHAIN/jdk17/bin:$TWINDROP_TOOLCHAIN/android-sdk/cmdline-tools/latest/bin:$TWINDROP_TOOLCHAIN/android-sdk/platform-tools:$PATH"
+TWINDROP_REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+export PATH="$TWINDROP_REPO/packaging/toolchain/bin:$TWINDROP_TOOLCHAIN/flutter/bin:$TWINDROP_TOOLCHAIN/dart/dart-sdk/bin:$TWINDROP_TOOLCHAIN/jdk17/bin:$TWINDROP_TOOLCHAIN/android-sdk/cmdline-tools/latest/bin:$TWINDROP_TOOLCHAIN/android-sdk/platform-tools:$PATH"
 
 export JAVA_HOME="$TWINDROP_TOOLCHAIN/jdk17"
 export ANDROID_HOME="$TWINDROP_TOOLCHAIN/android-sdk"

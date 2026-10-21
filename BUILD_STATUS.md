@@ -14,15 +14,24 @@
 
 ## Toolchain
 - OS / kernel / arch: Fedora 44 / 7.2.11-200.fc44.x86_64 / x86_64
-- Flutter / Dart: 3.47.7 stable (Dart 3.13.5) — installed userland at `/data/toolchain/flutter`
+- Flutter / Dart: 3.47.7 stable, Dart 3.13.5 — userland at `/data/toolchain/flutter`
+  (`flutter doctor -v`: Flutter ok, Android toolchain ok (SDK 36.0.0, build-tools
+  36.0.0, JDK 17 Temurin, licenses accepted); Linux toolchain listed clang missing
+  until `packaging/toolchain/bin` wrappers to GCC 16.2.1 were prepended to PATH)
 - Standalone Dart: 3.13.6 at `/data/toolchain/dart/dart-sdk` (core package development)
 - JDK: Temurin 17 (userland, `/data/toolchain/jdk17`) — host has JRE 25 only, no javac
 - Android SDK: command-line tools at `/data/toolchain/android-sdk` (platform/build-tools to install)
 - AppImage tooling: to download (`appimagetool`, no root; FUSE may be absent → extract-and-run)
-- Linux desktop build deps: **not installed system-wide** (no sudo). A userland Fedora
-  sysroot at `/data/toolchain/sysroot` provides gtk3-devel, libsecret-devel,
-  libnotify-devel and libayatana-appindicator-gtk3-devel; builds use
-  `PKG_CONFIG_SYSROOT_DIR` / `PKG_CONFIG_PATH` (see `tool/env.sh`, `docs/DECISIONS.md` D-002).
+- Linux desktop build deps: **not installed system-wide** (no sudo). A userland
+  Fedora 44 sysroot at `/data/toolchain/sysroot` provides gtk3-devel,
+  libsecret-devel, libnotify-devel, libayatana-appindicator-gtk3-devel,
+  libdbusmenu-devel + recursive closure (pixman/dbus/libxml2/libmount/libblkid/
+  sysprof-capture headers); `pkg-config --cflags` for gtk+-3.0/libsecret-1/
+  libnotify/ayatana-appindicator3-0.1/dbusmenu-glib-0.4 resolves with every
+  include dir present (verified). Builds use `PKG_CONFIG_SYSROOT_DIR` /
+  `PKG_CONFIG_PATH` (see `tool/env.sh`, `docs/DECISIONS.md` D-002/D-005).
+- clang/clang++: not installed; `packaging/toolchain/bin` wrappers to GCC 16.2.1
+  (D-006).
 
 ## Implemented (by requirement ID)
 - None yet.

@@ -1,4 +1,5 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 
 import 'tokens.dart';
 import 'typography.dart';
@@ -32,6 +33,15 @@ extension TdContext on BuildContext {
 
   /// Focus ring colour (accent is allowed for focus; docs/13 §1).
   Color get tdFocusColor => td.accent;
+
+  /// True on touch platforms, where controls use the comfortable 48 dp height
+  /// (docs/13 §3 "Density"). Layout (phone vs desktop) still follows width.
+  bool get tdMobilePlatform =>
+      defaultTargetPlatform == TargetPlatform.android ||
+      defaultTargetPlatform == TargetPlatform.iOS;
+
+  /// Control height: 48 dp on touch platforms, 36 px on desktop.
+  double get tdControlHeight => tdMobilePlatform ? 48 : 36;
 }
 
 /// Semantic text styles that depend on tokens, kept here so screens express

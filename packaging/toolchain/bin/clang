@@ -1,0 +1,4 @@
+#!/bin/sh
+# TwinDrop toolchain shim: host has gcc/g++ but Flutter hard-codes CC=clang CXX=clang++.
+# Keep CMake/GCC semantics; clang-specific flags used here are GCC-compatible.
+exec gcc "$@"

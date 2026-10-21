@@ -1,4 +1,4 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:twindrop_core/models/enums.dart';
 
 /// Font families. Bundled by the app as assets (docs/13 §2); never fetched at
@@ -308,4 +308,23 @@ class TdTokens extends ThemeExtension<TdTokens> {
       qrInk: mix(qrInk, other.qrInk),
     );
   }
+}
+
+
+/// Icon sizes used by the design system (outline icons; docs/13 §4).
+abstract final class TdIconSizes {
+  /// Delivery ticks (chat bubbles).
+  static const double delivery = 14;
+
+  /// Inline icons (buttons, meta rows).
+  static const double sm = 16;
+
+  /// Desktop action icons.
+  static const double md = 20;
+
+  /// Phone navigation icons.
+  static const double lg = 24;
+
+  /// Empty-state logo mark (docs/13 §6).
+  static const double emptyMark = 24;
 }

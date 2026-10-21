@@ -14,6 +14,7 @@ class TdType extends ThemeExtension<TdType> {
     required this.body,
     required this.bodyPhone,
     required this.title,
+    required this.cardTitle,
     required this.screen,
     required this.label,
     required this.code,
@@ -34,6 +35,9 @@ class TdType extends ThemeExtension<TdType> {
 
   /// Sans 17/24 semibold — card and sheet titles.
   final TextStyle title;
+
+  /// Sans 15/22 semibold — note card / sheet titles (docs/13 §6).
+  final TextStyle cardTitle;
 
   /// Sans 22/28 semibold — screen titles.
   final TextStyle screen;
@@ -96,6 +100,12 @@ class TdType extends ThemeExtension<TdType> {
         weight: FontWeight.w600,
         letterSpacing: -0.17, // -0.01 em
       ),
+      cardTitle: sans(
+        size: 15,
+        height: 22,
+        weight: FontWeight.w600,
+        letterSpacing: -0.15, // -0.01 em
+      ),
       screen: sans(
         size: 22,
         height: 28,
@@ -111,12 +121,14 @@ class TdType extends ThemeExtension<TdType> {
   /// Body style for the current width class.
   TextStyle bodyFor(bool phone) => phone ? bodyPhone : body;
 
+  @override
   TdType copyWith({
     TextStyle? meta,
     TextStyle? secondary,
     TextStyle? body,
     TextStyle? bodyPhone,
     TextStyle? title,
+    TextStyle? cardTitle,
     TextStyle? screen,
     TextStyle? label,
     TextStyle? code,
@@ -128,6 +140,7 @@ class TdType extends ThemeExtension<TdType> {
       body: body ?? this.body,
       bodyPhone: bodyPhone ?? this.bodyPhone,
       title: title ?? this.title,
+      cardTitle: cardTitle ?? this.cardTitle,
       screen: screen ?? this.screen,
       label: label ?? this.label,
       code: code ?? this.code,
@@ -146,6 +159,7 @@ class TdType extends ThemeExtension<TdType> {
       body: mix(body, other.body),
       bodyPhone: mix(bodyPhone, other.bodyPhone),
       title: mix(title, other.title),
+      cardTitle: mix(cardTitle, other.cardTitle),
       screen: mix(screen, other.screen),
       label: mix(label, other.label),
       code: mix(code, other.code),

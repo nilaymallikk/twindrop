@@ -5,7 +5,7 @@
 > **BLOCKED** with the reason. See `AGENTS.md`.
 
 ## Current state
-- Phase: **6 — packaging and release** (phases 0-5 implemented; see "Implemented")
+- Phase: **10 — packaging & release** (phases 0-9 implemented; see "Implemented")
 - Date: 2026-10-21
 - Host: Fedora Linux 44 (Workstation), x86_64, GNOME/Wayland session on `DISPLAY=:0`
 - Working dir: `/data/Projects/TwinDrop`
@@ -89,8 +89,8 @@ rather than only the flattering one.
 ## Artifacts
 | Artifact | Path | Bytes | SHA-256 | Launched/installed? |
 |---|---|---:|---|---|
-| AppImage | `dist/TwinDrop-x86_64.AppImage` | 44 680 384 | `20ed2fc0fe7fa4e9e7afd994033b2df05246be6a0f3ab5c7273e6593d1bf9d55` | **yes** — see below |
-| APK | `dist/twindrop.apk` | 81 169 578 | `6df5a6d70e715c3f33f5b7bfc254be382a961ad06d4de901b886a97927a4a483` | **no** — no device attached |
+| AppImage | `dist/TwinDrop-x86_64.AppImage` | 44 680 384 | `7dc46ebbb24315fc40f2f49dfc6b358d9118c36e8c267ba730ccdb2c899601d7` | **yes** — see below |
+| APK | `dist/twindrop.apk` | 81 169 578 | `73a2cedc18d3af29782baa3669d922f64d42d92fc91eaeb01fb278d0f822c4d2` | **no** — no device attached |
 
 ### APK contents verified with `aapt2 dump badging` / `aapt2 dump xmltree`
 - `package app.twindrop`, versionName `1.0.0`, minSdk **26**, targetSdk **36** (docs/06 §1).
@@ -110,13 +110,13 @@ rather than only the flattering one.
 ### AppImage launch evidence (Fedora GNOME, Wayland, `DISPLAY=:0`)
 ```
 $ ./dist/TwinDrop-x86_64.AppImage --hidden
-(app.twindrop:171070): Atk-CRITICAL **: atk_socket_embed: assertion 'plug_id != NULL' failed
+(app.twindrop:213980): Atk-CRITICAL **: atk_socket_embed: assertion 'plug_id != NULL' failed
 [IMPORTANT:flutter/shell/platform/embedder/embedder_surface_gl_impeller.cc(126)] Using the Impeller rendering backend (OpenGLESSDF).
 ```
-- The image mounted through FUSE and ran `/tmp/.mount_TwinDrbGHhVY/usr/lib/twindrop/twindrop --hidden`.
-- The process was still alive 12 s after launch (no crash, no missing-library error).
+- The image mounted through FUSE and ran `/tmp/.mount_TwinDr*/usr/lib/twindrop/twindrop --hidden`.
+- The process was still alive 11 s after launch (no crash, no missing-library error).
 - The tray icon registered with the GNOME StatusNotifierWatcher:
-  `org.kde.StatusNotifierItem-171070-1` (PID 171070 = TwinDrop) in
+  `org.kde.StatusNotifierItem-213980-1` (PID 213980 = TwinDrop) in
   `RegisteredStatusNotifierItems`.
 - The replica was created and initialised: `~/.local/share/app.twindrop/twindrop.db`
   with 15 tables, `categories = [('inbox','Inbox',1)]`, `change_log = [(1,'category','inbox')]`,
@@ -198,6 +198,21 @@ $ wmctrl -l
 - The Android build now uses `minSdk = 26` (docs/06 §1) and picks up an optional
   `android/key.properties` for a real release signature, falling back to the debug key
   with a loud warning when it is absent.
+- **The Unicode guard was inert.** `isWellFormedUnicode` relied on `utf8.encode`
+  throwing for a lone surrogate, but it silently replaces it with U+FFFD — so a remote
+  row carrying `"\ud800"` was stored instead of being quarantined (SYNC-006). The code
+  units are now inspected directly.
+- **Editing a note's text kept a stale link.** `editedContent` only re-extracted the
+  link when the note had none, so a note edited away from its URL kept a link that was
+  no longer in the text. The link is now re-extracted from the new text.
+- **Validation errors escaped the error boundary.** The validators threw a raw
+  `FormatException` instead of the typed `ValidationError`, so the UI showed
+  "invalid category name" rather than something actionable. The validators now throw
+  the typed error and the app maps the common cases to copy that says what to do next.
+- `Peer.copyWith` treated `tokenHash: null` as "unchanged", so a revoked peer kept
+  its hash. The hash is now kept **on purpose** — `docs/05` needs it to answer 403 for
+  a revoked token and 401 for an unknown one — and `copyWith` grew an explicit
+  `clearTokenHash` flag (D-014).
 
 ## Next concrete task
 - Sign the release APK with a real keystore (needs a human: the keystore and its

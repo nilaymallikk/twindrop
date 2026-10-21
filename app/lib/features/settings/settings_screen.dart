@@ -427,6 +427,22 @@ class SettingsScreen extends StatelessWidget {
     return <Widget>[
       TdSettingsRow(label: 'Version', value: appVersion, monoValue: true),
       TdSettingsRow(
+        label: 'What this is',
+        description: 'TwinDrop moves text and links between your own phone and '
+            'your own desktop over your own Wi-Fi. There is no account, no '
+            'cloud and no analytics.',
+      ),
+      TdSettingsRow(
+        label: 'Your data',
+        description: 'Messages and notes stay on this device and on the paired '
+            'desktop. Nothing is sent anywhere else.',
+      ),
+      TdSettingsRow(
+        label: 'Open-source licences',
+        description: 'IBM Plex fonts are under the SIL Open Font License. '
+            'Flutter and the plugins keep their own licences.',
+      ),
+      TdSettingsRow(
         label: 'Diagnostics',
         description: 'Addresses, pin state, and connection tests.',
         onTap: onOpenDiagnostics,

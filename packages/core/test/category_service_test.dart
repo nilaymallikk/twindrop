@@ -96,23 +96,22 @@ void main() {
   });
 
   group('category name validation', () {
-    // KNOWN DEVIATION: `models/errors.dart` states that every failure that
-    // can cross a boundary - validation included - must be a typed
-    // `TwinDropError`, but `validateCategoryName()` throws a raw
-    // `FormatException`. The assertion below pins the current behaviour;
-    // see the finding in the test report (validators.dart:166).
+    // The error model in `models/errors.dart` says every failure that can cross
+    // a boundary - validation included - must be a typed `TwinDropError`, so
+    // `validateCategoryName()` throws `ValidationError`, not a raw
+    // `FormatException`.
     test('rejects an empty name', () async {
-      expect(() => notepad.createCategory(''), throwsA(isA<FormatException>()));
+      expect(() => notepad.createCategory(''), throwsA(isA<ValidationError>()));
     });
 
     test('rejects a whitespace-only name', () async {
       expect(
         () => notepad.createCategory('    '),
-        throwsA(isA<FormatException>()),
+        throwsA(isA<ValidationError>()),
       );
       expect(
         () => notepad.createCategory('\t\n '),
-        throwsA(isA<FormatException>()),
+        throwsA(isA<ValidationError>()),
       );
     });
 
@@ -124,7 +123,7 @@ void main() {
     test('rejects a name of 61 characters', () async {
       expect(
         () => notepad.createCategory('a' * 61),
-        throwsA(isA<FormatException>()),
+        throwsA(isA<ValidationError>()),
       );
     });
 

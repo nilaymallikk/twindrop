@@ -103,8 +103,9 @@ Item editedContent(
     throw const ValidationError('not an http(s) link');
   }
   if (url != null && url.trim().isEmpty) newUrl = null;
-  if (newUrl == null && url == null && !clearUrl) {
-    // Editing text may introduce or remove the first link.
+  if (url == null && !clearUrl) {
+    // Editing the text may introduce or remove the first link: re-extract it
+    // from the new text so the stored link never disagrees with the body.
     newUrl = firstValidUrl(newText)?.url;
   }
   if (newUrl != null && cleanInstagramLinks) {

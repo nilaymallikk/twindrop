@@ -62,7 +62,9 @@ class PeerRegistry {
     if (peer == null) return null;
     final updated = peer.copyWith(
       revokedAt: DateTime.now().millisecondsSinceEpoch,
-      tokenHash: null,
+      // The token hash is deliberately kept: `docs/05` says an unknown token
+      // is 401 but a *revoked* one is 403, and the hash is the only way to tell
+      // the two apart. It is still only sha256(token), never the token.
     );
     await _db.putPeer(updated);
     _bus.notify();

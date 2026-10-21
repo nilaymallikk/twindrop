@@ -13,6 +13,8 @@ cd "$(dirname "$0")/.."
 # shellcheck source=env.sh
 . tool/env.sh
 
+REPO="$(pwd)"
+
 SKIP_ANDROID=0
 SKIP_APPIMAGE=0
 for arg in "$@"; do

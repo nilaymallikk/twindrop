@@ -65,6 +65,7 @@ class Peer {
     int? ackedSeq,
     int? protocolVersion,
     int? revokedAt,
+    bool clearTokenHash = false,
     bool clearRevokedAt = false,
   }) =>
       Peer(
@@ -72,7 +73,9 @@ class Peer {
         name: name ?? this.name,
         kind: kind ?? this.kind,
         roleOfPeer: roleOfPeer ?? this.roleOfPeer,
-        tokenHash: tokenHash ?? this.tokenHash,
+        // `null` means "unchanged"; clearing needs an explicit flag so a
+        // revoked peer really loses its token hash.
+        tokenHash: clearTokenHash ? null : (tokenHash ?? this.tokenHash),
         tokenRef: tokenRef ?? this.tokenRef,
         certFp: certFp ?? this.certFp,
         lastHost: lastHost ?? this.lastHost,

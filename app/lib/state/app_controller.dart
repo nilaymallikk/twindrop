@@ -1188,7 +1188,24 @@ class AppController extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Turns a failure into copy the user can act on (`docs/02`): every message
+  /// says what to do next and never repeats the payload back.
   String _messageFor(Object error) {
+    if (error is ValidationError) {
+      switch (error.message) {
+        case 'invalid category name':
+          return 'Use a name of 1 to 60 letters that is not already used.';
+        case 'text too large':
+          return 'That is too long to send. Shorten it and try again.';
+        case 'title too long':
+          return 'That title is too long.';
+        case 'text is empty':
+          return 'Type something before sending.';
+        case 'text is not valid UTF-8':
+          return 'That text contains characters that cannot be sent.';
+      }
+      return 'That input was not accepted. Check it and try again.';
+    }
     if (error is TwinDropError) return error.message;
     if (error is FormatException) return error.message;
     return 'Something went wrong. Try again.';

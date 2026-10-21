@@ -241,11 +241,11 @@ void main() {
     );
 
     test('validateMessageText throws instead of truncating', () {
-      expect(() => validateMessageText(''), throwsFormatException);
-      expect(() => validateMessageText('  '), throwsFormatException);
+      expect(() => validateMessageText(''), throwsA(isA<ValidationError>()));
+      expect(() => validateMessageText('  '), throwsA(isA<ValidationError>()));
       expect(
         () => validateMessageText('a' * (maxMessageBytes + 1)),
-        throwsFormatException,
+        throwsA(isA<ValidationError>()),
       );
       expect(() => validateMessageText('hello'), returnsNormally);
     });
@@ -253,7 +253,7 @@ void main() {
     test('validateNoteText throws instead of truncating', () {
       expect(
         () => validateNoteText('a' * (maxNoteBytes + 1)),
-        throwsFormatException,
+        throwsA(isA<ValidationError>()),
       );
       expect(() => validateNoteText('hello'), returnsNormally);
     });
@@ -265,7 +265,7 @@ void main() {
       expect(isValidTitle('a' * (maxTitleChars + 1)), isFalse);
       expect(
         () => validateTitle('a' * (maxTitleChars + 1)),
-        throwsFormatException,
+        throwsA(isA<ValidationError>()),
       );
       expect(() => validateTitle('a' * maxTitleChars), returnsNormally);
     });
@@ -278,7 +278,7 @@ void main() {
       } on Object catch (e) {
         caught = e;
       }
-      expect(caught, isA<FormatException>());
+      expect(caught, isA<ValidationError>());
       expect(tooBig.length, maxMessageBytes + 1);
     });
   });
@@ -301,13 +301,17 @@ void main() {
       expect(decodeUtf8Strict(utf8.encode('ok')), 'ok');
     });
 
-    test('isWellFormedUnicode accepts a lone surrogate (KNOWN WEAKNESS)', () {
+    test('isWellFormedUnicode rejects a lone surrogate', () {
       // `utf8.encode` replaces unpaired surrogates with U+FFFD instead of
-      // throwing, so this guard can never reject anything. Reported as a
-      // finding: it must not be relied upon as a UTF-8 validity check.
-      expect(isWellFormedUnicode('\uD800'), isTrue);
-      expect(utf8.encode('\uD800'), [0xEF, 0xBF, 0xBD]);
+      // throwing, so the guard inspects the code units directly. A remote row
+      // carrying a lone surrogate must be rejected (SYNC-006), not silently
+      // stored as U+FFFD.
+      expect(isWellFormedUnicode('\uD800'), isFalse);
+      expect(isWellFormedUnicode('\uDC00'), isFalse);
+      expect(isWellFormedUnicode('a\uD800b'), isFalse);
+      expect(isWellFormedUnicode('\uD800\uDC00'), isTrue);
       expect(isWellFormedUnicode('plain'), isTrue);
+      expect(isWellFormedUnicode('👋🏽'), isTrue);
     });
 
     test('the content hash is stable for identical content', () {
@@ -343,8 +347,8 @@ void main() {
     });
 
     test('validateCategoryName throws for invalid names', () {
-      expect(() => validateCategoryName(''), throwsFormatException);
-      expect(() => validateCategoryName('a' * 61), throwsFormatException);
+      expect(() => validateCategoryName(''), throwsA(isA<ValidationError>()));
+      expect(() => validateCategoryName('a' * 61), throwsA(isA<ValidationError>()));
       expect(() => validateCategoryName('ok'), returnsNormally);
     });
 

@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import '../models/errors.dart';
+
 /// Input validators and canonicalisation rules (`docs/04-data-model.md`
 /// §Validation, `docs/08-security-privacy.md`).
 
@@ -127,44 +129,58 @@ String? decodeUtf8Strict(List<int> bytes) {
 
 /// Reject text containing lone surrogates (invalid UTF-16 that cannot be
 /// encoded as UTF-8).
+///
+/// `utf8.encode` does not throw for a lone surrogate — it silently replaces
+/// it with U+FFFD — so the code units are inspected directly.
 bool isWellFormedUnicode(String text) {
-  try {
-    utf8.encode(text);
-    return true;
-  } on ArgumentError {
-    return false;
+  for (var i = 0; i < text.length; i++) {
+    final unit = text.codeUnitAt(i);
+    if (unit >= 0xD800 && unit <= 0xDBFF) {
+      // High surrogate: it must be followed by a low surrogate.
+      if (i + 1 >= text.length) return false;
+      final next = text.codeUnitAt(i + 1);
+      if (next < 0xDC00 || next > 0xDFFF) return false;
+      i++;
+    } else if (unit >= 0xDC00 && unit <= 0xDFFF) {
+      // Low surrogate without a preceding high surrogate.
+      return false;
+    }
   }
+  return true;
 }
 
+/// Validators throw the typed [ValidationError], not a raw exception: every
+/// failure that can reach the UI or the wire goes through the error model in
+/// `models/errors.dart` (`docs/03` §Error boundary).
 void validateMessageText(String text) {
   if (!isWellFormedUnicode(text)) {
-    throw const FormatException('text is not valid UTF-8');
+    throw const ValidationError('text is not valid UTF-8');
   }
   if (text.trim().isEmpty) {
-    throw const FormatException('text is empty');
+    throw const ValidationError('text is empty');
   }
   if (utf8.encode(text).length > maxMessageBytes) {
-    throw const FormatException('text too large');
+    throw const ValidationError('text too large');
   }
 }
 
 void validateNoteText(String text) {
   if (!isWellFormedUnicode(text)) {
-    throw const FormatException('text is not valid UTF-8');
+    throw const ValidationError('text is not valid UTF-8');
   }
   if (utf8.encode(text).length > maxNoteBytes) {
-    throw const FormatException('text too large');
+    throw const ValidationError('text too large');
   }
 }
 
 void validateTitle(String? title) {
   if (title != null && title.length > maxTitleChars) {
-    throw const FormatException('title too long');
+    throw const ValidationError('title too long');
   }
 }
 
 void validateCategoryName(String name) {
   if (!isValidCategoryName(name)) {
-    throw const FormatException('invalid category name');
+    throw const ValidationError('invalid category name');
   }
 }

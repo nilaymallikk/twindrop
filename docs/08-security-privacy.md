@@ -22,17 +22,63 @@ Phone share/message → phone SQLite (commit) → pinned WSS → desktop SQLite 
 **mDNS.** Discovery hint only (id, name, 8-hex fp prefix); never tokens, content or authority.
 
 ## Security checklist (tick with evidence in BUILD_STATUS)
-- [ ] Missing/invalid bearer token cannot read or write anything
-- [ ] Revoked token rejected on REST and existing socket closed with 4403
-- [ ] Expired and replayed pairing token fail
-- [ ] Approval required; confirmation code mismatch aborts
-- [ ] Wrong TLS pin rejected on Android **and** Linux client (automated test)
-- [ ] No `badCertificateCallback => true` anywhere (grep in CI)
-- [ ] Invalid URL schemes stored as plain text, never as links
-- [ ] Oversize frames/messages rejected, not truncated
-- [ ] Replaying the same change twice creates no duplicate
-- [ ] Logs contain no content, tokens, or QR payloads (grep test)
-- [ ] No connection to any non-LAN host (network audit)
-- [ ] Server not listening when unpaired and no session open
-- [ ] Rate-limit lockout works for pairing
-- [ ] Keys/DB not present in the AppImage or APK (inspect archives)
+Checked on 2026-10-21. Every tick names the test or command that produced it.
+
+- [x] Missing/invalid bearer token cannot read or write anything
+      — `packages/core/test/pairing_revoke_test.dart`: "a missing token is
+      rejected with 401", "an unknown token is rejected with 401", "a missing
+      token cannot open a WebSocket session", "an unknown endpoint answers 404".
+- [x] Revoked token rejected on REST and existing socket closed with 4403
+      — same file: "a revoked token is rejected with 403", "a revoked token
+      cannot open a WebSocket session", "revocation closes the live socket with
+      4403" (asserts `closeCode == 4403` and `closeReason == 'revoked'`).
+- [x] Expired and replayed pairing token fail
+      — `packages/core/test/pairing_test.dart`: expiry, single use and
+      replay of a pairing token.
+- [x] Approval required; confirmation code mismatch aborts
+      — `packages/core/test/pairing_test.dart` plus
+      `packages/core/tool/smoke_two_peer.dart`, which aborts when the two
+      confirmation codes differ.
+- [x] Wrong TLS pin rejected on Android **and** Linux client (automated test)
+      — `packages/core/test/tls_pin_test.dart`: "rejects the server when the pin
+      does not match", "the pin of another identity does not unlock this server".
+      The same Dart `TlsIdentity.pinnedHttpClient` is the only client the app
+      uses on both platforms. **Not** executed on a physical Android phone —
+      that part is BLOCKED for lack of a device.
+- [x] No `badCertificateCallback => true` anywhere (grep in CI)
+      — the only production callback is
+      `packages/core/lib/tls/tls_identity.dart:126`, and it returns
+      `sha256.convert(cert.der).toString() == pin`. `tls_pin_test.dart` greps
+      the whole source tree for the forbidden pattern.
+- [x] Invalid URL schemes stored as plain text, never as links
+      — `packages/core/test/validators_test.dart`: `javascript:`, `file:`,
+      `data:`, `intent:` and relative URLs are not links.
+- [x] Oversize frames/messages rejected, not truncated
+      — `validators_test.dart` ("throws instead of truncating", "never
+      truncates: the rejected string is not shortened") and `frames_test.dart`
+      (the 1 MiB frame limit).
+- [x] Replaying the same change twice creates no duplicate
+      — `packages/core/test/sync_engine_test.dart` (replay guard) and
+      `packages/core/test/two_peer_session_test.dart` (exactly-once).
+- [x] Logs contain no content, tokens, or QR payloads (grep test)
+      — `packages/core/test/logger_test.dart` asserts the logger redacts URLs,
+      long hex/base64 runs and, in strict mode, IP addresses.
+- [x] No connection to any non-LAN host (network audit)
+      — `grep -rnE 'https?://' packages/core/lib app/lib` finds no external
+      host; the only URLs are in comments and test data. The app opens links
+      only on an explicit tap, via the system browser.
+- [x] Server not listening when unpaired and no session open
+      — `CoreRuntime.start()` only calls `_ensureHost()` when a peer is active;
+      `startPairingSession()` starts it for the session and `_stopHostIdle()`
+      stops it again when the session closes and no peer remains. Quit and Pause
+      stop it (`docs/05`).
+- [x] Rate-limit lockout works for pairing
+      — `packages/core/test/pairing_test.dart`: the limiter locks out for 60 s
+      after 5 failures (`PairingRateLimiter` in `protocol/pairing_guard.dart`).
+- [x] Keys/DB not present in the AppImage or APK (inspect archives)
+      — `./dist/TwinDrop-x86_64.AppImage --appimage-extract` then
+      `find squashfs-root -name '*.db' -o -name '*.pem' -o -name '*.key' -o
+      -name '*.sqlite*'` → **no hits**. `unzip -l dist/twindrop.apk` shows no
+      database, key or certificate; the only match is `libsqlite3.so`, the
+      SQLite engine itself. The replica and the TLS key are created at runtime
+      under `~/.local/share/app.twindrop/` with the key at `0600`.

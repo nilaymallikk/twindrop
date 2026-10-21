@@ -71,7 +71,7 @@ void main() {
           hlc: '000000000001000-00001-a',
           createdAt: 1000,
         ),
-        throwsA(isA<FormatException>()),
+        throwsA(isA<ValidationError>()),
       );
     });
 
@@ -85,7 +85,7 @@ void main() {
           hlc: '000000000001000-00001-a',
           createdAt: 1000,
         ),
-        throwsA(isA<FormatException>()),
+        throwsA(isA<ValidationError>()),
       );
     });
 
@@ -146,7 +146,7 @@ void main() {
           hlc: '000000000001000-00001-a',
           createdAt: 1000,
         ),
-        throwsA(isA<FormatException>()),
+        throwsA(isA<ValidationError>()),
       );
     });
 
@@ -233,10 +233,10 @@ void main() {
       expect(edited.kind, ItemKind.link);
     });
 
-    test('keeps the stored link when the new text has none', () {
-      // Documented behaviour: the stored link is only re-extracted from the
-      // text when the item has no link yet. Editing the text away from the
-      // link keeps the previously validated http(s) URL.
+    test('re-extracts the link when the edited text no longer has one', () {
+      // The stored link must always match the body: a note whose text was
+      // edited away from the link would otherwise keep a link that is not in
+      // the text any more.
       final withLink = buildNewItem(
         type: ItemType.note,
         text: 'see https://example.com/x',
@@ -250,8 +250,27 @@ void main() {
         text: 'no link any more',
         hlc: '000000000002000-00001-a',
       );
-      expect(edited.url, 'https://example.com/x');
+      expect(edited.url, isNull);
       expect(edited.text, 'no link any more');
+      expect(edited.kind, ItemKind.text);
+    });
+
+    test('re-extracts a new link when the edited text has one', () {
+      final withoutLink = buildNewItem(
+        type: ItemType.note,
+        text: 'just words',
+        deviceId: 'device-a',
+        deviceName: 'Device A',
+        hlc: '000000000001000-00001-a',
+        createdAt: 1000,
+      );
+      final edited = editedContent(
+        withoutLink,
+        text: 'now with https://example.com/y',
+        hlc: '000000000002000-00001-a',
+      );
+      expect(edited.url, 'https://example.com/y');
+      expect(edited.kind, ItemKind.link);
     });
 
     test('drops the link when it is cleared explicitly', () {

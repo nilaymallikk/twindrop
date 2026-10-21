@@ -121,3 +121,23 @@ link time.
 matching the versioned file in the same directory.
 **Reason:** The sysroot has to satisfy the linker, not just `pkg-config`. The script is
 idempotent and only ever creates links to files that already exist in the sysroot.
+
+## D-014 | 2026-10-21 | The revoked token hash is kept on purpose
+**Question:** `PeerRegistry.revoke` wrote `tokenHash: null`, but `Peer.copyWith` treats
+`null` as "unchanged", so the hash was never actually cleared.
+**Choice:** The hash is **kept** when a peer is revoked, and `Peer.copyWith` gained an
+explicit `clearTokenHash` flag for the cases that really do want to drop it.
+**Reason:** `docs/05` requires an unknown token to answer **401** and a *revoked* one to
+answer **403**. The stored hash is the only way to tell the two apart. It is still only
+`sha256(token)`, never the token, so nothing sensitive is retained.
+
+## D-015 | 2026-10-21 | Validation failures throw the typed error
+**Question:** The validators threw a raw `FormatException`, which escaped the service
+boundary even though `models/errors.dart` says every failure that can cross a boundary
+must be a `TwinDropError`.
+**Choice:** `validateMessageText`, `validateNoteText`, `validateTitle` and
+`validateCategoryName` throw `ValidationError`. The app maps the four common cases to
+actionable copy in `AppController._messageFor`.
+**Reason:** `docs/03` §Error boundary and `docs/02` ("every error says what to do
+next"). The raw exception told the user "invalid category name" instead of "use a name
+of 1 to 60 letters that is not already used".

@@ -13,15 +13,16 @@ class PeerRegistry {
     required AppDatabase db,
     required ChangeBus bus,
     required Logger logger,
-  })  : _db = db,
-        _bus = bus,
-        _logger = logger;
+  }) : _db = db,
+       _bus = bus,
+       _logger = logger;
 
   final AppDatabase _db;
   final ChangeBus _bus;
   final Logger _logger;
 
-  final StreamController<String> _revoked = StreamController<String>.broadcast();
+  final StreamController<String> _revoked =
+      StreamController<String>.broadcast();
 
   /// Emits peer ids as they are revoked, so live sockets can be closed with
   /// code 4403 (`docs/05` §Close codes).
@@ -51,8 +52,12 @@ class PeerRegistry {
   }
 
   Future<void> touch(String peerId, {String? host, int? port, int? at}) async {
-    await _db.touchPeerSeen(peerId, at ?? DateTime.now().millisecondsSinceEpoch,
-        host: host, port: port);
+    await _db.touchPeerSeen(
+      peerId,
+      at ?? DateTime.now().millisecondsSinceEpoch,
+      host: host,
+      port: port,
+    );
   }
 
   /// Desktop-side revoke (`PAIR-009`): keeps the row for the history/diagnostics
@@ -86,7 +91,10 @@ class PeerRegistry {
   Future<Peer> addPairedPeer(Peer peer) async {
     await _db.putPeer(peer);
     _bus.notify();
-    _logger.info('peer paired', fields: {'peer': peer.id, 'kind': peer.kind.wire});
+    _logger.info(
+      'peer paired',
+      fields: {'peer': peer.id, 'kind': peer.kind.wire},
+    );
     return peer;
   }
 

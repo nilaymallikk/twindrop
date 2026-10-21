@@ -100,7 +100,8 @@ Future<T?> showTdDialog<T>(
                               label: action.label,
                               variant: action.variant,
                               onPressed: () =>
-                                  Navigator.of(dialogContext).pop(action.result),
+                                  Navigator.of(dialogContext)
+                                      .pop(action.result),
                             ),
                         ],
                       ),
@@ -143,8 +144,9 @@ Future<bool> showTdConfirmDialog(
       TdDialogAction(
         label: confirmLabel,
         result: true,
-        variant:
-            destructive ? TdButtonVariant.destructive : TdButtonVariant.primary,
+        variant: destructive
+            ? TdButtonVariant.destructive
+            : TdButtonVariant.primary,
       ),
     ],
   );
@@ -217,8 +219,7 @@ Future<T?> showTdSheet<T>(
       if (MediaQuery.maybeDisableAnimationsOf(context) ?? false) {
         return child;
       }
-      final curved =
-          CurvedAnimation(parent: animation, curve: TdMotion.curve);
+      final curved = CurvedAnimation(parent: animation, curve: TdMotion.curve);
       return FadeTransition(
         opacity: curved,
         child: SlideTransition(
@@ -247,9 +248,12 @@ Future<T?> showTdActionSheet<T>(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         for (final item in items)
-          TdMenuRow<T>(item: item, onSelected: (value) {
-            Navigator.of(sheetContext).pop(value);
-          }),
+          TdMenuRow<T>(
+            item: item,
+            onSelected: (value) {
+              Navigator.of(sheetContext).pop(value);
+            },
+          ),
       ],
     ),
   );
@@ -267,12 +271,20 @@ Future<T?> showTdMenu<T>(
   const itemHeight = 36.0;
   const menuWidth = 220.0;
   final menuHeight = items.length * itemHeight + TdSpace.s8;
-  final left = globalPosition.dx
-      .clamp(TdSpace.s8, (overlaySize.width - menuWidth - TdSpace.s8).clamp(
-          TdSpace.s8, double.infinity));
-  final top = globalPosition.dy
-      .clamp(TdSpace.s8, (overlaySize.height - menuHeight - TdSpace.s8).clamp(
-          TdSpace.s8, double.infinity));
+  final left = globalPosition.dx.clamp(
+    TdSpace.s8,
+    (overlaySize.width - menuWidth - TdSpace.s8).clamp(
+      TdSpace.s8,
+      double.infinity,
+    ),
+  );
+  final top = globalPosition.dy.clamp(
+    TdSpace.s8,
+    (overlaySize.height - menuHeight - TdSpace.s8).clamp(
+      TdSpace.s8,
+      double.infinity,
+    ),
+  );
 
   return showGeneralDialog<T>(
     context: context,
@@ -296,9 +308,12 @@ Future<T?> showTdMenu<T>(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
                   for (final item in items)
-                    TdMenuRow<T>(item: item, onSelected: (value) {
-                      Navigator.of(menuContext).pop(value);
-                    }),
+                    TdMenuRow<T>(
+                      item: item,
+                      onSelected: (value) {
+                        Navigator.of(menuContext).pop(value);
+                      },
+                    ),
                 ],
               ),
             ),
@@ -333,8 +348,8 @@ class TdMenuRow<T> extends StatelessWidget {
     final color = !enabled
         ? tokens.muted
         : item.destructive
-            ? tokens.error
-            : tokens.text;
+        ? tokens.error
+        : tokens.text;
     final row = TdPressable(
       onPressed: enabled ? () => onSelected(item.result) : null,
       enabled: enabled,

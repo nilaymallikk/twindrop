@@ -118,8 +118,9 @@ Future<void> _runLinux(List<String> args) async {
   );
 
   final appImage = Platform.environment['APPIMAGE'];
-  final executable =
-      (appImage != null && appImage.isNotEmpty) ? appImage : Platform.resolvedExecutable;
+  final executable = (appImage != null && appImage.isNotEmpty)
+      ? appImage
+      : Platform.resolvedExecutable;
 
   controller = AppController(
     paths: paths,
@@ -130,8 +131,7 @@ Future<void> _runLinux(List<String> args) async {
         required String label,
         required bool connected,
         required int unread,
-      }) =>
-          shell.setStatus(label: label, connected: connected, unread: unread),
+      }) => shell.setStatus(label: label, connected: connected, unread: unread),
       onPaused: shell.setPaused,
       isAutostartEnabled: autostart.isEnabled,
       setAutostart: (enabled) =>

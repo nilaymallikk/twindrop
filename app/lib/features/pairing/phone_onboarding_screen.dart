@@ -131,7 +131,8 @@ class _PhoneOnboardingScreenState extends State<PhoneOnboardingScreen> {
         _title(
           context,
           'Set up TwinDrop',
-          subtitle: 'Pair this phone with the desktop. Both devices must be on '
+          subtitle:
+              'Pair this phone with the desktop. Both devices must be on '
               'the same Wi-Fi.',
         ),
         TdButton(
@@ -183,24 +184,17 @@ class _PhoneOnboardingScreenState extends State<PhoneOnboardingScreen> {
         _title(
           context,
           'Enter the address',
-          subtitle: 'Type the address shown on the desktop, then the pairing '
+          subtitle:
+              'Type the address shown on the desktop, then the pairing '
               'code next to it.',
         ),
         TdSectionLabel('Address'),
         const SizedBox(height: TdSpace.s8),
-        _Field(
-          controller: _address,
-          hint: '192.168.1.23:47321',
-          mono: true,
-        ),
+        _Field(controller: _address, hint: '192.168.1.23:47321', mono: true),
         const SizedBox(height: TdSpace.s16),
         TdSectionLabel('Pairing code'),
         const SizedBox(height: TdSpace.s8),
-        _Field(
-          controller: _code,
-          hint: '4-character code',
-          mono: true,
-        ),
+        _Field(controller: _code, hint: '4-character code', mono: true),
         if (error != null) ...<Widget>[
           const SizedBox(height: TdSpace.s12),
           TdErrorState(message: error),
@@ -212,9 +206,9 @@ class _PhoneOnboardingScreenState extends State<PhoneOnboardingScreen> {
           onPressed: widget.data.busy
               ? null
               : () => widget.onSubmitManual(
-                    _address.text.trim(),
-                    _code.text.trim(),
-                  ),
+                  _address.text.trim(),
+                  _code.text.trim(),
+                ),
         ),
         const SizedBox(height: TdSpace.s8),
         TdButton(
@@ -235,7 +229,8 @@ class _PhoneOnboardingScreenState extends State<PhoneOnboardingScreen> {
         _title(
           context,
           'Check the security code',
-          subtitle: 'Compare this with the code on the desktop. They must '
+          subtitle:
+              'Compare this with the code on the desktop. They must '
               'match exactly.',
         ),
         if (fingerprint == null)
@@ -258,7 +253,8 @@ class _PhoneOnboardingScreenState extends State<PhoneOnboardingScreen> {
           variant: TdButtonVariant.secondary,
           expand: true,
           onPressed: widget.onCancel,
-        ),      ],
+        ),
+      ],
     );
   }
 
@@ -270,7 +266,8 @@ class _PhoneOnboardingScreenState extends State<PhoneOnboardingScreen> {
         _title(
           context,
           'Confirm the code',
-          subtitle: 'The desktop shows the same code. Approve only if they '
+          subtitle:
+              'The desktop shows the same code. Approve only if they '
               'match.',
         ),
         Center(child: TdConfirmationCode(code: code)),
@@ -305,7 +302,8 @@ class _PhoneOnboardingScreenState extends State<PhoneOnboardingScreen> {
         _title(
           context,
           'Two small permissions',
-          subtitle: 'TwinDrop works without them; they only make delivery '
+          subtitle:
+              'TwinDrop works without them; they only make delivery '
               'faster and more reliable. You can skip any step.',
         ),
         if (current == null)
@@ -337,7 +335,8 @@ class _PhoneOnboardingScreenState extends State<PhoneOnboardingScreen> {
         _title(
           context,
           'You are paired',
-          subtitle: 'Messages and links now sync between this phone and '
+          subtitle:
+              'Messages and links now sync between this phone and '
               '${widget.data.desktopName ?? 'the desktop'}.',
         ),
         TdButton(
@@ -439,7 +438,8 @@ class _QrScannerState extends State<_QrScanner> {
       if (value == null || value.isEmpty) continue;
       _handled = true;
       widget.onSubmitQr(value);
-      return;    }
+      return;
+    }
   }
 }
 
@@ -509,8 +509,9 @@ class _Field extends StatelessWidget {
       ],
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: (mono ? context.tdType.mono : context.tdType.body)
-            .copyWith(color: tokens.muted),
+        hintStyle: (mono ? context.tdType.mono : context.tdType.body).copyWith(
+          color: tokens.muted,
+        ),
         filled: true,
         fillColor: tokens.surface,
         contentPadding: const EdgeInsets.symmetric(

@@ -51,5 +51,6 @@ extension TdStyles on TextStyle {
   static TextStyle metaOf(BuildContext context) => context.tdType.meta;
 
   /// Secondary copy: sans 13, textSecondary.
-  static TextStyle secondaryOf(BuildContext context) => context.tdType.secondary;
+  static TextStyle secondaryOf(BuildContext context) =>
+      context.tdType.secondary;
 }

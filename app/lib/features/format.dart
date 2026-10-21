@@ -75,7 +75,7 @@ String tdCountdownLabel(Duration remaining) {
 
 /// Groups chat entries by local day for date separators. Returned keys are
 /// `today`-style labels in chronological order of appearance.
-List<String> tdDateKeys(Iterable<int> createdAtMs) =>
-    <String>{for (final ms in createdAtMs) _dayKey(
-          DateTime.fromMillisecondsSinceEpoch(ms).toLocal(),
-        )}.toList();
+List<String> tdDateKeys(Iterable<int> createdAtMs) => <String>{
+  for (final ms in createdAtMs)
+    _dayKey(DateTime.fromMillisecondsSinceEpoch(ms).toLocal()),
+}.toList();

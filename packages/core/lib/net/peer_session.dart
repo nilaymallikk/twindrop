@@ -33,21 +33,21 @@ class PeerSession {
     required Future<void> Function(int code, String reason) closeSocket,
     required this.isHost,
     required void Function(PeerSession session, int? code, String? reason)
-        onEnded,
+    onEnded,
     int Function()? nowMs,
-  })  : _db = db,
-        _sync = sync,
-        _bus = bus,
-        _peers = peers,
-        _logger = logger,
-        _localDeviceId = localDeviceId,
-        _localDeviceName = localDeviceName,
-        _localKind = localKind,
-        _appVersion = appVersion,
-        _sendRaw = sendRaw,
-        _closeSocket = closeSocket,
-        _onEnded = onEnded,
-        _nowMs = nowMs ?? (() => DateTime.now().millisecondsSinceEpoch);
+  }) : _db = db,
+       _sync = sync,
+       _bus = bus,
+       _peers = peers,
+       _logger = logger,
+       _localDeviceId = localDeviceId,
+       _localDeviceName = localDeviceName,
+       _localKind = localKind,
+       _appVersion = appVersion,
+       _sendRaw = sendRaw,
+       _closeSocket = closeSocket,
+       _onEnded = onEnded,
+       _nowMs = nowMs ?? (() => DateTime.now().millisecondsSinceEpoch);
 
   final AppDatabase _db;
   final SyncEngine _sync;
@@ -97,12 +97,14 @@ class PeerSession {
   /// Client side: send `hello` immediately, then wait for `ready`.
   Future<void> startClient() async {
     _startTimers(expectsHandshake: true);
-    await _send(HelloFrame(
-      deviceId: _localDeviceId,
-      name: _localDeviceName,
-      kind: _localKind,
-      appVersion: _appVersion,
-    ));
+    await _send(
+      HelloFrame(
+        deviceId: _localDeviceId,
+        name: _localDeviceName,
+        kind: _localKind,
+        appVersion: _appVersion,
+      ),
+    );
   }
 
   void _startTimers({required bool expectsHandshake}) {
@@ -152,15 +154,15 @@ class PeerSession {
     } on UnsupportedVersionError {
       await _close(CloseCodes.upgradeRequired, CloseCodes.reasonUpgrade);
     } on TwinDropError catch (e) {
-      _logger.warn('ws: frame failed', fields: {
-        'peer': peerId,
-        'code': e.code,
-      });
+      _logger.warn(
+        'ws: frame failed',
+        fields: {'peer': peerId, 'code': e.code},
+      );
     } on Object catch (e) {
-      _logger.warn('ws: unexpected frame failure', fields: {
-        'peer': peerId,
-        'error': e.runtimeType,
-      });
+      _logger.warn(
+        'ws: unexpected frame failure',
+        fields: {'peer': peerId, 'error': e.runtimeType},
+      );
     }
   }
 
@@ -183,12 +185,14 @@ class PeerSession {
           if (!_readyCompleter.isCompleted) _readyCompleter.complete();
           await _peers.touch(peerId);
           final seq = await _sync.localSeq();
-          await _send(ReadyFrame(
-            deviceId: _localDeviceId,
-            name: _localDeviceName,
-            seq: seq,
-            serverTime: _nowMs(),
-          ));
+          await _send(
+            ReadyFrame(
+              deviceId: _localDeviceId,
+              name: _localDeviceName,
+              seq: seq,
+              serverTime: _nowMs(),
+            ),
+          );
           _busSub ??= _bus.stream.listen((_) => _notifyPeer());
           await _pull();
         }
@@ -216,14 +220,21 @@ class PeerSession {
           page: frame.page,
         );
         await _send(AckFrame(seq: frame.page.next));
-        _logger.debug('ws: page applied', fields: {
-          'peer': peerId,
-          'applied': result.applied,
-          'more': frame.page.more,
-        });
+        _logger.debug(
+          'ws: page applied',
+          fields: {
+            'peer': peerId,
+            'applied': result.applied,
+            'more': frame.page.more,
+          },
+        );
         if (frame.page.more) {
-          await _send(PullFrame(after: frame.page.next,
-              limit: SyncEngine.defaultPageSize));
+          await _send(
+            PullFrame(
+              after: frame.page.next,
+              limit: SyncEngine.defaultPageSize,
+            ),
+          );
         }
       case NotifyFrame():
         // Inline rows are an optimisation; ignoring them can never lose data
@@ -236,10 +247,10 @@ class PeerSession {
       case PongFrame():
         _lastPong = _nowMs();
       case ErrorFrame():
-        _logger.warn('ws: peer error frame', fields: {
-          'peer': peerId,
-          'code': frame.code,
-        });
+        _logger.warn(
+          'ws: peer error frame',
+          fields: {'peer': peerId, 'code': frame.code},
+        );
       case UnknownFrame():
         // Forward compatible: ignore unknown types.
         break;
@@ -275,10 +286,9 @@ class PeerSession {
           await _close(CloseCodes.unauthorized, CloseCodes.reasonUnauthorized);
           return;
         }
-        await _send(PullFrame(
-          after: peer.remoteSeq,
-          limit: SyncEngine.defaultPageSize,
-        ));
+        await _send(
+          PullFrame(after: peer.remoteSeq, limit: SyncEngine.defaultPageSize),
+        );
       } while (_pullQueued && _ready && !_closed);
     } finally {
       _pulling = false;

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
+
 import 'ids.dart';
 
 /// Namespace for deterministic conflict-copy ids. Fixed forever: changing it
@@ -46,10 +47,8 @@ String confirmationCode({
 }) {
   final hmac = Hmac(sha256, pairingTokenBytes);
   final digest = hmac.convert(utf8.encode('$requestId$fingerprintHex')).bytes;
-  final value = ((digest[0] << 24) |
-          (digest[1] << 16) |
-          (digest[2] << 8) |
-          digest[3]) &
+  final value =
+      ((digest[0] << 24) | (digest[1] << 16) | (digest[2] << 8) | digest[3]) &
       0xFFFFFFFF;
   return (value % 10000).toString().padLeft(4, '0');
 }

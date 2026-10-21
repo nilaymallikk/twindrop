@@ -27,13 +27,13 @@ class TdToggle extends StatelessWidget {
     final trackColor = !enabled
         ? tokens.raised
         : value
-            ? tokens.paper
-            : tokens.surface;
+        ? tokens.paper
+        : tokens.surface;
     final knobColor = !enabled
         ? tokens.muted
         : value
-            ? tokens.onPaper
-            : tokens.muted;
+        ? tokens.onPaper
+        : tokens.muted;
     final side = context.tdControlHeight;
 
     return Semantics(

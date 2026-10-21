@@ -10,7 +10,11 @@ import '../services/notepad_service.dart';
 /// Exported document plus the suggested file name (the app layer writes the
 /// file, core stays filesystem-free for the DB path rules in `docs/04`).
 class ExportDocument {
-  const ExportDocument({required this.fileName, required this.content, required this.mimeType});
+  const ExportDocument({
+    required this.fileName,
+    required this.content,
+    required this.mimeType,
+  });
 
   final String fileName;
   final String content;
@@ -27,10 +31,10 @@ class ExportService {
     required NotepadService notepad,
     required String deviceName,
     DateTime Function()? now,
-  })  : _db = db,
-        _notepad = notepad,
-        _deviceName = deviceName,
-        _now = now ?? DateTime.now;
+  }) : _db = db,
+       _notepad = notepad,
+       _deviceName = deviceName,
+       _now = now ?? DateTime.now;
 
   final AppDatabase _db;
   final NotepadService _notepad;
@@ -77,8 +81,9 @@ class ExportService {
         }
         buffer
           ..writeln(
-              '_${_iso(DateTime.fromMillisecondsSinceEpoch(note.createdAt, isUtc: true))}'
-              '${note.pinned ? ' · pinned' : ''}_')
+            '_${_iso(DateTime.fromMillisecondsSinceEpoch(note.createdAt, isUtc: true))}'
+            '${note.pinned ? ' · pinned' : ''}_',
+          )
           ..writeln();
       }
     }
@@ -93,7 +98,9 @@ class ExportService {
     final categories = await _categories(categoryId);
     final notes = <Map<String, dynamic>>[];
     for (final category in categories) {
-      for (final note in await _notepad.notesForExport(categoryId: category.id)) {
+      for (final note in await _notepad.notesForExport(
+        categoryId: category.id,
+      )) {
         notes.add(_noteJson(note));
       }
     }
@@ -110,7 +117,7 @@ class ExportService {
             if (c.color != null) 'color': c.color,
             'sortOrder': c.sortOrder,
             'isInbox': c.isInbox,
-          }
+          },
       ],
       'notes': notes,
     };
@@ -132,22 +139,23 @@ class ExportService {
   }
 
   Map<String, dynamic> _noteJson(Item note) => <String, dynamic>{
-        'id': note.id,
-        'type': note.type.wire,
-        'kind': note.kind.wire,
-        'text': note.text,
-        if (note.title != null) 'title': note.title,
-        if (note.url != null) 'url': note.url,
-        if (note.sourceApp != null) 'sourceApp': note.sourceApp,
-        if (note.categoryId != null) 'categoryId': note.categoryId,
-        if (note.sourceItemId != null) 'sourceItemId': note.sourceItemId,
-        'createdAt': _iso(
-            DateTime.fromMillisecondsSinceEpoch(note.createdAt, isUtc: true)),
-        'pinned': note.pinned,
-        'isConflictCopy': note.isConflictCopy,
-        'originDevice': note.originDevice,
-        'originName': note.originName,
-      };
+    'id': note.id,
+    'type': note.type.wire,
+    'kind': note.kind.wire,
+    'text': note.text,
+    if (note.title != null) 'title': note.title,
+    if (note.url != null) 'url': note.url,
+    if (note.sourceApp != null) 'sourceApp': note.sourceApp,
+    if (note.categoryId != null) 'categoryId': note.categoryId,
+    if (note.sourceItemId != null) 'sourceItemId': note.sourceItemId,
+    'createdAt': _iso(
+      DateTime.fromMillisecondsSinceEpoch(note.createdAt, isUtc: true),
+    ),
+    'pinned': note.pinned,
+    'isConflictCopy': note.isConflictCopy,
+    'originDevice': note.originDevice,
+    'originName': note.originName,
+  };
 
   String _fallbackTitle(Item note) {
     final t = note.text.trim();

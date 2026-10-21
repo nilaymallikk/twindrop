@@ -207,7 +207,10 @@ class SharePanelView extends StatelessWidget {
                   TdIcon(TdIcons.check, size: 18, color: tokens.ok),
                   const SizedBox(width: TdSpace.s8),
                   Expanded(
-                    child: Text('Saved to Inbox', style: context.tdType.cardTitle),
+                    child: Text(
+                      'Saved to Inbox',
+                      style: context.tdType.cardTitle,
+                    ),
                   ),
                 ],
               ),

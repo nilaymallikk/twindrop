@@ -7,10 +7,7 @@ import 'package:path_provider/path_provider.dart';
 /// AppImage mount or the APK; everything lives under XDG/app-support dirs
 /// (`docs/07-linux.md`, `docs/04-data-model.md` §Integrity).
 class AppPaths {
-  AppPaths({
-    required this.supportDir,
-    required this.documentsDir,
-  });
+  AppPaths({required this.supportDir, required this.documentsDir});
 
   /// App-private data: SQLite replica, TLS identity, quarantine exports.
   final Directory supportDir;

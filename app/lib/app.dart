@@ -71,11 +71,13 @@ class _TwinDropAppState extends State<TwinDropApp> with WidgetsBindingObserver {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _messengerKey.currentState
         ?..hideCurrentSnackBar()
-        ..showSnackBar(SnackBar(
-          content: Text(toast),
-          behavior: SnackBarBehavior.floating,
-          duration: const Duration(seconds: 3),
-        ));
+        ..showSnackBar(
+          SnackBar(
+            content: Text(toast),
+            behavior: SnackBarBehavior.floating,
+            duration: const Duration(seconds: 3),
+          ),
+        );
     });
   }
 
@@ -301,8 +303,8 @@ class _Root extends StatelessWidget {
       peerLabel: peer == null
           ? null
           : (peer.lastHost != null && peer.lastPort != null
-              ? '${peer.lastHost}:${peer.lastPort}'
-              : peer.kind.wire),
+                ? '${peer.lastHost}:${peer.lastPort}'
+                : peer.kind.wire),
       deviceId: controller.runtime?.deviceId,
       deviceName: controller.deviceName,
       localAddresses: diag?.localAddresses ?? const <String>[],
@@ -312,14 +314,16 @@ class _Root extends StatelessWidget {
       queueCount: diag?.queuedItems ?? 0,
       serverState: controller.isDesktop
           ? ((diag?.serverRunning ?? false)
-              ? 'Running on port ${diag?.port}'
-              : 'Stopped')
+                ? 'Running on port ${diag?.port}'
+                : 'Stopped')
           : null,
       ipPort: controller.isDesktop
           ? ((diag?.localAddresses.isNotEmpty ?? false)
-              ? '${diag!.localAddresses.first}:${diag.port}'
-              : null)
-          : (peer?.lastHost != null ? '${peer!.lastHost}:${peer.lastPort}' : null),
+                ? '${diag!.localAddresses.first}:${diag.port}'
+                : null)
+          : (peer?.lastHost != null
+                ? '${peer!.lastHost}:${peer.lastPort}'
+                : null),
       themeChoice: controller.themeChoice,
       onThemeChanged: controller.setTheme,
       notifications: controller.notifications,
@@ -334,33 +338,35 @@ class _Root extends StatelessWidget {
       onRevoke: peer == null
           ? null
           : () => _confirm(
-                context,
-                title: 'Remove ${peer.name}?',
-                message:
-                    'Its token is revoked and its live connection is closed. '
-                    'You can pair it again later.',
-                confirmLabel: 'Remove',
-                onConfirmed: () => controller.revokePeer(peer.id),
-              ),
+              context,
+              title: 'Remove ${peer.name}?',
+              message:
+                  'Its token is revoked and its live connection is closed. '
+                  'You can pair it again later.',
+              confirmLabel: 'Remove',
+              onConfirmed: () => controller.revokePeer(peer.id),
+            ),
       onUnpair: peer == null
           ? null
           : () => _confirm(
-                context,
-                title: 'Unpair this device?',
-                message: 'Local data stays on this device. The desktop can '
-                    'revoke the token later if it is offline.',
-                confirmLabel: 'Unpair',
-                onConfirmed: () async {
-                  await controller.unpair();
-                },
-              ),
+              context,
+              title: 'Unpair this device?',
+              message:
+                  'Local data stays on this device. The desktop can '
+                  'revoke the token later if it is offline.',
+              confirmLabel: 'Unpair',
+              onConfirmed: () async {
+                await controller.unpair();
+              },
+            ),
       onRetryNow: controller.retryNow,
       onExportMarkdown: () => controller.exportNotepad(markdown: true),
       onExportJson: () => controller.exportNotepad(markdown: false),
       onClearData: () => _confirm(
         context,
         title: 'Clear all TwinDrop data?',
-        message: 'Messages, notes, categories, pairing and tokens on this '
+        message:
+            'Messages, notes, categories, pairing and tokens on this '
             'device are deleted. This cannot be undone.',
         confirmLabel: 'Clear everything',
         destructive: true,
@@ -380,7 +386,8 @@ class _Root extends StatelessWidget {
       onKeepAliveChanged: (value) async {
         if (value) {
           await AndroidPlatform.startKeepAlive(
-              desktopName: controller.activePeer?.name);
+            desktopName: controller.activePeer?.name,
+          );
         } else {
           await AndroidPlatform.stopKeepAlive();
         }
@@ -415,56 +422,61 @@ class _Root extends StatelessWidget {
   }
 
   Future<void> _openNoteEditor(BuildContext context, Item? note) async {
-    await Navigator.of(context).push<void>(MaterialPageRoute(
-      builder: (_) => NoteEditorScreen(
-        categories: controller.categories,
-        note: note,
-        initialCategoryId: controller.selectedCategoryId,
-        onSave: (draft) async {
-          if (note == null) {
-            await controller.createNote(draft);
-          } else {
-            await controller.updateNote(note.id, draft);
-          }
-          if (context.mounted) Navigator.of(context).pop();
-        },
-        onCancel: () => Navigator.of(context).pop(),
-        onDelete: note == null
-            ? null
-            : () async {
-                await controller.deleteNote(note);
-                if (context.mounted) Navigator.of(context).pop();
-              },
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute(
+        builder: (_) => NoteEditorScreen(
+          categories: controller.categories,
+          note: note,
+          initialCategoryId: controller.selectedCategoryId,
+          onSave: (draft) async {
+            if (note == null) {
+              await controller.createNote(draft);
+            } else {
+              await controller.updateNote(note.id, draft);
+            }
+            if (context.mounted) Navigator.of(context).pop();
+          },
+          onCancel: () => Navigator.of(context).pop(),
+          onDelete: note == null
+              ? null
+              : () async {
+                  await controller.deleteNote(note);
+                  if (context.mounted) Navigator.of(context).pop();
+                },
+        ),
       ),
-    ));
+    );
   }
 
   Future<void> _openDiagnostics(BuildContext context) async {
-    final diag = controller.diagnostics ?? await controller.runtime!.diagnostics();
+    final diag =
+        controller.diagnostics ?? await controller.runtime!.diagnostics();
     if (!context.mounted) return;
     final peer = controller.activePeer;
-    await Navigator.of(context).push<void>(MaterialPageRoute(
-      builder: (_) => DiagnosticsScreen(
-        localAddresses: diag.localAddresses,
-        peerLabel: peer?.name,
-        peerLastAddress: (peer == null || peer.lastHost == null)
-            ? null
-            : '${peer.lastHost}:${peer.lastPort}',
-        mdnsSummary: diag.mdnsRunning ? 'Announcing' : 'Not available',
-        pinState: diag.fingerprint == null
-            ? null
-            : 'Pinned ${diag.fingerprint!.substring(0, 12)}…',
-        onTestConnection: controller.testConnection,
-        onManualAddress: (value) async {
-          await controller.setManualAddress(value);
-        },
-        onRetry: controller.retryNow,
-        firewallHint: controller.isDesktop
-            ? 'sudo firewall-cmd --add-port=${diag.port}/tcp'
-            : null,
-        serverPort: diag.port,
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute(
+        builder: (_) => DiagnosticsScreen(
+          localAddresses: diag.localAddresses,
+          peerLabel: peer?.name,
+          peerLastAddress: (peer == null || peer.lastHost == null)
+              ? null
+              : '${peer.lastHost}:${peer.lastPort}',
+          mdnsSummary: diag.mdnsRunning ? 'Announcing' : 'Not available',
+          pinState: diag.fingerprint == null
+              ? null
+              : 'Pinned ${diag.fingerprint!.substring(0, 12)}…',
+          onTestConnection: controller.testConnection,
+          onManualAddress: (value) async {
+            await controller.setManualAddress(value);
+          },
+          onRetry: controller.retryNow,
+          firewallHint: controller.isDesktop
+              ? 'sudo firewall-cmd --add-port=${diag.port}/tcp'
+              : null,
+          serverPort: diag.port,
+        ),
       ),
-    ));
+    );
   }
 
   Future<void> _openQuarantine(BuildContext context) async {
@@ -539,7 +551,10 @@ class _Root extends StatelessWidget {
     await Clipboard.setData(ClipboardData(text: value));
     if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Copied.'), behavior: SnackBarBehavior.floating),
+      const SnackBar(
+        content: Text('Copied.'),
+        behavior: SnackBarBehavior.floating,
+      ),
     );
   }
 

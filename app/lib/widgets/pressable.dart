@@ -76,8 +76,9 @@ class _TdPressableState extends State<TdPressable> {
     Widget interactive = FocusableActionDetector(
       enabled: _enabled,
       focusNode: widget.focusNode,
-      mouseCursor:
-          _enabled ? SystemMouseCursors.click : SystemMouseCursors.basic,
+      mouseCursor: _enabled
+          ? SystemMouseCursors.click
+          : SystemMouseCursors.basic,
       onShowFocusHighlight: (value) {
         if (_focused != value) setState(() => _focused = value);
       },

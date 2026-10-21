@@ -45,18 +45,18 @@ class AppDatabase extends _$AppDatabase {
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
-        onCreate: (m) async {
-          await m.createAll();
-          await _createFts();
-          await _createIndexes();
-        },
-        beforeOpen: (details) async {
-          await customStatement('PRAGMA journal_mode=WAL');
-          await customStatement('PRAGMA foreign_keys=ON');
-          await customStatement('PRAGMA synchronous=NORMAL');
-          await customStatement('PRAGMA busy_timeout=5000');
-        },
-      );
+    onCreate: (m) async {
+      await m.createAll();
+      await _createFts();
+      await _createIndexes();
+    },
+    beforeOpen: (details) async {
+      await customStatement('PRAGMA journal_mode=WAL');
+      await customStatement('PRAGMA foreign_keys=ON');
+      await customStatement('PRAGMA synchronous=NORMAL');
+      await customStatement('PRAGMA busy_timeout=5000');
+    },
+  );
 
   Future<void> _createFts() async {
     await customStatement(
@@ -87,15 +87,16 @@ class AppDatabase extends _$AppDatabase {
   // ---- settings (local only) ----
 
   Future<String?> getSetting(String key) async {
-    final row = await (select(settings)..where((t) => t.key.equals(key)))
-        .getSingleOrNull();
+    final row = await (select(
+      settings,
+    )..where((t) => t.key.equals(key))).getSingleOrNull();
     return row?.value;
   }
 
   Future<void> setSetting(String key, String value) async {
-    await into(settings).insertOnConflictUpdate(
-      SettingsCompanion.insert(key: key, value: value),
-    );
+    await into(
+      settings,
+    ).insertOnConflictUpdate(SettingsCompanion.insert(key: key, value: value));
   }
 
   Future<void> deleteSetting(String key) async {
@@ -150,7 +151,12 @@ class AppDatabase extends _$AppDatabase {
         '   OR text LIKE ? ESCAPE \'\\\' '
         '   OR url LIKE ? ESCAPE \'\\\' '
         'LIMIT ?',
-        variables: [Variable(like), Variable(like), Variable(like), Variable(limit)],
+        variables: [
+          Variable(like),
+          Variable(like),
+          Variable(like),
+          Variable(limit),
+        ],
       ).get();
       return rows.map((r) => r.read<String>('itemId')).toList();
     }
@@ -182,8 +188,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// SQLite user_version/schema sanity used by SET-005 migrations.
   Future<int> userVersion() async {
-    final row =
-        await customSelect('PRAGMA user_version').getSingle();
+    final row = await customSelect('PRAGMA user_version').getSingle();
     return row.read<int>('user_version');
   }
 }

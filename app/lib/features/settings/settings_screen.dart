@@ -188,9 +188,7 @@ class SettingsScreen extends StatelessWidget {
     final rows = <Widget>[
       TdSettingsRow(
         label: deviceName ?? 'This device',
-        description: peerName == null
-            ? 'Not paired'
-            : 'Paired with $peerName',
+        description: peerName == null ? 'Not paired' : 'Paired with $peerName',
         value: deviceId,
         monoValue: true,
       ),
@@ -199,11 +197,7 @@ class SettingsScreen extends StatelessWidget {
         trailing: TdStatus(status: status),
       ),
       if (ipPort != null)
-        TdSettingsRow(
-          label: 'Address',
-          value: ipPort,
-          monoValue: true,
-        ),
+        TdSettingsRow(label: 'Address', value: ipPort, monoValue: true),
       if (localAddresses.isNotEmpty)
         TdSettingsRow(
           label: 'Local addresses',
@@ -216,10 +210,7 @@ class SettingsScreen extends StatelessWidget {
         label: 'Waiting to sync',
         value: queueCount == 1 ? '1 item' : '$queueCount items',
       ),
-      TdSettingsRow(
-        label: 'Server',
-        value: serverState ?? 'Stopped',
-      ),
+      TdSettingsRow(label: 'Server', value: serverState ?? 'Stopped'),
       TdSettingsRow(
         label: 'Retry now',
         description: 'Try to reach your desktop immediately.',
@@ -242,7 +233,8 @@ class SettingsScreen extends StatelessWidget {
       if (onRevoke != null)
         TdSettingsRow(
           label: 'Remove this phone',
-          description: 'It loses access immediately. Its local data stays '
+          description:
+              'It loses access immediately. Its local data stays '
               'until you clear it on the phone.',
           destructive: true,
           onTap: () => _confirmRevoke(context),
@@ -269,7 +261,8 @@ class SettingsScreen extends StatelessWidget {
         ),
       TdToggleRow(
         label: 'Clean Instagram links',
-        description: 'Remove tracking parameters from shared Instagram and '
+        description:
+            'Remove tracking parameters from shared Instagram and '
             'Reels links.',
         value: cleanLinks,
         onChanged: onCleanLinksChanged,
@@ -285,8 +278,7 @@ class SettingsScreen extends StatelessWidget {
             ? 'Show a notification when a message arrives.'
             : 'Notifications are not available on this platform.',
         value: notifications,
-        onChanged:
-            notificationsSupported ? onNotificationsChanged : null,
+        onChanged: notificationsSupported ? onNotificationsChanged : null,
         disabledReason: notificationsSupported
             ? null
             : 'Notifications are not available on this platform.',
@@ -310,7 +302,8 @@ class SettingsScreen extends StatelessWidget {
     return <Widget>[
       TdToggleRow(
         label: 'Keep the connection open',
-        description: 'Runs one idle connection and shows a notification so '
+        description:
+            'Runs one idle connection and shows a notification so '
             'messages arrive while TwinDrop is closed.',
         value: keepAliveEnabled,
         onChanged: keepAliveSupported ? onKeepAliveChanged : null,
@@ -350,7 +343,7 @@ class SettingsScreen extends StatelessWidget {
         description: trayAvailable
             ? 'The window hides to the tray instead of closing.'
             : 'Your desktop is not showing tray icons, so TwinDrop stays in '
-                'a normal window.',
+                  'a normal window.',
         value: hideOnBlur,
         onChanged: trayAvailable ? onHideOnBlurChanged : null,
         disabledReason: trayAvailable
@@ -370,7 +363,8 @@ class SettingsScreen extends StatelessWidget {
         value: quickSendCommand,
         monoValue: true,
         enabled: quickSendCommand != null,
-        disabledReason: 'The quick-send command is not available in this '
+        disabledReason:
+            'The quick-send command is not available in this '
             'build.',
         trailing: onCopyQuickSend == null
             ? null
@@ -428,18 +422,21 @@ class SettingsScreen extends StatelessWidget {
       TdSettingsRow(label: 'Version', value: appVersion, monoValue: true),
       TdSettingsRow(
         label: 'What this is',
-        description: 'TwinDrop moves text and links between your own phone and '
+        description:
+            'TwinDrop moves text and links between your own phone and '
             'your own desktop over your own Wi-Fi. There is no account, no '
             'cloud and no analytics.',
       ),
       TdSettingsRow(
         label: 'Your data',
-        description: 'Messages and notes stay on this device and on the paired '
+        description:
+            'Messages and notes stay on this device and on the paired '
             'desktop. Nothing is sent anywhere else.',
       ),
       TdSettingsRow(
         label: 'Open-source licences',
-        description: 'IBM Plex fonts are under the SIL Open Font License. '
+        description:
+            'IBM Plex fonts are under the SIL Open Font License. '
             'Flutter and the plugins keep their own licences.',
       ),
       TdSettingsRow(
@@ -504,7 +501,8 @@ class SettingsScreen extends StatelessWidget {
     final confirmed = await showTdConfirmDialog(
       context,
       title: 'Remove this phone?',
-      message: 'It will have to pair again to sync. Its local data stays on '
+      message:
+          'It will have to pair again to sync. Its local data stays on '
           'the phone until you clear it there.',
       confirmLabel: 'Remove',
       destructive: true,
@@ -516,7 +514,8 @@ class SettingsScreen extends StatelessWidget {
     final confirmed = await showTdConfirmDialog(
       context,
       title: 'Unpair this device?',
-      message: 'Sync stops and the pairing is forgotten. Local data stays '
+      message:
+          'Sync stops and the pairing is forgotten. Local data stays '
           'until you clear it.',
       confirmLabel: 'Unpair',
       destructive: true,
@@ -528,7 +527,8 @@ class SettingsScreen extends StatelessWidget {
     final confirmed = await showTdConfirmDialog(
       context,
       title: 'Clear all data?',
-      message: 'Messages, notes and settings on this device are deleted. '
+      message:
+          'Messages, notes and settings on this device are deleted. '
           'Other devices keep their copies. This cannot be undone.',
       confirmLabel: 'Clear data',
       destructive: true,

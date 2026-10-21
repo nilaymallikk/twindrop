@@ -11,9 +11,9 @@ enum ItemType {
   const ItemType(this.wire);
   final String wire;
   static ItemType parse(String v) => values.firstWhere(
-        (e) => e.wire == v,
-        orElse: () => throw FormatException('unknown item type: $v'),
-      );
+    (e) => e.wire == v,
+    orElse: () => throw FormatException('unknown item type: $v'),
+  );
 }
 
 enum ItemKind {
@@ -23,9 +23,9 @@ enum ItemKind {
   const ItemKind(this.wire);
   final String wire;
   static ItemKind parse(String v) => values.firstWhere(
-        (e) => e.wire == v,
-        orElse: () => throw FormatException('unknown item kind: $v'),
-      );
+    (e) => e.wire == v,
+    orElse: () => throw FormatException('unknown item kind: $v'),
+  );
 }
 
 /// Message delivery vocabulary (`docs/05`): Queued -> Sent -> Delivered.
@@ -38,9 +38,9 @@ enum DeliveryState {
   const DeliveryState(this.wire);
   final String wire;
   static DeliveryState parse(String v) => values.firstWhere(
-        (e) => e.wire == v,
-        orElse: () => throw FormatException('unknown delivery state: $v'),
-      );
+    (e) => e.wire == v,
+    orElse: () => throw FormatException('unknown delivery state: $v'),
+  );
 }
 
 /// Visible connection state (PAIR-006). `paused` is desktop-specific.
@@ -68,9 +68,9 @@ enum PeerKind {
   const PeerKind(this.wire);
   final String wire;
   static PeerKind parse(String v) => values.firstWhere(
-        (e) => e.wire == v,
-        orElse: () => throw FormatException('unknown peer kind: $v'),
-      );
+    (e) => e.wire == v,
+    orElse: () => throw FormatException('unknown peer kind: $v'),
+  );
 }
 
 enum PeerRole {
@@ -80,9 +80,9 @@ enum PeerRole {
   const PeerRole(this.wire);
   final String wire;
   static PeerRole parse(String v) => values.firstWhere(
-        (e) => e.wire == v,
-        orElse: () => throw FormatException('unknown peer role: $v'),
-      );
+    (e) => e.wire == v,
+    orElse: () => throw FormatException('unknown peer role: $v'),
+  );
 }
 
 /// Default action after Android share (`SHARE-004`).
@@ -94,9 +94,9 @@ enum ShareDefaultAction {
   const ShareDefaultAction(this.wire);
   final String wire;
   static ShareDefaultAction parse(String v) => values.firstWhere(
-        (e) => e.wire == v,
-        orElse: () => ShareDefaultAction.notepad,
-      );
+    (e) => e.wire == v,
+    orElse: () => ShareDefaultAction.notepad,
+  );
 }
 
 enum AppThemeChoice {
@@ -107,10 +107,8 @@ enum AppThemeChoice {
 
   const AppThemeChoice(this.wire);
   final String wire;
-  static AppThemeChoice parse(String v) => values.firstWhere(
-        (e) => e.wire == v,
-        orElse: () => AppThemeChoice.dark,
-      );
+  static AppThemeChoice parse(String v) =>
+      values.firstWhere((e) => e.wire == v, orElse: () => AppThemeChoice.dark);
 }
 
 /// Pairing session / request state (`docs/05`).
@@ -123,9 +121,9 @@ enum PairingState {
   const PairingState(this.wire);
   final String wire;
   static PairingState parse(String v) => values.firstWhere(
-        (e) => e.wire == v,
-        orElse: () => throw FormatException('unknown pairing state: $v'),
-      );
+    (e) => e.wire == v,
+    orElse: () => throw FormatException('unknown pairing state: $v'),
+  );
 }
 
 /// Why a remote change was quarantined (SYNC-006).
@@ -140,7 +138,7 @@ enum QuarantineReason {
   const QuarantineReason(this.wire);
   final String wire;
   static QuarantineReason parse(String v) => values.firstWhere(
-        (e) => e.wire == v,
-        orElse: () => QuarantineReason.validationFailed,
-      );
+    (e) => e.wire == v,
+    orElse: () => QuarantineReason.validationFailed,
+  );
 }

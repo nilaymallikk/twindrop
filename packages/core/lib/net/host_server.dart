@@ -33,18 +33,18 @@ class HostServer {
     required String Function() versionName,
     required List<String> Function() localHosts,
     int preferredPort = 47321,
-  })  : _identity = identity,
-        _db = db,
-        _sync = sync,
-        _bus = bus,
-        _peers = peers,
-        _logger = logger,
-        _deviceId = deviceId,
-        _deviceName = deviceName,
-        _appVersion = appVersion,
-        _versionName = versionName,
-        _localHosts = localHosts,
-        _preferredPort = preferredPort {
+  }) : _identity = identity,
+       _db = db,
+       _sync = sync,
+       _bus = bus,
+       _peers = peers,
+       _logger = logger,
+       _deviceId = deviceId,
+       _deviceName = deviceName,
+       _appVersion = appVersion,
+       _versionName = versionName,
+       _localHosts = localHosts,
+       _preferredPort = preferredPort {
     pairing = PairingService(
       peers: peers,
       logger: logger,
@@ -116,8 +116,7 @@ class HostServer {
         break;
       }
     }
-    throw NetworkError('could not bind the desktop port',
-        cause: lastError);
+    throw NetworkError('could not bind the desktop port', cause: lastError);
   }
 
   Future<void> stop() async {
@@ -182,7 +181,9 @@ class HostServer {
     if (address.isLoopback) return true;
     if (address.type == InternetAddressType.IPv6) {
       final a = address.address.toLowerCase();
-      if (a == '::1' || a.startsWith('fe80:') || a.startsWith('fc') ||
+      if (a == '::1' ||
+          a.startsWith('fe80:') ||
+          a.startsWith('fc') ||
           a.startsWith('fd')) {
         return true;
       }
@@ -236,10 +237,14 @@ class HostServer {
   Future<void> _handleSelfRevoke(HttpRequest request) async {
     final authenticator = TokenAuthenticator(peers: _peers, logger: _logger);
     final peer = await authenticator.authenticateHeader(
-        request.headers.value(HttpHeaders.authorizationHeader));
+      request.headers.value(HttpHeaders.authorizationHeader),
+    );
     await _peers.revoke(peer.id);
-    await _closePeerSocket(peer.id,
-        CloseCodes.forbidden, CloseCodes.reasonRevoked);
+    await _closePeerSocket(
+      peer.id,
+      CloseCodes.forbidden,
+      CloseCodes.reasonRevoked,
+    );
     await _writeJson(request, HttpStatus.ok, <String, dynamic>{'ok': true});
   }
 
@@ -249,7 +254,8 @@ class HostServer {
     }
     final authenticator = TokenAuthenticator(peers: _peers, logger: _logger);
     final peer = await authenticator.authenticateHeader(
-        request.headers.value(HttpHeaders.authorizationHeader));
+      request.headers.value(HttpHeaders.authorizationHeader),
+    );
 
     final WebSocket socket;
     try {
@@ -260,7 +266,10 @@ class HostServer {
 
     // One session per device: the newest wins, the old one is closed 4409.
     await _closePeerSocket(
-        peer.id, CloseCodes.duplicateSession, CloseCodes.reasonDuplicate);
+      peer.id,
+      CloseCodes.duplicateSession,
+      CloseCodes.reasonDuplicate,
+    );
 
     late final PeerSession session;
     session = PeerSession(
@@ -297,10 +306,10 @@ class HostServer {
           socket.close(CloseCodes.internal, CloseCodes.reasonInternal);
         }
       },
-      onDone: () => session.handleSocketClosed(
-          socket.closeCode, socket.closeReason),
-      onError: (Object _) => session.handleSocketClosed(
-          socket.closeCode, socket.closeReason),
+      onDone: () =>
+          session.handleSocketClosed(socket.closeCode, socket.closeReason),
+      onError: (Object _) =>
+          session.handleSocketClosed(socket.closeCode, socket.closeReason),
       cancelOnError: true,
     );
     await session.startHost();
@@ -326,8 +335,9 @@ class HostServer {
   }
 
   void _onPeerRevoked(String peerId) {
-    unawaited(_closePeerSocket(
-        peerId, CloseCodes.forbidden, CloseCodes.reasonRevoked));
+    unawaited(
+      _closePeerSocket(peerId, CloseCodes.forbidden, CloseCodes.reasonRevoked),
+    );
   }
 
   void _emitSessions() {
@@ -354,11 +364,17 @@ class HostServer {
   }
 
   Future<void> _writeJson(
-      HttpRequest request, int status, Map<String, dynamic> body) async {
+    HttpRequest request,
+    int status,
+    Map<String, dynamic> body,
+  ) async {
     final response = request.response;
     response.statusCode = status;
-    response.headers.contentType =
-        ContentType('application', 'json', charset: 'utf-8');
+    response.headers.contentType = ContentType(
+      'application',
+      'json',
+      charset: 'utf-8',
+    );
     response.write(jsonEncode(body));
     await response.close();
   }
@@ -366,13 +382,20 @@ class HostServer {
   Future<void> _writeError(HttpRequest request, TwinDropError error) async {
     final response = request.response;
     response.statusCode = error.httpStatus;
-    response.headers.contentType =
-        ContentType('application', 'json', charset: 'utf-8');
-    response.write(jsonEncode(ApiError(
-      code: error.code,
-      message: error.message,
-      retryable: error.retryable,
-    ).toJson()));
+    response.headers.contentType = ContentType(
+      'application',
+      'json',
+      charset: 'utf-8',
+    );
+    response.write(
+      jsonEncode(
+        ApiError(
+          code: error.code,
+          message: error.message,
+          retryable: error.retryable,
+        ).toJson(),
+      ),
+    );
     await response.close();
   }
 }

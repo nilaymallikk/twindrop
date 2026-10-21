@@ -73,31 +73,29 @@ class PairingRequestRecord {
     bool? collected,
     String? issuedToken,
     bool clearIssuedToken = false,
-  }) =>
-      PairingRequestRecord(
-        requestId: requestId,
-        pollSecret: pollSecret,
-        clientInstanceId: clientInstanceId,
-        displayName: displayName,
-        platform: platform,
-        protocolVersion: protocolVersion,
-        confirmationCode: confirmationCode,
-        requestedAt: requestedAt,
-        state: state ?? this.state,
-        collected: collected ?? this.collected,
-        issuedToken:
-            clearIssuedToken ? null : (issuedToken ?? this.issuedToken),
-      );
+  }) => PairingRequestRecord(
+    requestId: requestId,
+    pollSecret: pollSecret,
+    clientInstanceId: clientInstanceId,
+    displayName: displayName,
+    platform: platform,
+    protocolVersion: protocolVersion,
+    confirmationCode: confirmationCode,
+    requestedAt: requestedAt,
+    state: state ?? this.state,
+    collected: collected ?? this.collected,
+    issuedToken: clearIssuedToken ? null : (issuedToken ?? this.issuedToken),
+  );
 
   PairingRequestInfo get info => PairingRequestInfo(
-        requestId: requestId,
-        displayName: displayName,
-        platform: platform,
-        protocolVersion: protocolVersion,
-        confirmationCode: confirmationCode,
-        requestedAt: requestedAt,
-        state: state,
-      );
+    requestId: requestId,
+    displayName: displayName,
+    platform: platform,
+    protocolVersion: protocolVersion,
+    confirmationCode: confirmationCode,
+    requestedAt: requestedAt,
+    state: state,
+  );
 }
 
 /// Desktop-side pairing manager (`docs/05` §Pairing, `PAIR-001`..`PAIR-005`).
@@ -116,14 +114,14 @@ class PairingService {
     required List<String> Function() hostsProvider,
     required int Function() portProvider,
     DateTime Function()? now,
-  })  : _peers = peers,
-        _logger = logger,
-        _hostDeviceId = hostDeviceId,
-        _hostName = hostName,
-        _fingerprint = fingerprint,
-        _hostsProvider = hostsProvider,
-        _portProvider = portProvider,
-        _now = now ?? DateTime.now;
+  }) : _peers = peers,
+       _logger = logger,
+       _hostDeviceId = hostDeviceId,
+       _hostName = hostName,
+       _fingerprint = fingerprint,
+       _hostsProvider = hostsProvider,
+       _portProvider = portProvider,
+       _now = now ?? DateTime.now;
 
   final PeerRegistry _peers;
   final Logger _logger;
@@ -161,17 +159,18 @@ class PairingService {
   }
 
   List<PairingRequestInfo> get pendingRequests => [
-        for (final r in _requests.values)
-          if (r.state == PairingState.pendingApproval) r.info,
-      ];
+    for (final r in _requests.values)
+      if (r.state == PairingState.pendingApproval) r.info,
+  ];
 
   bool get isOpen => currentSession != null;
 
   /// Start a 5-minute session. [manual] creates a 20-byte token so it fits the
   /// documented 8×4 base32 manual code; QR sessions use a full 256-bit token.
   PairingSession startSession({bool manual = false, Duration? ttl}) {
-    final bytes =
-        secureRandomBytes(manual ? 20 : PairingPayload.pairingTokenLength);
+    final bytes = secureRandomBytes(
+      manual ? 20 : PairingPayload.pairingTokenLength,
+    );
     final token = base64UrlToken(bytes);
     final now = _now();
     final expires = now.add(ttl ?? const Duration(minutes: 5));
@@ -195,10 +194,10 @@ class PairingService {
     _requests.clear();
     _rateLimiter.reset();
     _sessionEvents.add(session);
-    _logger.info('pairing: session started', fields: {
-      'manual': manual,
-      'expires': expires.toUtc().toIso8601String(),
-    });
+    _logger.info(
+      'pairing: session started',
+      fields: {'manual': manual, 'expires': expires.toUtc().toIso8601String()},
+    );
     return session;
   }
 
@@ -227,7 +226,8 @@ class PairingService {
     }
     if (request.protocolVersion > FrameCodec.protocolVersion) {
       throw const UnsupportedVersionError(
-          'this phone uses a newer protocol; update TwinDrop');
+        'this phone uses a newer protocol; update TwinDrop',
+      );
     }
 
     List<int>? tokenBytes;
@@ -236,7 +236,8 @@ class PairingService {
     } on FormatException {
       tokenBytes = null;
     }
-    final tokenOk = tokenBytes != null &&
+    final tokenOk =
+        tokenBytes != null &&
         DeviceTokens.constantTimeEquals(
           base64UrlToken(tokenBytes),
           base64UrlToken(session.tokenBytes),
@@ -332,8 +333,10 @@ class PairingService {
     final record = _requests[requestId];
     if (record == null) throw const NotFoundError('pairing request not found');
     if (record.state != PairingState.pendingApproval) return;
-    _requests[requestId] =
-        record.copyWith(state: PairingState.rejected, clearIssuedToken: true);
+    _requests[requestId] = record.copyWith(
+      state: PairingState.rejected,
+      clearIssuedToken: true,
+    );
     _requestEvents.add(_requests[requestId]!.info);
     _logger.info('pairing: rejected', fields: {'request': requestId});
   }
@@ -405,8 +408,9 @@ class PairingService {
 
 List<int>? _decodePairingToken(String token) {
   try {
-    final normalized =
-        base64Url.normalize(token.padRight((token.length + 3) & ~3, '='));
+    final normalized = base64Url.normalize(
+      token.padRight((token.length + 3) & ~3, '='),
+    );
     final bytes = base64Url.decode(normalized);
     if (bytes.length != 20 && bytes.length != 32) return null;
     return bytes;

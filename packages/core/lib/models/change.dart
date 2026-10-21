@@ -25,12 +25,12 @@ class ChangeEntry {
   static const String entityCategory = 'category';
 
   Map<String, dynamic> toJson() => <String, dynamic>{
-        'seq': seq,
-        'entityType': entityType,
-        'entityId': entityId,
-        if (sourcePeer != null) 'sourcePeer': sourcePeer,
-        'createdAt': createdAt,
-      };
+    'seq': seq,
+    'entityType': entityType,
+    'entityId': entityId,
+    if (sourcePeer != null) 'sourcePeer': sourcePeer,
+    'createdAt': createdAt,
+  };
 }
 
 /// Local-only delivery state for a message sent to one peer (`peer_delivery`).

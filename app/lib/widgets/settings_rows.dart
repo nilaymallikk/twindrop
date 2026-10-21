@@ -42,69 +42,69 @@ class TdSettingsRow extends StatelessWidget {
     final interactive = onTap != null && enabled;
 
     Widget content(TdInteractionState state) => Container(
-          constraints: const BoxConstraints(minHeight: 44),
-          color: state.isActive ? tokens.raised : tokens.surface,
-          padding: const EdgeInsets.symmetric(
-            horizontal: TdSpace.s12,
-            vertical: TdSpace.s8,
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    Text(
-                      label,
-                      style: type.label.copyWith(
-                        color: !enabled
-                            ? tokens.muted
-                            : destructive
-                                ? tokens.error
-                                : tokens.text,
-                      ),
-                    ),
-                    if (description != null) ...<Widget>[
-                      const SizedBox(height: 2),
-                      Text(
-                        description!,
-                        style: type.secondary.copyWith(color: tokens.muted),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-              if (value != null) ...<Widget>[
-                const SizedBox(width: TdSpace.s12),
-                Flexible(
-                  child: Text(
-                    value!,
-                    style: (monoValue ? type.meta : type.secondary).copyWith(
-                      color: tokens.muted,
-                    ),
-                    textAlign: TextAlign.right,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
+      constraints: const BoxConstraints(minHeight: 44),
+      color: state.isActive ? tokens.raised : tokens.surface,
+      padding: const EdgeInsets.symmetric(
+        horizontal: TdSpace.s12,
+        vertical: TdSpace.s8,
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Text(
+                  label,
+                  style: type.label.copyWith(
+                    color: !enabled
+                        ? tokens.muted
+                        : destructive
+                        ? tokens.error
+                        : tokens.text,
                   ),
                 ),
+                if (description != null) ...<Widget>[
+                  const SizedBox(height: 2),
+                  Text(
+                    description!,
+                    style: type.secondary.copyWith(color: tokens.muted),
+                  ),
+                ],
               ],
-              if (trailing != null) ...<Widget>[
-                const SizedBox(width: TdSpace.s12),
-                trailing!,
-              ],
-              if (interactive) ...<Widget>[
-                const SizedBox(width: TdSpace.s8),
-                TdIcon(
-                  TdIcons.chevronRight,
-                  size: TdIconSizes.sm,
+            ),
+          ),
+          if (value != null) ...<Widget>[
+            const SizedBox(width: TdSpace.s12),
+            Flexible(
+              child: Text(
+                value!,
+                style: (monoValue ? type.meta : type.secondary).copyWith(
                   color: tokens.muted,
                 ),
-              ],
-            ],
-          ),
-        );
+                textAlign: TextAlign.right,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+          if (trailing != null) ...<Widget>[
+            const SizedBox(width: TdSpace.s12),
+            trailing!,
+          ],
+          if (interactive) ...<Widget>[
+            const SizedBox(width: TdSpace.s8),
+            TdIcon(
+              TdIcons.chevronRight,
+              size: TdIconSizes.sm,
+              color: tokens.muted,
+            ),
+          ],
+        ],
+      ),
+    );
 
     final row = TdPressable(
       onPressed: onTap,
@@ -259,10 +259,7 @@ class TdValueLine extends StatelessWidget {
         children: <Widget>[
           Text(label, style: type.secondary.copyWith(color: tokens.muted)),
           const SizedBox(height: 2),
-          SelectableText(
-            value,
-            style: type.mono.copyWith(color: tokens.text),
-          ),
+          SelectableText(value, style: type.mono.copyWith(color: tokens.text)),
         ],
       ),
     );

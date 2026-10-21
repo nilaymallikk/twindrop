@@ -162,9 +162,7 @@ class DesktopShell with WindowListener {
     await _bestEffort(() => windowManager.setSkipTaskbar(false));
     await _bestEffort(() => windowManager.setResizable(true));
     await windowManager.setSize(_mainSize);
-    await _bestEffort(
-      () => windowManager.setAlignment(Alignment.center),
-    );
+    await _bestEffort(() => windowManager.setAlignment(Alignment.center));
     await windowManager.show();
     await windowManager.focus();
   }
@@ -190,10 +188,7 @@ class DesktopShell with WindowListener {
       await windowManager.setAlignment(Alignment.topRight);
       final position = await windowManager.getPosition();
       await windowManager.setPosition(
-        Offset(
-          position.dx - _popupRightMargin,
-          position.dy + _popupTopMargin,
-        ),
+        Offset(position.dx - _popupRightMargin, position.dy + _popupTopMargin),
       );
     });
   }
@@ -203,10 +198,7 @@ class DesktopShell with WindowListener {
     if (menu == null) return;
 
     MenuItem? entry(String label, VoidCallback? callback) {
-      final item = MenuItem.createWithLabelAndType(
-        label,
-        MenuItemType.normal,
-      );
+      final item = MenuItem.createWithLabelAndType(label, MenuItemType.normal);
       if (item == null) return null;
       if (callback == null) {
         item.isEnabled = false;
@@ -275,9 +267,7 @@ class DesktopShell with WindowListener {
         ? (_unread > 0 ? 'unread' : 'connected')
         : 'offline';
     final variant = _darkPanel ? 'white' : 'black';
-    final icon = ImageAsset.fromAsset(
-      'assets/tray/$state-$variant-24.png',
-    );
+    final icon = ImageAsset.fromAsset('assets/tray/$state-$variant-24.png');
     if (icon != null) tray.icon = icon;
   }
 
@@ -362,11 +352,11 @@ class DesktopShell with WindowListener {
 
   static Future<String> _gsettings(String key) async {
     try {
-      final result = await Process.run(
-        'gsettings',
-        ['get', 'org.gnome.desktop.interface', key],
-        stdoutEncoding: utf8,
-      ).timeout(const Duration(milliseconds: 800));
+      final result = await Process.run('gsettings', [
+        'get',
+        'org.gnome.desktop.interface',
+        key,
+      ], stdoutEncoding: utf8).timeout(const Duration(milliseconds: 800));
       return result.exitCode == 0 ? '${result.stdout}'.toLowerCase() : '';
     } catch (_) {
       return '';

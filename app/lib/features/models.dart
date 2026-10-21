@@ -177,13 +177,7 @@ class PermissionStepState {
 
 /// Desktop pairing stages. The screen renders only what the state says; it
 /// never starts a session or approves on its own.
-enum DesktopPairingStage {
-  idle,
-  waitingForPhone,
-  approval,
-  connected,
-  error,
-}
+enum DesktopPairingStage { idle, waitingForPhone, approval, connected, error }
 
 @immutable
 class DesktopPairingData {
@@ -274,9 +268,4 @@ class PhoneOnboardingData {
 
 /// Android share panel status. Copy is truthful: offline saves are not
 /// described as delivered (SHARE-005).
-enum SharePanelStatus {
-  saved,
-  offlineSaved,
-  unsupported,
-  storageError,
-}
+enum SharePanelStatus { saved, offlineSaved, unsupported, storageError }

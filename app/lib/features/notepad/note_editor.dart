@@ -41,15 +41,16 @@ class NoteEditorScreen extends StatefulWidget {
 }
 
 class _NoteEditorScreenState extends State<NoteEditorScreen> {
-  late final TextEditingController _titleController =
-      TextEditingController(text: widget.note?.title ?? '');
-  late final TextEditingController _textController =
-      TextEditingController(text: widget.note?.text ?? '');
+  late final TextEditingController _titleController = TextEditingController(
+    text: widget.note?.title ?? '',
+  );
+  late final TextEditingController _textController = TextEditingController(
+    text: widget.note?.text ?? '',
+  );
   late String _categoryId = _initialCategoryId();
 
   String _initialCategoryId() {
-    final requested =
-        widget.note?.categoryId ?? widget.initialCategoryId;
+    final requested = widget.note?.categoryId ?? widget.initialCategoryId;
     final live = _categories;
     if (requested != null && live.any((c) => c.id == requested)) {
       return requested;
@@ -178,7 +179,8 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                       const TdSectionLabel('Category'),
                       if (_categories.isEmpty)
                         const TdNotice(
-                          message: 'No categories yet. The note will go to '
+                          message:
+                              'No categories yet. The note will go to '
                               'Inbox.',
                           tone: TdNoticeTone.neutral,
                         )
@@ -189,13 +191,13 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                               TdCategoryItem(
                                 id: category.id,
                                 name: category.name,
-                                isInbox: category.isInbox ||
+                                isInbox:
+                                    category.isInbox ||
                                     category.id == Category.inboxId,
                               ),
                           ],
                           selectedId: _categoryId,
-                          onSelected: (id) =>
-                              setState(() => _categoryId = id),
+                          onSelected: (id) => setState(() => _categoryId = id),
                         ),
                       const SizedBox(height: TdSpace.s24),
                       TdButton(

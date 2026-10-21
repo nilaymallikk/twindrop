@@ -50,8 +50,8 @@ class TdNoteCard extends StatelessWidget {
         final borderColor = selected
             ? tokens.accent
             : state.focused
-                ? tokens.accent
-                : tokens.hairline;
+            ? tokens.accent
+            : tokens.hairline;
         return Container(
           padding: const EdgeInsets.all(TdSpace.s12),
           decoration: BoxDecoration(
@@ -71,8 +71,8 @@ class TdNoteCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
-                        if (title != null && title!.trim().isNotEmpty) ...<
-                            Widget>[
+                        if (title != null &&
+                            title!.trim().isNotEmpty) ...<Widget>[
                           Text(
                             title!,
                             style: type.cardTitle,

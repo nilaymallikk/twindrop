@@ -153,17 +153,12 @@ class _Sidebar extends StatelessWidget {
               children: <Widget>[
                 Row(
                   children: <Widget>[
-                    const TdLogoMark(
-                      size: 20,
-                      semanticLabel: 'TwinDrop',
-                    ),
+                    const TdLogoMark(size: 20, semanticLabel: 'TwinDrop'),
                     const SizedBox(width: TdSpace.s8),
                     Expanded(
                       child: Text(
                         'TwinDrop',
-                        style: type.label.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
+                        style: type.label.copyWith(fontWeight: FontWeight.w600),
                       ),
                     ),
                   ],
@@ -292,9 +287,7 @@ class _BottomNav extends StatelessWidget {
                   decoration: BoxDecoration(
                     border: Border(
                       top: BorderSide(
-                        color: selected
-                            ? tokens.paper
-                            : TdPalette.transparent,
+                        color: selected ? tokens.paper : TdPalette.transparent,
                         width: 2,
                       ),
                     ),
@@ -316,18 +309,15 @@ class _BottomNav extends StatelessWidget {
                             AppShell.labelFor(item),
                             style: type.secondary.copyWith(
                               color: color,
-                              fontWeight:
-                                  selected ? FontWeight.w600 : FontWeight.w400,
+                              fontWeight: selected
+                                  ? FontWeight.w600
+                                  : FontWeight.w400,
                             ),
                           ),
                         ],
                       ),
                       if (item == AppSection.chat && unreadChat > 0)
-                        Positioned(
-                          top: 8,
-                          right: 24,
-                          child: TdUnreadDot(),
-                        ),
+                        Positioned(top: 8, right: 24, child: TdUnreadDot()),
                     ],
                   ),
                 );

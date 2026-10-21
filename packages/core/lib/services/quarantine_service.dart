@@ -7,8 +7,8 @@ import '../util/logger.dart';
 /// Read/clear access to the visible quarantine (`SYNC-006`, Settings → Data).
 class QuarantineService {
   QuarantineService({required AppDatabase db, required Logger logger})
-      : _db = db,
-        _logger = logger;
+    : _db = db,
+      _logger = logger;
 
   final AppDatabase _db;
   final Logger _logger;

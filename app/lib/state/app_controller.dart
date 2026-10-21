@@ -27,8 +27,12 @@ class DesktopHooks {
     this.onHideWindow,
   });
 
-  final void Function({required String label, required bool connected, required int unread})?
-      onStatus;
+  final void Function({
+    required String label,
+    required bool connected,
+    required int unread,
+  })?
+  onStatus;
   final void Function(bool paused)? onPaused;
   final Future<bool> Function()? isAutostartEnabled;
   final Future<void> Function(bool enabled)? setAutostart;
@@ -50,9 +54,9 @@ class AppController extends ChangeNotifier {
     CoreNotifier? notifier,
     TokenStore? tokenStore,
     Logger? logger,
-  })  : _notifier = notifier,
-        _tokenStore = tokenStore,
-        _logger = logger ?? Logger.silent;
+  }) : _notifier = notifier,
+       _tokenStore = tokenStore,
+       _logger = logger ?? Logger.silent;
 
   final AppPaths paths;
   final CorePlatform platform;
@@ -143,11 +147,13 @@ class AppController extends ChangeNotifier {
     try {
       busy = true;
       notifyListeners();
-      final store = _tokenStore ??
+      final store =
+          _tokenStore ??
           (platform == CorePlatform.phone
               ? SecureTokenStore()
               : MemoryTokenStore());
-      final notifier = _notifier ??
+      final notifier =
+          _notifier ??
           (platform == CorePlatform.phone
               ? AndroidNotifier()
               : const _NoopNotifier());
@@ -175,8 +181,10 @@ class AppController extends ChangeNotifier {
       cleanLinks = await rt.settings.cleanLinks();
       shareAction = await rt.settings.shareDefaultAction();
       paused = await rt.settings.paused();
-      hideOnBlur =
-          await rt.settings.getBool('desktop.hide_on_blur', fallback: true);
+      hideOnBlur = await rt.settings.getBool(
+        'desktop.hide_on_blur',
+        fallback: true,
+      );
       _lastReadAt = await _readLastReadAt();
 
       _revisionSub = rt.revisionStream.listen((_) => _scheduleRefresh());
@@ -196,7 +204,8 @@ class AppController extends ChangeNotifier {
 
       if (platform == CorePlatform.phone) {
         keepAliveSupported = true;
-        notificationsSupported = await AndroidPlatform.areNotificationsEnabled();
+        notificationsSupported =
+            await AndroidPlatform.areNotificationsEnabled();
         keepAliveEnabled = await AndroidPlatform.isKeepAliveRunning();
         batteryOptimized = !(await AndroidPlatform.isIgnoringBattery());
         await _syncKeepAlive();
@@ -307,12 +316,14 @@ class AppController extends ChangeNotifier {
             state = DeliveryState.sent;
           }
         }
-        entries.add(ChatEntry(
-          item: item,
-          mine: mine,
-          delivery: state,
-          deviceLabel: mine ? 'This phone' : item.originName,
-        ));
+        entries.add(
+          ChatEntry(
+            item: item,
+            mine: mine,
+            delivery: state,
+            deviceLabel: mine ? 'This phone' : item.originName,
+          ),
+        );
       }
       messages = entries.reversed.toList(growable: false);
       chatError = null;
@@ -343,7 +354,9 @@ class AppController extends ChangeNotifier {
         );
       } else {
         filtered = all
-            .where((n) => (n.categoryId ?? Category.inboxId) == selectedCategoryId)
+            .where(
+              (n) => (n.categoryId ?? Category.inboxId) == selectedCategoryId,
+            )
             .toList(growable: false);
       }
       filtered.sort((a, b) {
@@ -500,56 +513,56 @@ class AppController extends ChangeNotifier {
   }
 
   CategoryActions get categoryActions => CategoryActions(
-        onCreate: (name) async {
-          try {
-            await runtime!.notepad.createCategory(name);
-            await _loadNotepad();
-            notifyListeners();
-            return null;
-          } on Object catch (e) {
-            return _messageFor(e);
-          }
-        },
-        onRename: (id, name) async {
-          try {
-            await runtime!.notepad.renameCategory(id, name);
-            await _loadNotepad();
-            notifyListeners();
-            return null;
-          } on Object catch (e) {
-            return _messageFor(e);
-          }
-        },
-        onDelete: (id) async {
-          try {
-            await runtime!.notepad.deleteCategory(id);
-            if (selectedCategoryId == id) selectedCategoryId = Category.inboxId;
-            await _loadNotepad();
-            notifyListeners();
-            return true;
-          } on Object catch (e) {
-            toast = _messageFor(e);
-            notifyListeners();
-            return false;
-          }
-        },
-        onReorder: (from, to) async {
-          final ids = categories.map((c) => c.id).toList();
-          if (from < 0 || from >= ids.length || to < 0 || to >= ids.length) {
-            return;
-          }
-          final moved = ids.removeAt(from);
-          ids.insert(to, moved);
-          try {
-            await runtime!.notepad.reorderCategories(ids);
-            await _loadNotepad();
-            notifyListeners();
-          } on Object catch (e) {
-            toast = _messageFor(e);
-            notifyListeners();
-          }
-        },
-      );
+    onCreate: (name) async {
+      try {
+        await runtime!.notepad.createCategory(name);
+        await _loadNotepad();
+        notifyListeners();
+        return null;
+      } on Object catch (e) {
+        return _messageFor(e);
+      }
+    },
+    onRename: (id, name) async {
+      try {
+        await runtime!.notepad.renameCategory(id, name);
+        await _loadNotepad();
+        notifyListeners();
+        return null;
+      } on Object catch (e) {
+        return _messageFor(e);
+      }
+    },
+    onDelete: (id) async {
+      try {
+        await runtime!.notepad.deleteCategory(id);
+        if (selectedCategoryId == id) selectedCategoryId = Category.inboxId;
+        await _loadNotepad();
+        notifyListeners();
+        return true;
+      } on Object catch (e) {
+        toast = _messageFor(e);
+        notifyListeners();
+        return false;
+      }
+    },
+    onReorder: (from, to) async {
+      final ids = categories.map((c) => c.id).toList();
+      if (from < 0 || from >= ids.length || to < 0 || to >= ids.length) {
+        return;
+      }
+      final moved = ids.removeAt(from);
+      ids.insert(to, moved);
+      try {
+        await runtime!.notepad.reorderCategories(ids);
+        await _loadNotepad();
+        notifyListeners();
+      } on Object catch (e) {
+        toast = _messageFor(e);
+        notifyListeners();
+      }
+    },
+  );
 
   // ---------------------------------------------------------------- pairing ---
 
@@ -670,9 +683,7 @@ class AppController extends ChangeNotifier {
     await runtime?.cancelPairingSession();
     _pairingSession = null;
     _pairingTimer?.cancel();
-    desktopPairing = const DesktopPairingData(
-      stage: DesktopPairingStage.idle,
-    );
+    desktopPairing = const DesktopPairingData(stage: DesktopPairingStage.idle);
     notifyListeners();
   }
 
@@ -924,13 +935,15 @@ class AppController extends ChangeNotifier {
   }) async {
     final current = phoneOnboarding;
     final steps = current.permissions
-        .map((s) => s.permission == permission
-            ? PermissionStepState(
-                permission: permission,
-                granted: granted,
-                skipped: skipped,
-              )
-            : s)
+        .map(
+          (s) => s.permission == permission
+              ? PermissionStepState(
+                  permission: permission,
+                  granted: granted,
+                  skipped: skipped,
+                )
+              : s,
+        )
         .toList();
     if (permission == PhonePermission.notifications && granted) {
       await AndroidPlatform.requestNotificationPermission();
@@ -1099,8 +1112,10 @@ class AppController extends ChangeNotifier {
       await rt.db.customStatement('DELETE FROM categories');
       await rt.db.customStatement('DELETE FROM quarantine');
       await rt.db.customStatement('DELETE FROM peers');
-      await rt.db.customStatement("DELETE FROM settings WHERE key NOT IN "
-          "('device.id','device.name','device.kind')");
+      await rt.db.customStatement(
+        "DELETE FROM settings WHERE key NOT IN "
+        "('device.id','device.name','device.kind')",
+      );
     });
     await rt.notepad.ensureInbox();
     await rt.notifier.clear();
@@ -1119,8 +1134,11 @@ class AppController extends ChangeNotifier {
     final port = peer.lastPort;
     if (host == null || port == null) return 'No known address yet.';
     try {
-      final socket = await Socket.connect(host, port,
-          timeout: const Duration(seconds: 4));
+      final socket = await Socket.connect(
+        host,
+        port,
+        timeout: const Duration(seconds: 4),
+      );
       socket.destroy();
       return 'Reached $host:$port.';
     } on Object catch (e) {
@@ -1167,7 +1185,10 @@ class AppController extends ChangeNotifier {
       if (acked.isNotEmpty) await AndroidPlatform.ackShares(acked);
       if (pending.isNotEmpty) await _loadNotepad();
     } on Object catch (e) {
-      _logger.debug('share queue unavailable', fields: {'error': e.runtimeType});
+      _logger.debug(
+        'share queue unavailable',
+        fields: {'error': e.runtimeType},
+      );
     }
   }
 

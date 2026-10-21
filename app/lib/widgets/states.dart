@@ -111,8 +111,8 @@ class TdNotice extends StatelessWidget {
             ],
           ),
           if ((actionLabel != null && onAction != null) ||
-              (secondaryActionLabel != null && onSecondaryAction != null)) ...<
-              Widget>[
+              (secondaryActionLabel != null &&
+                  onSecondaryAction != null)) ...<Widget>[
             const SizedBox(height: TdSpace.s8),
             Wrap(
               spacing: TdSpace.s8,
@@ -209,9 +209,7 @@ class TdOfflineBanner extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: tokens.surface,
-        border: Border(
-          bottom: BorderSide(color: tokens.hairline, width: 1),
-        ),
+        border: Border(bottom: BorderSide(color: tokens.hairline, width: 1)),
       ),
       child: Row(
         children: <Widget>[

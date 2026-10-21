@@ -106,10 +106,7 @@ class _TdUndoBarState extends State<TdUndoBar> {
               ],
             ),
             if (widget.showCountdown)
-              TdCountdownHairline(
-                duration: widget.duration,
-                height: 2,
-              ),
+              TdCountdownHairline(duration: widget.duration, height: 2),
           ],
         ),
       ),

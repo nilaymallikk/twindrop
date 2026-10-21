@@ -28,10 +28,10 @@ class ChatService extends CoreService {
     required String deviceName,
     bool Function()? cleanLinks,
     super.nowMs,
-  })  : _peers = peers,
-        _deviceId = deviceId,
-        _deviceName = deviceName,
-        _cleanLinks = cleanLinks ?? (() => true);
+  }) : _peers = peers,
+       _deviceId = deviceId,
+       _deviceName = deviceName,
+       _cleanLinks = cleanLinks ?? (() => true);
 
   final PeerRegistry _peers;
   final String _deviceId;
@@ -85,14 +85,13 @@ class ChatService extends CoreService {
     int? beforeCreatedAt,
     String? beforeId,
     bool includeDeleted = false,
-  }) =>
-      db.listItems(
-        type: ItemType.message,
-        limit: limit,
-        beforeCreatedAt: beforeCreatedAt,
-        beforeId: beforeId,
-        includeDeleted: includeDeleted,
-      );
+  }) => db.listItems(
+    type: ItemType.message,
+    limit: limit,
+    beforeCreatedAt: beforeCreatedAt,
+    beforeId: beforeId,
+    includeDeleted: includeDeleted,
+  );
 
   Stream<List<Item>> watchMessages({int limit = 100}) async* {
     yield await listMessages(limit: limit);
@@ -120,11 +119,7 @@ class ChatService extends CoreService {
     late Item updated;
     await db.transaction(() async {
       final hlc = await stamp();
-      updated = item.copyWith(
-        deleted: true,
-        deletedHlc: hlc,
-        metaHlc: hlc,
-      );
+      updated = item.copyWith(deleted: true, deletedHlc: hlc, metaHlc: hlc);
       await db.putItem(updated);
       await db.ftsRemove(id);
       await db.appendChange('item', id);

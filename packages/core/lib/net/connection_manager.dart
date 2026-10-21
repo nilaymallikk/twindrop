@@ -39,20 +39,20 @@ class ConnectionManager {
     CoreNotifier? notifier,
     Random? random,
     this.pauseOnStart = false,
-  })  : _db = db,
-        _sync = sync,
-        _bus = bus,
-        _peers = peers,
-        _tokenStore = tokenStore,
-        _logger = logger,
-        _deviceId = deviceId,
-        _deviceName = deviceName,
-        _deviceKind = deviceKind,
-        _appVersion = appVersion,
-        _discovery = discovery,
-        _multicastLock = multicastLock ?? NoopMulticastLock(),
-        _notifier = notifier ?? NoopNotifier(),
-        _random = random ?? Random();
+  }) : _db = db,
+       _sync = sync,
+       _bus = bus,
+       _peers = peers,
+       _tokenStore = tokenStore,
+       _logger = logger,
+       _deviceId = deviceId,
+       _deviceName = deviceName,
+       _deviceKind = deviceKind,
+       _appVersion = appVersion,
+       _discovery = discovery,
+       _multicastLock = multicastLock ?? NoopMulticastLock(),
+       _notifier = notifier ?? NoopNotifier(),
+       _random = random ?? Random();
 
   final AppDatabase _db;
   final SyncEngine _sync;
@@ -78,7 +78,8 @@ class ConnectionManager {
       StreamController<String?>.broadcast();
 
   ConnectionStatus _status = ConnectionStatus.unpaired;
-  final Map<String, ConnectionStatus> _peerStates = <String, ConnectionStatus>{};
+  final Map<String, ConnectionStatus> _peerStates =
+      <String, ConnectionStatus>{};
   bool _stopped = true;
   bool _paused = false;
   bool _pinnedFailure = false;
@@ -98,8 +99,8 @@ class ConnectionManager {
   Set<String> get connectedPeerIds =>
       _session == null ? const <String>{} : <String>{_session!.peerId};
 
-  int get backoffSeconds => _backoffSeconds[
-      _backoffIndex.clamp(0, _backoffSeconds.length - 1)];
+  int get backoffSeconds =>
+      _backoffSeconds[_backoffIndex.clamp(0, _backoffSeconds.length - 1)];
 
   Stream<ConnectionStatus> get statusStream => _statusController.stream;
   Stream<Map<String, ConnectionStatus>> get peerStatesStream =>
@@ -180,7 +181,9 @@ class ConnectionManager {
         await _sleepBackoff();
         continue;
       }
-      final token = await _tokenStore.read(peer.tokenRef ?? peerTokenRef(peer.id));
+      final token = await _tokenStore.read(
+        peer.tokenRef ?? peerTokenRef(peer.id),
+      );
       if (token == null || token.isEmpty) {
         _logger.warn('conn: no token for peer', fields: {'peer': peer.id});
         _setStatus(ConnectionStatus.unpaired);
@@ -245,7 +248,10 @@ class ConnectionManager {
   }
 
   Future<PeerSession?> _connect(
-      Peer peer, String token, ({String host, int port}) locator) async {
+    Peer peer,
+    String token,
+    ({String host, int port}) locator,
+  ) async {
     final pin = peer.certFp;
     if (pin == null || pin.length != 64) {
       _logger.warn('conn: peer has no valid pin', fields: {'peer': peer.id});
@@ -267,8 +273,9 @@ class ConnectionManager {
       final request = await http
           .getUrl(healthUri)
           .timeout(const Duration(seconds: 5));
-      final response =
-          await request.close().timeout(const Duration(seconds: 5));
+      final response = await request.close().timeout(
+        const Duration(seconds: 5),
+      );
       await response.drain<void>();
       if (response.statusCode != 200) {
         throw NetworkError('health check failed (${response.statusCode})');
@@ -319,10 +326,10 @@ class ConnectionManager {
             socket.close(CloseCodes.internal, CloseCodes.reasonInternal);
           }
         },
-        onDone: () => session.handleSocketClosed(
-            socket.closeCode, socket.closeReason),
-        onError: (Object _) => session.handleSocketClosed(
-            socket.closeCode, socket.closeReason),
+        onDone: () =>
+            session.handleSocketClosed(socket.closeCode, socket.closeReason),
+        onError: (Object _) =>
+            session.handleSocketClosed(socket.closeCode, socket.closeReason),
         cancelOnError: true,
       );
       unawaited(session.startClient());
@@ -332,10 +339,10 @@ class ConnectionManager {
       return session;
     } on HandshakeException catch (e) {
       _pinnedFailure = true;
-      _logger.warn('conn: certificate rejected', fields: {
-        'peer': peer.id,
-        'error': e.runtimeType,
-      });
+      _logger.warn(
+        'conn: certificate rejected',
+        fields: {'peer': peer.id, 'error': e.runtimeType},
+      );
       _errorController.add(const CertificateMismatchError().message);
       http.close(force: true);
       return null;
@@ -382,9 +389,7 @@ class ConnectionManager {
     if (discovery == null) return null;
     await _multicastLock.acquire();
     try {
-      final found = await discovery.find(
-        expectedPin: peer.certFp,
-      );
+      final found = await discovery.find(expectedPin: peer.certFp);
       if (found == null) return null;
       return (host: found.host, port: found.port);
     } finally {

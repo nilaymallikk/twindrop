@@ -49,25 +49,26 @@ class PairingPayload {
   bool isExpiredAt(DateTime now) => !now.isBefore(expiresAt);
 
   /// Raw pairing-token bytes (for the confirmation code HMAC).
-  List<int> get pairingTokenBytes => base64Url.decode(base64Url.normalize(
-        pairingToken.padRight((pairingToken.length + 3) & ~3, '='),
-      ));
+  List<int> get pairingTokenBytes => base64Url.decode(
+    base64Url.normalize(
+      pairingToken.padRight((pairingToken.length + 3) & ~3, '='),
+    ),
+  );
 
-  String encode() => base64Url
-      .encode(utf8.encode(jsonEncode(toJson())))
-      .replaceAll('=', '');
+  String encode() =>
+      base64Url.encode(utf8.encode(jsonEncode(toJson()))).replaceAll('=', '');
 
   Map<String, dynamic> toJson() => <String, dynamic>{
-        'app': appId,
-        'v': version,
-        'hosts': hosts,
-        'port': port,
-        'fp': fingerprint,
-        'pt': pairingToken,
-        'exp': expiresAt.toUtc().toIso8601String(),
-        'name': deviceName,
-        'id': deviceId,
-      };
+    'app': appId,
+    'v': version,
+    'hosts': hosts,
+    'port': port,
+    'fp': fingerprint,
+    'pt': pairingToken,
+    'exp': expiresAt.toUtc().toIso8601String(),
+    'name': deviceName,
+    'id': deviceId,
+  };
 
   /// Strict parse of the QR string. Throws [ProtocolError] for malformed data
   /// and [UnsupportedVersionError] for a newer protocol version.
@@ -82,9 +83,9 @@ class PairingPayload {
     }
     List<int> bytes;
     try {
-      bytes = base64Url.decode(base64Url.normalize(
-        trimmed.padRight((trimmed.length + 3) & ~3, '='),
-      ));
+      bytes = base64Url.decode(
+        base64Url.normalize(trimmed.padRight((trimmed.length + 3) & ~3, '=')),
+      );
     } on FormatException {
       throw const ProtocolError('pairing payload is not base64url');
     }
@@ -106,7 +107,8 @@ class PairingPayload {
     if (v is! int) throw const ProtocolError('missing protocol version');
     if (v > version) {
       throw const UnsupportedVersionError(
-          'this QR code comes from a newer TwinDrop version');
+        'this QR code comes from a newer TwinDrop version',
+      );
     }
     if (v != version) throw const ProtocolError('unsupported QR version');
 
@@ -141,9 +143,9 @@ class PairingPayload {
     }
     List<int> tokenBytes;
     try {
-      tokenBytes = base64Url.decode(base64Url.normalize(
-        pt.padRight((pt.length + 3) & ~3, '='),
-      ));
+      tokenBytes = base64Url.decode(
+        base64Url.normalize(pt.padRight((pt.length + 3) & ~3, '=')),
+      );
     } on FormatException {
       throw const ProtocolError('invalid pairing token encoding');
     }
@@ -214,7 +216,10 @@ abstract final class ManualPairingCode {
     }
     final chars = buffer.toString();
     final padded = chars.padRight(codeLength, alphabet[0]);
-    return List.generate(groups, (g) => padded.substring(g * groupLength, (g + 1) * groupLength)).join(' ');
+    return List.generate(
+      groups,
+      (g) => padded.substring(g * groupLength, (g + 1) * groupLength),
+    ).join(' ');
   }
 
   /// Parse a user-typed code (case-insensitive, spaces/dashes ignored) back to
@@ -250,8 +255,7 @@ abstract final class ManualPairingCode {
 }
 
 /// Human-readable grouping helper used by the desktop UI ("ABCD-EFGH-…").
-String groupManualCodeForDisplay(String code) =>
-    code.replaceAll(' ', '-');
+String groupManualCodeForDisplay(String code) => code.replaceAll(' ', '-');
 
 /// Cryptographically secure random bytes.
 List<int> secureRandomBytes(int length) {

@@ -162,7 +162,10 @@ class TdTokens extends ThemeExtension<TdTokens> {
 
   /// Resolves the requested appearance. `system` follows [platformBrightness];
   /// dark stays the first-run default (docs/13 §1).
-  static TdTokens resolve(AppThemeChoice choice, Brightness platformBrightness) {
+  static TdTokens resolve(
+    AppThemeChoice choice,
+    Brightness platformBrightness,
+  ) {
     switch (choice) {
       case AppThemeChoice.light:
         return _light;
@@ -313,7 +316,6 @@ class TdTokens extends ThemeExtension<TdTokens> {
     );
   }
 }
-
 
 /// Icon sizes used by the design system (outline icons; docs/13 §4).
 abstract final class TdIconSizes {

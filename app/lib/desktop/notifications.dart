@@ -26,8 +26,7 @@ class DesktopNotifications {
           ),
         ),
         onDidReceiveNotificationResponse: (response) {
-          final id =
-              response.id ?? int.tryParse(response.payload ?? '') ?? -1;
+          final id = response.id ?? int.tryParse(response.payload ?? '') ?? -1;
           _taps.remove(id)?.call();
         },
       );

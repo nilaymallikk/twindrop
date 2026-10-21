@@ -25,11 +25,11 @@ Future<String?> showCategoryNameDialog(
     transitionDuration: context.tdSheet,
     pageBuilder: (dialogContext, animation, secondaryAnimation) =>
         _CategoryNameDialog(
-      title: title,
-      initialName: initialName,
-      confirmLabel: confirmLabel,
-      onSubmit: onSubmit,
-    ),
+          title: title,
+          initialName: initialName,
+          confirmLabel: confirmLabel,
+          onSubmit: onSubmit,
+        ),
     transitionBuilder: (context, animation, secondaryAnimation, child) {
       if (MediaQuery.maybeDisableAnimationsOf(context) ?? false) return child;
       return FadeTransition(
@@ -58,8 +58,9 @@ class _CategoryNameDialog extends StatefulWidget {
 }
 
 class _CategoryNameDialogState extends State<_CategoryNameDialog> {
-  late final TextEditingController _controller =
-      TextEditingController(text: widget.initialName ?? '');
+  late final TextEditingController _controller = TextEditingController(
+    text: widget.initialName ?? '',
+  );
   String? _error;
   bool _busy = false;
 
@@ -139,8 +140,9 @@ class _CategoryNameDialogState extends State<_CategoryNameDialog> {
                     children: <Widget>[
                       TdButton(
                         label: 'Cancel',
-                        onPressed:
-                            _busy ? null : () => Navigator.of(context).pop(),
+                        onPressed: _busy
+                            ? null
+                            : () => Navigator.of(context).pop(),
                         disabledReason: busyReason,
                       ),
                       TdButton(

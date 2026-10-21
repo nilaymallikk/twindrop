@@ -8,14 +8,18 @@ import 'package:twindrop_core/core.dart';
 /// non-Android platforms: the MissingPluginException is turned into a typed
 /// failure only when a caller actually needs the result.
 class AndroidPlatform {
-  static const MethodChannel _shareQueue =
-      MethodChannel('twindrop/share_queue');
+  static const MethodChannel _shareQueue = MethodChannel(
+    'twindrop/share_queue',
+  );
   static const MethodChannel _keepAlive = MethodChannel('twindrop/keepalive');
   static const MethodChannel _network = MethodChannel('twindrop/network');
   static const MethodChannel _app = MethodChannel('twindrop/app');
-  static const MethodChannel _notifications =
-      MethodChannel('twindrop/notifications');
-  static const MethodChannel _sharePanel = MethodChannel('twindrop/share_panel');
+  static const MethodChannel _notifications = MethodChannel(
+    'twindrop/notifications',
+  );
+  static const MethodChannel _sharePanel = MethodChannel(
+    'twindrop/share_panel',
+  );
 
   static const int requestNotificationsCode = 7101;
 
@@ -89,8 +93,8 @@ class AndroidPlatform {
   static Future<bool> startKeepAlive({String? desktopName}) async {
     try {
       return await _keepAlive.invokeMethod<bool>('start', {
-        'desktopName': desktopName,
-      }) ??
+            'desktopName': desktopName,
+          }) ??
           false;
     } on MissingPluginException {
       return false;
@@ -129,8 +133,9 @@ class AndroidPlatform {
 
   static Future<bool> isBatteryOptimizationIgnored() async {
     try {
-      return await _keepAlive
-              .invokeMethod<bool>('isBatteryOptimizationIgnored') ??
+      return await _keepAlive.invokeMethod<bool>(
+            'isBatteryOptimizationIgnored',
+          ) ??
           false;
     } on MissingPluginException {
       return true;
@@ -217,8 +222,9 @@ class AndroidPlatform {
 
   static Future<Map<String, dynamic>> platformInfo() async {
     try {
-      final raw =
-          await _app.invokeMethod<Map<dynamic, dynamic>>('getPlatformInfo');
+      final raw = await _app.invokeMethod<Map<dynamic, dynamic>>(
+        'getPlatformInfo',
+      );
       return raw == null
           ? const <String, dynamic>{}
           : Map<String, dynamic>.from(raw);
@@ -231,8 +237,9 @@ class AndroidPlatform {
 
   static Future<Map<String, dynamic>> currentNetwork() async {
     try {
-      final raw =
-          await _network.invokeMethod<Map<dynamic, dynamic>>('getCurrent');
+      final raw = await _network.invokeMethod<Map<dynamic, dynamic>>(
+        'getCurrent',
+      );
       return raw == null
           ? const <String, dynamic>{}
           : Map<String, dynamic>.from(raw);
@@ -245,7 +252,9 @@ class AndroidPlatform {
 
   /// Registered once by the UI entrypoint; the native monitor pushes
   /// `networkChanged` so the connection manager retries immediately.
-  static void listenNetworkChanges(void Function(Map<String, dynamic>) onChanged) {
+  static void listenNetworkChanges(
+    void Function(Map<String, dynamic>) onChanged,
+  ) {
     _network.setMethodCallHandler((call) async {
       if (call.method == 'networkChanged' && call.arguments is Map) {
         onChanged(Map<String, dynamic>.from(call.arguments as Map));
@@ -274,7 +283,8 @@ class AndroidPlatform {
 
   static Future<Map<String, dynamic>> getPanelPayload() async {
     final raw = await _sharePanel.invokeMethod<Map<dynamic, dynamic>>(
-        'getPanelPayload');
+      'getPanelPayload',
+    );
     return raw == null
         ? const <String, dynamic>{}
         : Map<String, dynamic>.from(raw);
@@ -290,7 +300,9 @@ class AndroidPlatform {
 
   /// The native side pushes `panelShown` / `panelChanged` when the panel
   /// activity attaches or a second share arrives while the panel is open.
-  static void listenPanelChanges(void Function(Map<String, dynamic>) onChanged) {
+  static void listenPanelChanges(
+    void Function(Map<String, dynamic>) onChanged,
+  ) {
     _sharePanel.setMethodCallHandler((call) async {
       if ((call.method == 'panelShown' || call.method == 'panelChanged') &&
           call.arguments is Map) {
@@ -326,7 +338,8 @@ class AndroidNotifier implements CoreNotifier {
   @override
   Future<void> onConnectionChanged(ConnectionStatus status) async {
     await AndroidPlatform.setKeepAliveStatus(
-      connected: status == ConnectionStatus.connected ||
+      connected:
+          status == ConnectionStatus.connected ||
           status == ConnectionStatus.syncing,
       paused: status == ConnectionStatus.paused,
     );

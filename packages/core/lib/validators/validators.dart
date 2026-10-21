@@ -28,7 +28,9 @@ class ExtractedLink {
 }
 
 final RegExp _urlCandidate = RegExp(
-  r'https?://[^\s<>"' r"'" r'`]+',
+  r'https?://[^\s<>"'
+  r"'"
+  r'`]+',
   caseSensitive: false,
 );
 
@@ -92,8 +94,9 @@ String cleanInstagramUrl(String url) {
     host: uri.host,
     port: uri.hasPort ? uri.port : null,
     path: uri.path,
-    queryParameters:
-        params.isEmpty ? null : params.map((k, v) => MapEntry(k, v.join(','))),
+    queryParameters: params.isEmpty
+        ? null
+        : params.map((k, v) => MapEntry(k, v.join(','))),
     fragment: uri.hasFragment ? uri.fragment : null,
   ).toString();
 }

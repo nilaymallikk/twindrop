@@ -112,26 +112,23 @@ class SingleInstance {
   void _listen() {
     final server = _server;
     if (server == null) return;
-    server.listen(
-      (client) {
-        client
-            .cast<List<int>>()
-            .transform(utf8.decoder)
-            .transform(const LineSplitter())
-            .listen(
-              (line) {
-                final command = line.trim();
-                if (_allowedCommands.contains(command)) {
-                  _commands.add(command);
-                }
-              },
-              onError: (_) => client.destroy(),
-              onDone: client.destroy,
-              cancelOnError: true,
-            );
-      },
-      onError: (_) {},
-    );
+    server.listen((client) {
+      client
+          .cast<List<int>>()
+          .transform(utf8.decoder)
+          .transform(const LineSplitter())
+          .listen(
+            (line) {
+              final command = line.trim();
+              if (_allowedCommands.contains(command)) {
+                _commands.add(command);
+              }
+            },
+            onError: (_) => client.destroy(),
+            onDone: client.destroy,
+            cancelOnError: true,
+          );
+    }, onError: (_) {});
   }
 
   Future<void> _restrictPermissions(String path) async {

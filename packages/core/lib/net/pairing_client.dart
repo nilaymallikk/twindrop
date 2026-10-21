@@ -56,8 +56,8 @@ class PairedDesktop {
 /// Phone-side pairing client (`docs/05` §Pairing, `PAIR-001`..`PAIR-005`).
 class PairingClient {
   PairingClient({Logger? logger, Duration? pollTimeout})
-      : _logger = logger,
-        _pollTimeout = pollTimeout ?? const Duration(seconds: 90);
+    : _logger = logger,
+      _pollTimeout = pollTimeout ?? const Duration(seconds: 90);
 
   final Logger? _logger;
   final Duration _pollTimeout;
@@ -99,8 +99,9 @@ class PairingClient {
       }
       if (client == null) {
         throw const NetworkError(
-            'cannot reach the desktop; check that both devices are on the same '
-            'Wi-Fi');
+          'cannot reach the desktop; check that both devices are on the same '
+          'Wi-Fi',
+        );
       }
       onWait?.call(payload.deviceName);
       final code = await _requestAndPoll(
@@ -271,7 +272,8 @@ class PairingClient {
   List<int> _decodeToken(String token) {
     try {
       final bytes = base64Url.decode(
-          base64Url.normalize(token.padRight((token.length + 3) & ~3, '=')));
+        base64Url.normalize(token.padRight((token.length + 3) & ~3, '=')),
+      );
       if (bytes.length != 20 && bytes.length != 32) {
         throw const PairingFailedError();
       }
@@ -282,8 +284,15 @@ class PairingClient {
   }
 
   Future<void> _health(HttpClient client, String host, int port) async {
-    final uri = Uri(scheme: 'https', host: host, port: port, path: '/v1/health');
-    final request = await client.getUrl(uri).timeout(const Duration(seconds: 5));
+    final uri = Uri(
+      scheme: 'https',
+      host: host,
+      port: port,
+      path: '/v1/health',
+    );
+    final request = await client
+        .getUrl(uri)
+        .timeout(const Duration(seconds: 5));
     final response = await request.close().timeout(const Duration(seconds: 5));
     final body = await response.transform(utf8.decoder).join();
     if (response.statusCode != 200) {
@@ -292,7 +301,8 @@ class PairingClient {
     final json = jsonDecode(body);
     if (json is! Map || json['protocolVersion'] != 1) {
       throw const UnsupportedVersionError(
-          'this desktop uses a different protocol; update TwinDrop');
+        'this desktop uses a different protocol; update TwinDrop',
+      );
     }
   }
 
@@ -304,9 +314,14 @@ class PairingClient {
     Map<String, dynamic> body,
   ) async {
     final uri = Uri(scheme: 'https', host: host, port: port, path: path);
-    final request = await client.postUrl(uri).timeout(const Duration(seconds: 5));
-    request.headers.contentType =
-        ContentType('application', 'json', charset: 'utf-8');
+    final request = await client
+        .postUrl(uri)
+        .timeout(const Duration(seconds: 5));
+    request.headers.contentType = ContentType(
+      'application',
+      'json',
+      charset: 'utf-8',
+    );
     request.write(jsonEncode(body));
     final response = await request.close().timeout(const Duration(seconds: 8));
     final text = await response.transform(utf8.decoder).join();
@@ -314,7 +329,8 @@ class PairingClient {
       throw _apiError(text, response.statusCode);
     }
     final decoded = jsonDecode(text);
-    if (decoded is! Map) throw const ProtocolError('malformed pairing response');
+    if (decoded is! Map)
+      throw const ProtocolError('malformed pairing response');
     return Map<String, dynamic>.from(decoded);
   }
 
@@ -332,7 +348,9 @@ class PairingClient {
       path: '/v1/pair/status',
       queryParameters: <String, String>{'requestId': requestId},
     );
-    final request = await client.getUrl(uri).timeout(const Duration(seconds: 5));
+    final request = await client
+        .getUrl(uri)
+        .timeout(const Duration(seconds: 5));
     request.headers.set('X-Poll-Secret', pollSecret);
     final response = await request.close().timeout(const Duration(seconds: 8));
     final text = await response.transform(utf8.decoder).join();
@@ -356,7 +374,9 @@ class PairingClient {
           return const PairingFailedError(expired: true);
         }
         if (error.code == ErrorCodes.unsupportedVersion) {
-          return const UnsupportedVersionError('update TwinDrop on both devices');
+          return const UnsupportedVersionError(
+            'update TwinDrop on both devices',
+          );
         }
         return PairingFailedError();
       }

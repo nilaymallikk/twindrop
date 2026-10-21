@@ -86,8 +86,8 @@ class TdChatBubble extends StatelessWidget {
           color: selected
               ? tokens.accent
               : mine
-                  ? tokens.paper
-                  : tokens.hairline,
+              ? tokens.paper
+              : tokens.hairline,
           width: 1,
         ),
       ),
@@ -98,11 +98,7 @@ class TdChatBubble extends StatelessWidget {
           Text(text, style: bodyStyle),
           if (linkUrl != null) ...<Widget>[
             const SizedBox(height: TdSpace.s8),
-            TdLinkChip(
-              url: linkUrl!,
-              onTap: onOpenLink,
-              inverted: mine,
-            ),
+            TdLinkChip(url: linkUrl!, onTap: onOpenLink, inverted: mine),
           ],
         ],
       ),
@@ -130,8 +126,7 @@ class TdChatBubble extends StatelessWidget {
       builder: (context, constraints) {
         final maxBubble = constraints.maxWidth * 0.78;
         final align = mine ? Alignment.centerRight : Alignment.centerLeft;
-        final cross =
-            mine ? CrossAxisAlignment.end : CrossAxisAlignment.start;
+        final cross = mine ? CrossAxisAlignment.end : CrossAxisAlignment.start;
 
         Widget result = Column(
           crossAxisAlignment: cross,
@@ -172,7 +167,8 @@ class TdChatBubble extends StatelessWidget {
 
     final labelled = Semantics(
       selected: selectionMode ? selected : null,
-      label: '${mine ? 'You' : deviceLabel}, $timeLabel. $text'
+      label:
+          '${mine ? 'You' : deviceLabel}, $timeLabel. $text'
           '${delivery != null ? '. ${TdDeliveryIcon.labelFor(delivery!)}' : ''}',
       excludeSemantics: true,
       child: content,

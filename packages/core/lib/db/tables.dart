@@ -67,7 +67,8 @@ class Items extends Table {
   TextColumn get metaHlc => text()();
 
   BoolColumn get restored => boolean().withDefault(const Constant(false))();
-  BoolColumn get isConflictCopy => boolean().withDefault(const Constant(false))();
+  BoolColumn get isConflictCopy =>
+      boolean().withDefault(const Constant(false))();
 
   @override
   Set<Column> get primaryKey => {id};

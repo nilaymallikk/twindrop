@@ -24,9 +24,9 @@ class NotepadService extends CoreService {
     required String deviceName,
     bool Function()? cleanLinks,
     super.nowMs,
-  })  : _deviceId = deviceId,
-        _deviceName = deviceName,
-        _cleanLinks = cleanLinks ?? (() => true);
+  }) : _deviceId = deviceId,
+       _deviceName = deviceName,
+       _cleanLinks = cleanLinks ?? (() => true);
 
   final String _deviceId;
   final String _deviceName;
@@ -181,7 +181,9 @@ class NotepadService extends CoreService {
         final note = await db.itemById(noteId);
         if (note == null) continue;
         final hlc = await stamp();
-        await db.putItem(note.copyWith(categoryId: Category.inboxId, metaHlc: hlc));
+        await db.putItem(
+          note.copyWith(categoryId: Category.inboxId, metaHlc: hlc),
+        );
         await db.appendChange('item', noteId);
       }
       final hlc = await stamp();
@@ -333,14 +335,13 @@ class NotepadService extends CoreService {
     int limit = 200,
     bool includeDeleted = false,
     bool onlyDeleted = false,
-  }) =>
-      db.listItems(
-        type: ItemType.note,
-        categoryId: categoryId,
-        limit: limit,
-        includeDeleted: includeDeleted,
-        onlyDeleted: onlyDeleted,
-      );
+  }) => db.listItems(
+    type: ItemType.note,
+    categoryId: categoryId,
+    limit: limit,
+    includeDeleted: includeDeleted,
+    onlyDeleted: onlyDeleted,
+  );
 
   Stream<List<Item>> watchNotes({String? categoryId, int limit = 200}) async* {
     yield await listNotes(categoryId: categoryId, limit: limit);

@@ -87,7 +87,8 @@ class _SaveToNotepadFormState extends State<_SaveToNotepadForm> {
     );
     if (!mounted || created == null) return;
     setState(() {
-      _notice = 'Added “$created”. It appears in the list the next time you '
+      _notice =
+          'Added “$created”. It appears in the list the next time you '
           'save.';
     });
   }
@@ -116,9 +117,7 @@ class _SaveToNotepadFormState extends State<_SaveToNotepadForm> {
           style: context.tdBody,
           cursorColor: tokens.accent,
           textInputAction: TextInputAction.done,
-          decoration: const InputDecoration(
-            hintText: 'Title (optional)',
-          ),
+          decoration: const InputDecoration(hintText: 'Title (optional)'),
         ),
         const SizedBox(height: TdSpace.s16),
         const TdSectionLabel('Category'),
@@ -128,8 +127,7 @@ class _SaveToNotepadFormState extends State<_SaveToNotepadForm> {
               TdCategoryItem(
                 id: category.id,
                 name: category.name,
-                isInbox:
-                    category.isInbox || category.id == Category.inboxId,
+                isInbox: category.isInbox || category.id == Category.inboxId,
               ),
           ],
           selectedId: _categoryId,
@@ -148,10 +146,7 @@ class _SaveToNotepadFormState extends State<_SaveToNotepadForm> {
           ),
         if (_notice != null) ...<Widget>[
           const SizedBox(height: TdSpace.s8),
-          Text(
-            _notice!,
-            style: type.secondary.copyWith(color: tokens.muted),
-          ),
+          Text(_notice!, style: type.secondary.copyWith(color: tokens.muted)),
         ],
         const SizedBox(height: TdSpace.s20),
         Row(

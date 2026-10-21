@@ -22,15 +22,20 @@ Widget _host(Widget child) {
 
 void main() {
   group('theme', () {
-    testWidgets('dark is the default and uses the bundled font family',
-        (tester) async {
+    testWidgets('dark is the default and uses the bundled font family', (
+      tester,
+    ) async {
       late ThemeData theme;
-      await tester.pumpWidget(_host(Builder(
-        builder: (context) {
-          theme = Theme.of(context);
-          return const SizedBox();
-        },
-      )));
+      await tester.pumpWidget(
+        _host(
+          Builder(
+            builder: (context) {
+              theme = Theme.of(context);
+              return const SizedBox();
+            },
+          ),
+        ),
+      );
 
       expect(theme.brightness, Brightness.dark);
       expect(theme.textTheme.bodyMedium?.fontFamily, TdFonts.sans);
@@ -39,18 +44,20 @@ void main() {
 
     testWidgets('light theme resolves to the light palette', (tester) async {
       late ThemeData theme;
-      await tester.pumpWidget(MaterialApp(
-        theme: buildTdTheme(
-          choice: AppThemeChoice.light,
-          platformBrightness: Brightness.light,
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: buildTdTheme(
+            choice: AppThemeChoice.light,
+            platformBrightness: Brightness.light,
+          ),
+          home: Builder(
+            builder: (context) {
+              theme = Theme.of(context);
+              return const SizedBox();
+            },
+          ),
         ),
-        home: Builder(
-          builder: (context) {
-            theme = Theme.of(context);
-            return const SizedBox();
-          },
-        ),
-      ));
+      );
 
       expect(theme.brightness, Brightness.light);
       expect(theme.scaffoldBackgroundColor, TdPalette.lightBg);
@@ -58,38 +65,51 @@ void main() {
   });
 
   group('chat screen', () {
-    testWidgets('shows the empty state when there are no messages',
-        (tester) async {
-      await tester.pumpWidget(_host(ChatScreen(
-        entries: const <ChatEntry>[],
-        status: ConnectionStatus.unpaired,
-        onSend: (_) {},
-        onSaveToNotepad: (_) {},
-      )));
+    testWidgets('shows the empty state when there are no messages', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          ChatScreen(
+            entries: const <ChatEntry>[],
+            status: ConnectionStatus.unpaired,
+            onSend: (_) {},
+            onSaveToNotepad: (_) {},
+          ),
+        ),
+      );
 
       expect(find.textContaining('No messages yet'), findsOneWidget);
     });
 
     testWidgets('the composer is always reachable', (tester) async {
       var sent = <String>[];
-      await tester.pumpWidget(_host(ChatScreen(
-        entries: const <ChatEntry>[],
-        status: ConnectionStatus.connected,
-        onSend: sent.add,
-        onSaveToNotepad: (_) {},
-      )));
+      await tester.pumpWidget(
+        _host(
+          ChatScreen(
+            entries: const <ChatEntry>[],
+            status: ConnectionStatus.connected,
+            onSend: sent.add,
+            onSaveToNotepad: (_) {},
+          ),
+        ),
+      );
 
       expect(find.byType(TextField), findsOneWidget);
     });
 
     testWidgets('an error message replaces the timeline', (tester) async {
-      await tester.pumpWidget(_host(ChatScreen(
-        entries: const <ChatEntry>[],
-        status: ConnectionStatus.offline,
-        errorMessage: 'The desktop is not reachable right now.',
-        onSend: (_) {},
-        onSaveToNotepad: (_) {},
-      )));
+      await tester.pumpWidget(
+        _host(
+          ChatScreen(
+            entries: const <ChatEntry>[],
+            status: ConnectionStatus.offline,
+            errorMessage: 'The desktop is not reachable right now.',
+            onSend: (_) {},
+            onSaveToNotepad: (_) {},
+          ),
+        ),
+      );
 
       expect(
         find.text('The desktop is not reachable right now.'),
@@ -99,27 +119,31 @@ void main() {
   });
 
   group('buttons', () {
-    testWidgets('a disabled button explains why it is disabled',
-        (tester) async {
-      await tester.pumpWidget(_host(
-        TdButton(
-          label: 'Pair a phone',
-          onPressed: null,
-          disabledReason: 'Connect to the desktop first.',
+    testWidgets('a disabled button explains why it is disabled', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          TdButton(
+            label: 'Pair a phone',
+            onPressed: null,
+            disabledReason: 'Connect to the desktop first.',
+          ),
         ),
-      ));
+      );
 
       expect(find.text('Pair a phone'), findsOneWidget);
       final button = tester.widget<TdButton>(find.byType(TdButton));
       expect(button.disabledReason, isNotNull);
     });
 
-    testWidgets('tapping a button calls the callback exactly once',
-        (tester) async {
+    testWidgets('tapping a button calls the callback exactly once', (
+      tester,
+    ) async {
       var taps = 0;
-      await tester.pumpWidget(_host(
-        TdButton(label: 'Send', onPressed: () => taps++),
-      ));
+      await tester.pumpWidget(
+        _host(TdButton(label: 'Send', onPressed: () => taps++)),
+      );
 
       await tester.tap(find.text('Send'));
       await tester.pump();

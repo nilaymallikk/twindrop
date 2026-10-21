@@ -63,7 +63,8 @@ Future<void> _mirrorStatus(CoreRuntime runtime, ConnectionStatus status) async {
   final active = await runtime.peers.active();
   await AndroidPlatform.setKeepAliveStatus(
     desktopName: active.isEmpty ? null : active.first.name,
-    connected: status == ConnectionStatus.connected ||
+    connected:
+        status == ConnectionStatus.connected ||
         status == ConnectionStatus.syncing,
     paused: status == ConnectionStatus.paused,
   );

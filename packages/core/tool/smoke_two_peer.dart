@@ -64,39 +64,60 @@ Future<void> main() async {
     throw StateError('confirmation codes differ: $deskCode vs $phoneCode');
   }
 
-  await _waitFor(() async {
-    final d = await desk.diagnostics();
-    final p = await phone.diagnostics();
-    print('status desk=${d.status} phone=${p.status} connected desk=${d.connectedPeerIds} phone=${p.connectedPeerIds}');
-    return p.connectedPeerIds.isNotEmpty && d.connectedPeerIds.isNotEmpty;
-  }, const Duration(seconds: 20), 'both connected');
+  await _waitFor(
+    () async {
+      final d = await desk.diagnostics();
+      final p = await phone.diagnostics();
+      print(
+        'status desk=${d.status} phone=${p.status} connected desk=${d.connectedPeerIds} phone=${p.connectedPeerIds}',
+      );
+      return p.connectedPeerIds.isNotEmpty && d.connectedPeerIds.isNotEmpty;
+    },
+    const Duration(seconds: 20),
+    'both connected',
+  );
   print('connected on both sides');
 
   await phone.chat.sendMessage('hello from phone');
-  final deskMsg = await _waitFor(() async {
-    final msgs = await desk.chat.listMessages();
-    final found = msgs.where((m) => m.text == 'hello from phone').toList();
-    return found.isNotEmpty ? found.first : null;
-  }, const Duration(seconds: 10), 'desk receives');
+  final deskMsg = await _waitFor(
+    () async {
+      final msgs = await desk.chat.listMessages();
+      final found = msgs.where((m) => m.text == 'hello from phone').toList();
+      return found.isNotEmpty ? found.first : null;
+    },
+    const Duration(seconds: 10),
+    'desk receives',
+  );
   print('desktop received ${deskMsg.id}');
 
   await desk.chat.sendMessage('hello from desktop');
-  final phoneMsg = await _waitFor(() async {
-    final msgs = await phone.chat.listMessages();
-    final found = msgs.where((m) => m.text == 'hello from desktop').toList();
-    return found.isNotEmpty ? found.first : null;
-  }, const Duration(seconds: 10), 'phone receives');
+  final phoneMsg = await _waitFor(
+    () async {
+      final msgs = await phone.chat.listMessages();
+      final found = msgs.where((m) => m.text == 'hello from desktop').toList();
+      return found.isNotEmpty ? found.first : null;
+    },
+    const Duration(seconds: 10),
+    'phone receives',
+  );
   print('phone received ${phoneMsg.id}');
 
-  final delivered = await _waitFor(() async {
-    final info = await desk.chat.deliveryFor(phoneMsg.id);
-    return info.isNotEmpty && info.every((i) => i.state == DeliveryState.delivered);
-  }, const Duration(seconds: 10), 'delivered');
+  final delivered = await _waitFor(
+    () async {
+      final info = await desk.chat.deliveryFor(phoneMsg.id);
+      return info.isNotEmpty &&
+          info.every((i) => i.state == DeliveryState.delivered);
+    },
+    const Duration(seconds: 10),
+    'delivered',
+  );
   print('delivery states ok=$delivered');
 
   final phoneMessages = await phone.chat.listMessages();
   final deskMessages = await desk.chat.listMessages();
-  print('phone messages=${phoneMessages.length} desk messages=${deskMessages.length}');
+  print(
+    'phone messages=${phoneMessages.length} desk messages=${deskMessages.length}',
+  );
   if (phoneMessages.where((m) => m.text == 'hello from desktop').length != 1) {
     throw StateError('duplicate desktop message on phone');
   }

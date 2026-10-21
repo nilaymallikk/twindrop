@@ -64,8 +64,8 @@ class TdCategoryTabs extends StatelessWidget {
                   final color = selected
                       ? tokens.text
                       : state.isActive
-                          ? tokens.textSecondary
-                          : tokens.muted;
+                      ? tokens.textSecondary
+                      : tokens.muted;
                   return Container(
                     padding: const EdgeInsets.fromLTRB(
                       TdSpace.s12,
@@ -214,10 +214,7 @@ class _SidebarRow extends StatelessWidget {
   final ValueChanged<TdCategoryItem>? onRename;
   final ValueChanged<TdCategoryItem>? onDelete;
 
-  Future<void> _showContextMenu(
-    BuildContext context,
-    Offset position,
-  ) async {
+  Future<void> _showContextMenu(BuildContext context, Offset position) async {
     final chosen = await showTdMenu<String>(
       context,
       globalPosition: position,

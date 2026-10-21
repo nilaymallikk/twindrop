@@ -68,7 +68,7 @@ class Hlc implements Comparable<Hlc> {
 /// `hlc.last`) and passed back through [last] on restart.
 class HlcClock {
   HlcClock({required this.deviceId, this.last, int Function()? nowMs})
-      : _nowMs = nowMs ?? (() => DateTime.now().millisecondsSinceEpoch);
+    : _nowMs = nowMs ?? (() => DateTime.now().millisecondsSinceEpoch);
 
   final String deviceId;
   final int Function() _nowMs;

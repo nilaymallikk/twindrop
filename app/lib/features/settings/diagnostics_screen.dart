@@ -81,96 +81,77 @@ class _DiagnosticsScreenState extends State<DiagnosticsScreen> {
             ),
           ),
           const SizedBox(height: TdSpace.s16),
-          _group(
-            context,
-            'This device',
-            <Widget>[
-              _row('Addresses', widget.localAddresses.isEmpty
+          _group(context, 'This device', <Widget>[
+            _row(
+              'Addresses',
+              widget.localAddresses.isEmpty
                   ? 'None found'
-                  : widget.localAddresses.join(', '), mono: true),
-              if (widget.serverPort > 0)
-                _row('Server port', '${widget.serverPort}', mono: true),
-              if (widget.pinState != null)
-                _row('Certificate', widget.pinState!, mono: true),
-              _row('Discovery', widget.mdnsSummary),
-            ],
-          ),
+                  : widget.localAddresses.join(', '),
+              mono: true,
+            ),
+            if (widget.serverPort > 0)
+              _row('Server port', '${widget.serverPort}', mono: true),
+            if (widget.pinState != null)
+              _row('Certificate', widget.pinState!, mono: true),
+            _row('Discovery', widget.mdnsSummary),
+          ]),
           const SizedBox(height: TdSpace.s16),
-          _group(
-            context,
-            'Desktop',
-            <Widget>[
-              _row('Paired device', widget.peerLabel ?? 'Not paired'),
-              _row(
-                'Last known address',
-                widget.peerLastAddress ?? 'Unknown',
-                mono: true,
-              ),
-            ],
-          ),
+          _group(context, 'Desktop', <Widget>[
+            _row('Paired device', widget.peerLabel ?? 'Not paired'),
+            _row(
+              'Last known address',
+              widget.peerLastAddress ?? 'Unknown',
+              mono: true,
+            ),
+          ]),
           const SizedBox(height: TdSpace.s16),
-          _group(
-            context,
-            'Connection',
-            <Widget>[
-              TdButton(
-                label: 'Test the connection',
-                variant: TdButtonVariant.secondary,
-                expand: true,
-                onPressed: _testing ? null : _test,
-              ),
-              if (_testResult != null) ...<Widget>[
-                const SizedBox(height: TdSpace.s12),
-                TdNotice(message: _testResult!, tone: TdNoticeTone.neutral),
-              ],
+          _group(context, 'Connection', <Widget>[
+            TdButton(
+              label: 'Test the connection',
+              variant: TdButtonVariant.secondary,
+              expand: true,
+              onPressed: _testing ? null : _test,
+            ),
+            if (_testResult != null) ...<Widget>[
               const SizedBox(height: TdSpace.s12),
-              TdButton(
-                label: 'Retry now',
-                variant: TdButtonVariant.secondary,
-                expand: true,
-                onPressed: widget.onRetry,
-              ),
+              TdNotice(message: _testResult!, tone: TdNoticeTone.neutral),
             ],
-          ),
+            const SizedBox(height: TdSpace.s12),
+            TdButton(
+              label: 'Retry now',
+              variant: TdButtonVariant.secondary,
+              expand: true,
+              onPressed: widget.onRetry,
+            ),
+          ]),
           const SizedBox(height: TdSpace.s16),
-          _group(
-            context,
-            'Manual address',
-            <Widget>[
+          _group(context, 'Manual address', <Widget>[
+            Text(
+              'Use this when discovery cannot find the desktop.',
+              style: context.tdType.meta,
+            ),
+            const SizedBox(height: TdSpace.s8),
+            _manualField(context),
+            const SizedBox(height: TdSpace.s12),
+            TdButton(
+              label: 'Use this address',
+              variant: TdButtonVariant.secondary,
+              expand: true,
+              onPressed: _manual.text.trim().isEmpty
+                  ? null
+                  : () => widget.onManualAddress(_manual.text.trim()),
+            ),
+          ]),
+          if (widget.firewallHint != null) ...<Widget>[
+            const SizedBox(height: TdSpace.s16),
+            _group(context, 'If the phone cannot connect', <Widget>[
               Text(
-                'Use this when discovery cannot find the desktop.',
+                'Some firewalls block the port. Allow it on the desktop:',
                 style: context.tdType.meta,
               ),
               const SizedBox(height: TdSpace.s8),
-              _manualField(context),
-              const SizedBox(height: TdSpace.s12),
-              TdButton(
-                label: 'Use this address',
-                variant: TdButtonVariant.secondary,
-                expand: true,
-                onPressed: _manual.text.trim().isEmpty
-                    ? null
-                    : () => widget.onManualAddress(_manual.text.trim()),
-              ),
-            ],
-          ),
-          if (widget.firewallHint != null) ...<Widget>[
-            const SizedBox(height: TdSpace.s16),
-            _group(
-              context,
-              'If the phone cannot connect',
-              <Widget>[
-                Text(
-                  'Some firewalls block the port. Allow it on the desktop:',
-                  style: context.tdType.meta,
-                ),
-                const SizedBox(height: TdSpace.s8),
-                SelectableText(
-                  widget.firewallHint!,
-                  style: context.tdType.mono,
-                ),
-              ],
-            ),
+              SelectableText(widget.firewallHint!, style: context.tdType.mono),
+            ]),
           ],
           const SizedBox(height: TdSpace.s32),
         ],

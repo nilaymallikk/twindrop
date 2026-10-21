@@ -335,7 +335,9 @@ class CoreRuntime {
   static Future<List<String>> _localAddresses() async {
     final out = <String>[];
     try {
-      final interfaces = await NetworkInterface.list(type: InternetAddressType.IPv4);
+      final interfaces = await NetworkInterface.list(
+        type: InternetAddressType.IPv4,
+      );
       for (final iface in interfaces) {
         for (final address in iface.addresses) {
           if (address.isLoopback) continue;
@@ -392,9 +394,11 @@ class CoreRuntime {
     _peerStatesController.add(<String, ConnectionStatus>{
       for (final id in sessions) id: ConnectionStatus.connected,
     });
-    _setStatus(sessions.isNotEmpty
-        ? ConnectionStatus.connected
-        : (_paused ? ConnectionStatus.paused : ConnectionStatus.searching));
+    _setStatus(
+      sessions.isNotEmpty
+          ? ConnectionStatus.connected
+          : (_paused ? ConnectionStatus.paused : ConnectionStatus.searching),
+    );
   }
 
   void _setStatus(ConnectionStatus status) {
@@ -520,19 +524,21 @@ class CoreRuntime {
       result.deviceToken,
     );
     final now = DateTime.now().millisecondsSinceEpoch;
-    await peers.addPairedPeer(Peer(
-      id: result.hostDeviceId,
-      name: result.hostName,
-      kind: PeerKind.desktop,
-      roleOfPeer: PeerRole.host,
-      tokenRef: peerTokenRef(result.hostDeviceId),
-      certFp: result.fingerprint,
-      lastHost: result.host,
-      lastPort: result.port,
-      lastSeen: now,
-      protocolVersion: result.protocolVersion,
-      createdAt: now,
-    ));
+    await peers.addPairedPeer(
+      Peer(
+        id: result.hostDeviceId,
+        name: result.hostName,
+        kind: PeerKind.desktop,
+        roleOfPeer: PeerRole.host,
+        tokenRef: peerTokenRef(result.hostDeviceId),
+        certFp: result.fingerprint,
+        lastHost: result.host,
+        lastPort: result.port,
+        lastSeen: now,
+        protocolVersion: result.protocolVersion,
+        createdAt: now,
+      ),
+    );
     connection?.setManualAddress(result.host, result.port);
     _setStatus(ConnectionStatus.searching);
     await connection?.start();

@@ -33,17 +33,18 @@ abstract final class DeviceTokens {
 /// Missing/invalid token → 401; valid token of a revoked device → 403.
 class TokenAuthenticator {
   TokenAuthenticator({required PeerRegistry peers, required Logger logger})
-      : _peers = peers,
-        _logger = logger;
+    : _peers = peers,
+      _logger = logger;
 
   final PeerRegistry _peers;
   final Logger _logger;
 
   static String? bearerFrom(String? authorizationHeader) {
     if (authorizationHeader == null) return null;
-    final match =
-        RegExp(r'^Bearer\s+([A-Za-z0-9\-_\.]{16,200})$', caseSensitive: false)
-            .firstMatch(authorizationHeader.trim());
+    final match = RegExp(
+      r'^Bearer\s+([A-Za-z0-9\-_\.]{16,200})$',
+      caseSensitive: false,
+    ).firstMatch(authorizationHeader.trim());
     return match?.group(1);
   }
 
@@ -129,7 +130,8 @@ class PairingRateLimiter {
   void check() {
     if (isLocked) {
       throw RateLimitedError(
-          retryAfterSeconds: remaining.inSeconds.clamp(1, 3600));
+        retryAfterSeconds: remaining.inSeconds.clamp(1, 3600),
+      );
     }
   }
 }
@@ -151,12 +153,12 @@ class PairRequest {
   final int protocolVersion;
 
   Map<String, dynamic> toJson() => {
-        'pairingToken': pairingToken,
-        'clientInstanceId': clientInstanceId,
-        'displayName': displayName,
-        'platform': platform,
-        'protocolVersion': protocolVersion,
-      };
+    'pairingToken': pairingToken,
+    'clientInstanceId': clientInstanceId,
+    'displayName': displayName,
+    'platform': platform,
+    'protocolVersion': protocolVersion,
+  };
 
   static PairRequest fromJson(Map<String, dynamic> json) {
     String str(String key, {int max = 200}) {
@@ -191,10 +193,10 @@ class PairRequestResponse {
   final int pollAfterMs;
 
   Map<String, dynamic> toJson() => {
-        'requestId': requestId,
-        'pollSecret': pollSecret,
-        'pollAfterMs': pollAfterMs,
-      };
+    'requestId': requestId,
+    'pollSecret': pollSecret,
+    'pollAfterMs': pollAfterMs,
+  };
 
   static PairRequestResponse fromJson(Map<String, dynamic> json) {
     final requestId = json['requestId'];
@@ -202,7 +204,8 @@ class PairRequestResponse {
     final pollAfterMs = json['pollAfterMs'];
     if (requestId is! String ||
         pollSecret is! String ||
-        pollAfterMs is! int || pollAfterMs < 0) {
+        pollAfterMs is! int ||
+        pollAfterMs < 0) {
       throw const ProtocolError('malformed pairing response');
     }
     return PairRequestResponse(
@@ -235,14 +238,14 @@ class PairStatusResponse {
   final bool alreadyCollected;
 
   Map<String, dynamic> toJson() => {
-        'state': state.wire,
-        if (deviceId != null) 'deviceId': deviceId,
-        if (deviceToken != null) 'deviceToken': deviceToken,
-        if (hostDeviceId != null) 'hostDeviceId': hostDeviceId,
-        if (hostName != null) 'hostName': hostName,
-        if (protocolVersion != null) 'protocolVersion': protocolVersion,
-        if (alreadyCollected) 'alreadyCollected': true,
-      };
+    'state': state.wire,
+    if (deviceId != null) 'deviceId': deviceId,
+    if (deviceToken != null) 'deviceToken': deviceToken,
+    if (hostDeviceId != null) 'hostDeviceId': hostDeviceId,
+    if (hostName != null) 'hostName': hostName,
+    if (protocolVersion != null) 'protocolVersion': protocolVersion,
+    if (alreadyCollected) 'alreadyCollected': true,
+  };
 
   static PairStatusResponse fromJson(Map<String, dynamic> json) {
     final state = json['state'];
@@ -296,14 +299,14 @@ class PairingRequestInfo {
   final PairingState state;
 
   PairingRequestInfo copyWith({PairingState? state}) => PairingRequestInfo(
-        requestId: requestId,
-        displayName: displayName,
-        platform: platform,
-        protocolVersion: protocolVersion,
-        confirmationCode: confirmationCode,
-        requestedAt: requestedAt,
-        state: state ?? this.state,
-      );
+    requestId: requestId,
+    displayName: displayName,
+    platform: platform,
+    protocolVersion: protocolVersion,
+    confirmationCode: confirmationCode,
+    requestedAt: requestedAt,
+    state: state ?? this.state,
+  );
 }
 
 /// HTTP error body (`docs/05` §Error format).
@@ -321,13 +324,13 @@ class ApiError {
   final bool retryable;
 
   Map<String, dynamic> toJson() => {
-        'error': {
-          'code': code,
-          'message': message,
-          if (requestId != null) 'requestId': requestId,
-          'retryable': retryable,
-        }
-      };
+    'error': {
+      'code': code,
+      'message': message,
+      if (requestId != null) 'requestId': requestId,
+      'retryable': retryable,
+    },
+  };
 
   static ApiError fromJson(Map<String, dynamic> json) {
     final e = json['error'];

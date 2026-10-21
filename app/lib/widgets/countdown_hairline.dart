@@ -38,8 +38,9 @@ class _TdCountdownHairlineState extends State<TdCountdownHairline>
     super.didChangeDependencies();
     if (_started) return;
     _started = true;
-    _controller.duration =
-        context.tdReduceMotion ? Duration.zero : widget.duration;
+    _controller.duration = context.tdReduceMotion
+        ? Duration.zero
+        : widget.duration;
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) widget.onComplete?.call();
     });

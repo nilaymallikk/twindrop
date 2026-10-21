@@ -53,20 +53,25 @@ class _TdButtonState extends State<TdButton> {
     final enabled = _enabled;
 
     final background = switch (widget.variant) {
-      TdButtonVariant.primary => enabled
-          ? (_hovered
-              ? Color.alphaBlend(
-                  tokens.onAccent.withValues(alpha: 0.12), tokens.accent)
-              : tokens.accent)
-          : tokens.raised,
-      TdButtonVariant.secondary => enabled
-          ? (_hovered
-              ? Color.alphaBlend(
-                  tokens.onPaper.withValues(alpha: 0.10), tokens.paper)
-              : tokens.paper)
-          : tokens.raised,
-      TdButtonVariant.tertiary ||
-      TdButtonVariant.destructive =>
+      TdButtonVariant.primary =>
+        enabled
+            ? (_hovered
+                  ? Color.alphaBlend(
+                      tokens.onAccent.withValues(alpha: 0.12),
+                      tokens.accent,
+                    )
+                  : tokens.accent)
+            : tokens.raised,
+      TdButtonVariant.secondary =>
+        enabled
+            ? (_hovered
+                  ? Color.alphaBlend(
+                      tokens.onPaper.withValues(alpha: 0.10),
+                      tokens.paper,
+                    )
+                  : tokens.paper)
+            : tokens.raised,
+      TdButtonVariant.tertiary || TdButtonVariant.destructive =>
         _hovered && enabled ? tokens.raised : TdPalette.transparent,
     };
     final foreground = !enabled
@@ -79,11 +84,11 @@ class _TdButtonState extends State<TdButton> {
           };
     final borderColor = _focused
         ? (widget.variant == TdButtonVariant.primary
-            ? tokens.onAccent
-            : tokens.accent)
+              ? tokens.onAccent
+              : tokens.accent)
         : (widget.variant == TdButtonVariant.secondary && enabled
-            ? tokens.paper
-            : TdPalette.transparent);
+              ? tokens.paper
+              : TdPalette.transparent);
 
     final labelStyle = type.label.copyWith(color: foreground);
     final content = Row(
@@ -122,8 +127,9 @@ class _TdButtonState extends State<TdButton> {
 
     button = FocusableActionDetector(
       enabled: enabled,
-      mouseCursor:
-          enabled ? SystemMouseCursors.click : SystemMouseCursors.basic,
+      mouseCursor: enabled
+          ? SystemMouseCursors.click
+          : SystemMouseCursors.basic,
       onShowFocusHighlight: (value) => setState(() => _focused = value),
       onShowHoverHighlight: (value) => setState(() => _hovered = value),
       shortcuts: const <ShortcutActivator, Intent>{
@@ -200,13 +206,14 @@ class _TdIconButtonState extends State<TdIconButton> {
     final enabled = widget.onPressed != null;
     final foreground = !enabled
         ? tokens.muted
-        : (widget.color ?? (widget.selected ? tokens.text : tokens.textSecondary));
+        : (widget.color ??
+              (widget.selected ? tokens.text : tokens.textSecondary));
     final side = context.tdControlHeight;
     final background = widget.selected
         ? tokens.raised
         : _hovered && enabled
-            ? tokens.raised
-            : TdPalette.transparent;
+        ? tokens.raised
+        : TdPalette.transparent;
 
     final button = Container(
       width: side,
@@ -225,8 +232,9 @@ class _TdIconButtonState extends State<TdIconButton> {
 
     Widget interactive = FocusableActionDetector(
       enabled: enabled,
-      mouseCursor:
-          enabled ? SystemMouseCursors.click : SystemMouseCursors.basic,
+      mouseCursor: enabled
+          ? SystemMouseCursors.click
+          : SystemMouseCursors.basic,
       onShowFocusHighlight: (value) => setState(() => _focused = value),
       onShowHoverHighlight: (value) => setState(() => _hovered = value),
       shortcuts: const <ShortcutActivator, Intent>{
@@ -255,8 +263,7 @@ class _TdIconButtonState extends State<TdIconButton> {
       ),
     );
 
-    final tooltip =
-        widget.tooltip ?? (enabled ? null : widget.disabledReason);
+    final tooltip = widget.tooltip ?? (enabled ? null : widget.disabledReason);
     if (tooltip != null) {
       interactive = Tooltip(message: tooltip, child: interactive);
     }
@@ -298,12 +305,13 @@ class _TdInlineActionState extends State<TdInlineAction> {
     final color = !enabled
         ? tokens.muted
         : widget.destructive
-            ? tokens.error
-            : tokens.accent;
+        ? tokens.error
+        : tokens.accent;
     final style = (widget.mono ? type.meta : type.label).copyWith(
       color: color,
-      decoration:
-          _hovered && enabled ? TextDecoration.underline : TextDecoration.none,
+      decoration: _hovered && enabled
+          ? TextDecoration.underline
+          : TextDecoration.none,
       decorationColor: color,
     );
 
@@ -326,8 +334,9 @@ class _TdInlineActionState extends State<TdInlineAction> {
 
     final interactive = FocusableActionDetector(
       enabled: enabled,
-      mouseCursor:
-          enabled ? SystemMouseCursors.click : SystemMouseCursors.basic,
+      mouseCursor: enabled
+          ? SystemMouseCursors.click
+          : SystemMouseCursors.basic,
       onShowFocusHighlight: (value) => setState(() => _focused = value),
       onShowHoverHighlight: (value) => setState(() => _hovered = value),
       shortcuts: const <ShortcutActivator, Intent>{

@@ -51,7 +51,9 @@ class _ChatTimelineState extends State<ChatTimeline> {
   void initState() {
     super.initState();
     _controller.addListener(_onScroll);
-    WidgetsBinding.instance.addPostFrameCallback((_) => _jumpToBottom(animate: false));
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => _jumpToBottom(animate: false),
+    );
   }
 
   @override
@@ -135,7 +137,8 @@ class _ChatTimelineState extends State<ChatTimeline> {
             }
             final entry = row.entry!;
             final selected = widget.selectedIds.contains(entry.id);
-            final animateIn = entry.id == lastEntryId &&
+            final animateIn =
+                entry.id == lastEntryId &&
                 (_previousCount ?? 0) < widget.entries.length &&
                 !oldIds.contains(entry.id);
             Widget bubble = Padding(
@@ -153,8 +156,8 @@ class _ChatTimelineState extends State<ChatTimeline> {
                 selected: selected,
                 selectionMode: widget.selectionMode,
                 animateIn: animateIn,
-                onMenuRequested: widget.selectionMode ||
-                        widget.onMenuRequested == null
+                onMenuRequested:
+                    widget.selectionMode || widget.onMenuRequested == null
                     ? null
                     : (position) => widget.onMenuRequested!(entry, position),
               ),

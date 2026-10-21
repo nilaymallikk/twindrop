@@ -36,13 +36,13 @@ class HelloFrame extends Frame {
 
   @override
   Map<String, dynamic> toJson() => {
-        't': type,
-        'v': v,
-        'id': deviceId,
-        'name': name,
-        'kind': kind.wire,
-        'app': appVersion,
-      };
+    't': type,
+    'v': v,
+    'id': deviceId,
+    'name': name,
+    'kind': kind.wire,
+    'app': appVersion,
+  };
 }
 
 class ReadyFrame extends Frame {
@@ -67,13 +67,13 @@ class ReadyFrame extends Frame {
 
   @override
   Map<String, dynamic> toJson() => {
-        't': type,
-        'v': v,
-        'id': deviceId,
-        'name': name,
-        'seq': seq,
-        'serverTime': serverTime,
-      };
+    't': type,
+    'v': v,
+    'id': deviceId,
+    'name': name,
+    'seq': seq,
+    'serverTime': serverTime,
+  };
 }
 
 class PullFrame extends Frame {
@@ -114,10 +114,10 @@ class NotifyFrame extends Frame {
 
   @override
   Map<String, dynamic> toJson() => {
-        't': type,
-        'seq': seq,
-        if (inline != null) 'inline': inline!.toJson(),
-      };
+    't': type,
+    'seq': seq,
+    if (inline != null) 'inline': inline!.toJson(),
+  };
 }
 
 class AckFrame extends Frame {
@@ -171,11 +171,11 @@ class ErrorFrame extends Frame {
 
   @override
   Map<String, dynamic> toJson() => {
-        't': type,
-        'code': code,
-        'message': message,
-        'retryable': retryable,
-      };
+    't': type,
+    'code': code,
+    'message': message,
+    'retryable': retryable,
+  };
 }
 
 /// A frame type this version does not know: ignored, never fatal
@@ -268,7 +268,8 @@ abstract final class FrameCodec {
     final v = _int(json, 'v');
     if (v > protocolVersion) {
       throw const UnsupportedVersionError(
-          'peer uses a newer protocol version; update TwinDrop');
+        'peer uses a newer protocol version; update TwinDrop',
+      );
     }
     if (v != protocolVersion) throw const ProtocolError('bad version');
     return HelloFrame(
@@ -284,7 +285,8 @@ abstract final class FrameCodec {
     final v = _int(json, 'v');
     if (v > protocolVersion) {
       throw const UnsupportedVersionError(
-          'peer uses a newer protocol version; update TwinDrop');
+        'peer uses a newer protocol version; update TwinDrop',
+      );
     }
     if (v != protocolVersion) throw const ProtocolError('bad version');
     return ReadyFrame(
@@ -311,8 +313,11 @@ abstract final class FrameCodec {
     return v;
   }
 
-  static String _string(Map<String, dynamic> json, String key,
-      {required int maxLength}) {
+  static String _string(
+    Map<String, dynamic> json,
+    String key, {
+    required int maxLength,
+  }) {
     final v = json[key];
     if (v is! String || v.length > maxLength) {
       throw ProtocolError('missing/invalid $key');
@@ -328,10 +333,10 @@ abstract final class FrameCodec {
 
 /// Error frame from a typed failure (`docs/05` error format).
 ErrorFrame errorFrameFor(TwinDropError error) => ErrorFrame(
-      code: error.code,
-      message: error.message,
-      retryable: error.retryable,
-    );
+  code: error.code,
+  message: error.message,
+  retryable: error.retryable,
+);
 
 /// Convenience for session code: highest seq currently committed.
 Future<int> latestSeq(ChangeBus bus, int Function() read) async => read();

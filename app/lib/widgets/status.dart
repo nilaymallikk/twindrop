@@ -54,12 +54,7 @@ TdStatusTone tdConnectionTone(ConnectionStatus status) {
 
 /// A single status dot (also used for unread markers).
 class TdDot extends StatelessWidget {
-  const TdDot({
-    super.key,
-    this.color,
-    this.hollow = false,
-    this.size = 8,
-  });
+  const TdDot({super.key, this.color, this.hollow = false, this.size = 8});
 
   final Color? color;
 
@@ -130,7 +125,10 @@ class TdStatus extends StatelessWidget {
         ? context.tdType.meta.copyWith(color: tokens.muted)
         : context.tdType.secondary;
     if (!showLabel) {
-      return Semantics(label: label, child: TdDot(color: color, size: dotSize));
+      return Semantics(
+        label: label,
+        child: TdDot(color: color, size: dotSize),
+      );
     }
     return Semantics(
       label: label,

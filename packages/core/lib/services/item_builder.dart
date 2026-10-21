@@ -34,7 +34,8 @@ Item buildNewItem({
     }
   } else {
     validateNoteText(text);
-    if (text.trim().isEmpty && (title == null || title!.trim().isEmpty) &&
+    if (text.trim().isEmpty &&
+        (title == null || title!.trim().isEmpty) &&
         (url == null || url!.trim().isEmpty)) {
       throw const ValidationError('note is empty');
     }
@@ -55,8 +56,7 @@ Item buildNewItem({
   }
 
   final kind = storedUrl != null ? ItemKind.link : ItemKind.text;
-  final contentHash =
-      contentHashOf(text: text, title: title, url: storedUrl);
+  final contentHash = contentHashOf(text: text, title: title, url: storedUrl);
   return Item(
     id: id ?? newId(),
     type: type,

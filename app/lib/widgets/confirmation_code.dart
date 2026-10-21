@@ -24,10 +24,7 @@ class TdConfirmationCode extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         if (label != null)
-          Text(
-            label!,
-            style: type.secondary.copyWith(color: tokens.muted),
-          ),
+          Text(label!, style: type.secondary.copyWith(color: tokens.muted)),
         if (label != null) const SizedBox(height: TdSpace.s4),
         Semantics(
           label: 'Confirmation code $code',

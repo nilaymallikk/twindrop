@@ -33,8 +33,8 @@ class DiscoveredHost {
 /// must be held only while a lookup is in flight.
 class MdnsDiscovery {
   MdnsDiscovery({Logger? logger, MulticastLock? multicastLock})
-      : _logger = logger,
-        _multicastLock = multicastLock;
+    : _logger = logger,
+      _multicastLock = multicastLock;
 
   final Logger? _logger;
   final MulticastLock? _multicastLock;
@@ -46,9 +46,11 @@ class MdnsDiscovery {
     final existing = _client;
     if (existing != null) return existing;
     final client = MDnsClient();
-    await client.start(onError: (Object e) {
-      _logger?.debug('mdns: socket error', fields: {'error': e.runtimeType});
-    });
+    await client.start(
+      onError: (Object e) {
+        _logger?.debug('mdns: socket error', fields: {'error': e.runtimeType});
+      },
+    );
     _client = client;
     return client;
   }
@@ -75,17 +77,14 @@ class MdnsDiscovery {
           .first
           .timeout(timeout);
       final txtRecords = await client
-          .lookup<TxtResourceRecord>(
-            ResourceRecordQuery.text(ptr.domainName),
-          )
+          .lookup<TxtResourceRecord>(ResourceRecordQuery.text(ptr.domainName))
           .toList()
           .timeout(timeout);
       final txt = <String, String>{};
       for (final record in txtRecords) {
         final idx = record.text.indexOf('=');
         if (idx <= 0) continue;
-        txt[record.text.substring(0, idx)] =
-            record.text.substring(idx + 1);
+        txt[record.text.substring(0, idx)] = record.text.substring(idx + 1);
       }
       final hint = txt['fp8'] ?? '';
       if (expectedPin != null &&
@@ -141,9 +140,10 @@ class MdnsAnnouncer {
     required this.port,
     required this.interfaceAddresses,
     Logger? logger,
-  })  : _logger = logger,
-        _hostName = 'twindrop-${deviceId.replaceAll('-', '').substring(0, 8)}'
-            '.local';
+  }) : _logger = logger,
+       _hostName =
+           'twindrop-${deviceId.replaceAll('-', '').substring(0, 8)}'
+           '.local';
 
   final String deviceId;
   final String deviceName;
@@ -188,12 +188,13 @@ class MdnsAnnouncer {
           if (event != RawSocketEvent.read) return;
           final datagram = socket.receive();
           if (datagram == null) return;
-          _maybeRespond(socket, datagram.data, datagram.address,
-              datagram.port);
+          _maybeRespond(socket, datagram.data, datagram.address, datagram.port);
         },
         onError: (Object e) {
-          _logger?.debug('mdns: announcer socket error',
-              fields: {'error': e.runtimeType});
+          _logger?.debug(
+            'mdns: announcer socket error',
+            fields: {'error': e.runtimeType},
+          );
         },
       );
       announce();
@@ -203,29 +204,33 @@ class MdnsAnnouncer {
       _logger?.info('mdns: announcing', fields: {'host': _hostName});
       return true;
     } on Object catch (e) {
-      _logger?.warn('mdns: announce unavailable',
-          fields: {'error': e.runtimeType});
+      _logger?.warn(
+        'mdns: announce unavailable',
+        fields: {'error': e.runtimeType},
+      );
       _running = false;
       return false;
     }
   }
 
   void _joinInterfaces(RawDatagramSocket socket) {
-    NetworkInterface.list(type: InternetAddressType.IPv4).then((list) {
-      for (final iface in list) {
-        try {
-          socket.joinMulticast(_group, iface);
-        } on Object {
-          // Interface may not support multicast (e.g. some VPNs).
-        }
-      }
-    }).catchError((Object _) {
-      try {
-        socket.joinMulticast(_group);
-      } on Object {
-        // Multicast unavailable: the app still works via last IP/manual.
-      }
-    });
+    NetworkInterface.list(type: InternetAddressType.IPv4)
+        .then((list) {
+          for (final iface in list) {
+            try {
+              socket.joinMulticast(_group, iface);
+            } on Object {
+              // Interface may not support multicast (e.g. some VPNs).
+            }
+          }
+        })
+        .catchError((Object _) {
+          try {
+            socket.joinMulticast(_group);
+          } on Object {
+            // Multicast unavailable: the app still works via last IP/manual.
+          }
+        });
   }
 
   void announce() {
@@ -363,10 +368,12 @@ _NameRead? _readName(Uint8List data, int start) {
       return null;
     }
     if (offset + 1 + length > data.length) return null;
-    labels.add(utf8.decode(
-      data.sublist(offset + 1, offset + 1 + length),
-      allowMalformed: true,
-    ));
+    labels.add(
+      utf8.decode(
+        data.sublist(offset + 1, offset + 1 + length),
+        allowMalformed: true,
+      ),
+    );
     offset += 1 + length;
   }
   return null;

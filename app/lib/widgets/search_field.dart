@@ -143,11 +143,7 @@ class TdKeyboardHint extends StatelessWidget {
 /// inserts a newline. Used by the composer and by screens that need shortcut
 /// handling without changing text field behaviour elsewhere.
 class TdSendOnEnter extends StatelessWidget {
-  const TdSendOnEnter({
-    super.key,
-    required this.onSend,
-    required this.child,
-  });
+  const TdSendOnEnter({super.key, required this.onSend, required this.child});
 
   final VoidCallback onSend;
   final Widget child;

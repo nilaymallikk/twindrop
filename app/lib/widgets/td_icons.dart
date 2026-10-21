@@ -27,38 +27,43 @@ class TdIconData {
 /// The TwinDrop outline icon set. Lucide-style geometry, single family.
 abstract final class TdIcons {
   static const TdIconData check = TdIconData('M20 6 9 17 4 12');
-  static const TdIconData checkCheck =
-      TdIconData('M18 6 7 17 2 12 M22 10 13 19 11 17');
-  static const TdIconData clock =
-      TdIconData('M12 2a10 10 0 1 0 0 20 10 10 0 1 0 0-20 M12 7v5l3 2');
-  static const TdIconData send =
-      TdIconData('M22 2 11 13 M22 2 15 22 11 13 2 9 22 2');
-  static const TdIconData search =
-      TdIconData('M11 3a8 8 0 1 0 0 16 8 8 0 1 0 0-16 M21 21l-4.3-4.3');
+  static const TdIconData checkCheck = TdIconData(
+    'M18 6 7 17 2 12 M22 10 13 19 11 17',
+  );
+  static const TdIconData clock = TdIconData(
+    'M12 2a10 10 0 1 0 0 20 10 10 0 1 0 0-20 M12 7v5l3 2',
+  );
+  static const TdIconData send = TdIconData(
+    'M22 2 11 13 M22 2 15 22 11 13 2 9 22 2',
+  );
+  static const TdIconData search = TdIconData(
+    'M11 3a8 8 0 1 0 0 16 8 8 0 1 0 0-16 M21 21l-4.3-4.3',
+  );
   static const TdIconData plus = TdIconData('M12 5v14 M5 12h14');
-  static const TdIconData pin =
-      TdIconData('M9 3h6 M10 3v6l-3 4h10l-3-4V3 M12 13v8');
-  static const TdIconData moreHorizontal =
-      TdIconData('M4 12h.01 M12 12h.01 M20 12h.01');
+  static const TdIconData pin = TdIconData(
+    'M9 3h6 M10 3v6l-3 4h10l-3-4V3 M12 13v8',
+  );
+  static const TdIconData moreHorizontal = TdIconData(
+    'M4 12h.01 M12 12h.01 M20 12h.01',
+  );
   static const TdIconData close = TdIconData('M18 6 6 18 M6 6l12 12');
   static const TdIconData chevronDown = TdIconData('m6 9 6 6 6-6');
   static const TdIconData chevronRight = TdIconData('m9 18 6-6-6-6');
   static const TdIconData chevronLeft = TdIconData('m15 18-6-6 6-6');
-  static const TdIconData arrowDown =
-      TdIconData('M12 5v14 M19 12l-7 7-7-7');
+  static const TdIconData arrowDown = TdIconData('M12 5v14 M19 12l-7 7-7-7');
   static const TdIconData arrowLeft = TdIconData('M19 12H5 M12 19l-7-7 7-7');
   static const TdIconData arrowUp = TdIconData('M12 19V5 M5 12l7-7 7 7');
   static const TdIconData link = TdIconData(
     'M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71 '
     'M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71',
   );
-  static const TdIconData copy =
-      TdIconData('M8 8h12v12H8z M16 8V4H4v12h4');
+  static const TdIconData copy = TdIconData('M8 8h12v12H8z M16 8V4H4v12h4');
   static const TdIconData trash = TdIconData(
     'M3 6h18 M8 6V4h8v2 M19 6l-1 14H6L5 6 M10 11v6 M14 11v6',
   );
-  static const TdIconData edit =
-      TdIconData('M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z');
+  static const TdIconData edit = TdIconData(
+    'M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z',
+  );
   static const TdIconData refresh = TdIconData(
     'M21 2v6h-6 M3 12a9 9 0 0 1 15-6.7L21 8 '
     'M3 22v-6h6 M21 12a9 9 0 0 1-15 6.7L3 16',
@@ -77,14 +82,16 @@ abstract final class TdIcons {
     'M15 3h6v6 M10 14 21 3 '
     'M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6',
   );
-  static const TdIconData monitor =
-      TdIconData('M3 4h18v12H3z M8 20h8 M12 16v4');
+  static const TdIconData monitor = TdIconData(
+    'M3 4h18v12H3z M8 20h8 M12 16v4',
+  );
   static const TdIconData phone = TdIconData(
     'M7 2h10a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z '
     'M11 18h2',
   );
-  static const TdIconData alert =
-      TdIconData('M12 2a10 10 0 1 0 0 20 10 10 0 1 0 0-20 M12 8v5 M12 16h.01');
+  static const TdIconData alert = TdIconData(
+    'M12 2a10 10 0 1 0 0 20 10 10 0 1 0 0-20 M12 8v5 M12 16h.01',
+  );
   static const TdIconData wifi = TdIconData(
     'M2 8.8a16 16 0 0 1 20 0 M5 12.5a11 11 0 0 1 14 0 '
     'M8.5 16a6 6 0 0 1 7 0 M12 20h.01',
@@ -96,11 +103,13 @@ abstract final class TdIcons {
   static const TdIconData shield = TdIconData(
     'M12 2 4 6v6c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V6z',
   );
-  static const TdIconData terminal =
-      TdIconData('M4 4h16v16H4z M8 9l3 3-3 3 M13 15h4');
-  static const TdIconData image =
-      TdIconData('M3 3h18v18H3z M8 11a2 2 0 1 0 0-4 2 2 0 0 0 0 4 '
-          'M21 15l-5-5L5 21');
+  static const TdIconData terminal = TdIconData(
+    'M4 4h16v16H4z M8 9l3 3-3 3 M13 15h4',
+  );
+  static const TdIconData image = TdIconData(
+    'M3 3h18v18H3z M8 11a2 2 0 1 0 0-4 2 2 0 0 0 0 4 '
+    'M21 15l-5-5L5 21',
+  );
   static const TdIconData select = TdIconData('M4 4h16v16H4z M8 12l3 3 6-6');
   static const TdIconData logout = TdIconData(
     'M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4 M16 17l5-5-5-5 M21 12H9',
@@ -115,8 +124,9 @@ abstract final class TdIcons {
     'M9 2h6v4H9z M7 4h10a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6'
     'a2 2 0 0 1 2-2z',
   );
-  static const TdIconData download =
-      TdIconData('M12 3v12 M7 10l5 5 5-5 M4 21h16');
+  static const TdIconData download = TdIconData(
+    'M12 3v12 M7 10l5 5 5-5 M4 21h16',
+  );
   static const TdIconData filter = TdIconData('M3 5h18l-7 8v6l-4 2v-8z');
   static const TdIconData grip = TdIconData(
     'M9 5h.01 M9 12h.01 M9 19h.01 M15 5h.01 M15 12h.01 M15 19h.01',
@@ -485,8 +495,7 @@ class _PathReader {
     final denom = rxSq * y1p * y1p + rySq * x1p * x1p;
     var factor = 0.0;
     if (denom != 0) {
-      final value =
-          (rxSq * rySq - rxSq * y1p * y1p - rySq * x1p * x1p) / denom;
+      final value = (rxSq * rySq - rxSq * y1p * y1p - rySq * x1p * x1p) / denom;
       factor = math.sqrt(math.max(0, value));
     }
     if (largeArc == sweep) factor = -factor;
@@ -509,13 +518,9 @@ class _PathReader {
     final handle = 4 / 3 * math.tan(segmentAngle / 4);
 
     double pointX(double angle) =>
-        cosPhi * rx * math.cos(angle) -
-        sinPhi * ry * math.sin(angle) +
-        centerX;
+        cosPhi * rx * math.cos(angle) - sinPhi * ry * math.sin(angle) + centerX;
     double pointY(double angle) =>
-        sinPhi * rx * math.cos(angle) +
-        cosPhi * ry * math.sin(angle) +
-        centerY;
+        sinPhi * rx * math.cos(angle) + cosPhi * ry * math.sin(angle) + centerY;
     double derivX(double angle) =>
         -cosPhi * rx * math.sin(angle) - sinPhi * ry * math.cos(angle);
     double derivY(double angle) =>

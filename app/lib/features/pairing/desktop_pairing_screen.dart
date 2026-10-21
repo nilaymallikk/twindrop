@@ -46,10 +46,7 @@ class DesktopPairingScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          Text(
-            'Pair a phone',
-            style: context.tdType.screen,
-          ),
+          Text('Pair a phone', style: context.tdType.screen),
           const SizedBox(height: TdSpace.s4),
           Text(
             'Open TwinDrop on the phone and scan this code, or type the '
@@ -112,11 +109,7 @@ class DesktopPairingScreen extends StatelessWidget {
           ),
         if (data.manualAddress != null) ...<Widget>[
           const SizedBox(height: TdSpace.s20),
-          _DetailRow(
-            label: 'Address',
-            value: data.manualAddress!,
-            mono: true,
-          ),
+          _DetailRow(label: 'Address', value: data.manualAddress!, mono: true),
         ],
         if (data.fingerprint != null) ...<Widget>[
           const SizedBox(height: TdSpace.s8),
@@ -166,7 +159,8 @@ class DesktopPairingScreen extends StatelessWidget {
         if (requestId == null) ...<Widget>[
           const SizedBox(height: TdSpace.s12),
           TdErrorState(
-            message: 'The approval request expired. Start a new pairing '
+            message:
+                'The approval request expired. Start a new pairing '
                 'session.',
             actionLabel: 'Start over',
             onAction: onRetry,
@@ -181,7 +175,8 @@ class DesktopPairingScreen extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         TdNotice(
-          message: 'Paired with ${data.connectedDeviceName ?? 'the phone'}. '
+          message:
+              'Paired with ${data.connectedDeviceName ?? 'the phone'}. '
               'Messages now sync both ways.',
           tone: TdNoticeTone.neutral,
         ),
@@ -224,10 +219,7 @@ class _DetailRow extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        SizedBox(
-          width: 112,
-          child: Text(label, style: context.tdType.meta),
-        ),
+        SizedBox(width: 112, child: Text(label, style: context.tdType.meta)),
         Expanded(
           child: Text(
             value,

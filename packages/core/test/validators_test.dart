@@ -348,7 +348,10 @@ void main() {
 
     test('validateCategoryName throws for invalid names', () {
       expect(() => validateCategoryName(''), throwsA(isA<ValidationError>()));
-      expect(() => validateCategoryName('a' * 61), throwsA(isA<ValidationError>()));
+      expect(
+        () => validateCategoryName('a' * 61),
+        throwsA(isA<ValidationError>()),
+      );
       expect(() => validateCategoryName('ok'), returnsNormally);
     });
 

@@ -52,9 +52,9 @@ class MergeEngine {
     required AppDatabase db,
     required HlcClock clock,
     required Logger logger,
-  })  : _db = db,
-        _clock = clock,
-        _logger = logger;
+  }) : _db = db,
+       _clock = clock,
+       _logger = logger;
 
   final AppDatabase _db;
   final HlcClock _clock;
@@ -68,10 +68,10 @@ class MergeEngine {
       await _db.putItem(remote);
       await _db.ftsUpsert(remote);
       await _db.appendChange('item', remote.id, sourcePeer: fromPeer);
-      _logger.debug('merge: inserted item', fields: {
-        'id': remote.id,
-        'from': fromPeer,
-      });
+      _logger.debug(
+        'merge: inserted item',
+        fields: {'id': remote.id, 'from': fromPeer},
+      );
       return MergeResult(item: remote, inserted: true, changed: true);
     }
 
@@ -89,7 +89,8 @@ class MergeEngine {
     } else {
       // Concurrent edit: higher content_hlc wins, loser becomes a conflict copy.
       final cmp = compareHlcValues(remote.contentHlc, local.contentHlc);
-      final remoteWins = cmp > 0 ||
+      final remoteWins =
+          cmp > 0 ||
           (cmp == 0 && remote.contentHash.compareTo(local.contentHash) > 0);
       contentSource = remoteWins ? remote : local;
       contentLoser = remoteWins ? local : remote;
@@ -118,7 +119,9 @@ class MergeEngine {
       title: contentSource.title,
       url: contentSource.url,
       sourceApp: local.sourceApp,
-      categoryId: contentSource.type == ItemType.message ? null : meta.categoryId,
+      categoryId: contentSource.type == ItemType.message
+          ? null
+          : meta.categoryId,
       originDevice: local.originDevice,
       originName: local.originName,
       sourceItemId: local.sourceItemId,
@@ -141,8 +144,10 @@ class MergeEngine {
       if (compareHlcValues(merged.contentHlc, merged.deletedHlc!) > 0) {
         finalItem = merged.copyWith(deleted: false, restored: true);
         restored = true;
-        _logger.debug('merge: restored item after concurrent delete',
-            fields: {'id': merged.id});
+        _logger.debug(
+          'merge: restored item after concurrent delete',
+          fields: {'id': merged.id},
+        );
       }
     }
 
@@ -199,8 +204,9 @@ class MergeEngine {
         ? loser.title!
         : loser.text;
     final trimmed = baseTitle.trim();
-    final snippet =
-        trimmed.length <= 40 ? trimmed : trimmed.substring(0, 40).trim();
+    final snippet = trimmed.length <= 40
+        ? trimmed
+        : trimmed.substring(0, 40).trim();
     var title = 'Conflict copy: $snippet';
     if (title.length > 200) title = title.substring(0, 200);
     return Item(
@@ -247,8 +253,10 @@ class MergeEngine {
 
   // ----------------------------------------------------------- categories ---
 
-  Future<CategoryMergeResult> mergeCategory(Category remote,
-      {String? fromPeer}) async {
+  Future<CategoryMergeResult> mergeCategory(
+    Category remote, {
+    String? fromPeer,
+  }) async {
     final local = await _db.categoryById(remote.id);
     if (local == null) {
       final row = remote.id == Category.inboxId
@@ -288,7 +296,8 @@ class MergeEngine {
         sortOrder: local.deleted && !remote.deleted
             ? remote.sortOrder
             : local.sortOrder,
-        isInbox: local.id == Category.inboxId || local.isInbox || remote.isInbox,
+        isInbox:
+            local.id == Category.inboxId || local.isInbox || remote.isInbox,
         metaHlc: local.metaHlc,
         deleted: local.deleted && remote.deleted,
       );
@@ -308,7 +317,10 @@ class MergeEngine {
     }
     await _resolveNameCollisions(fromPeer: fromPeer);
     return CategoryMergeResult(
-        category: merged, inserted: false, changed: changed);
+      category: merged,
+      inserted: false,
+      changed: changed,
+    );
   }
 
   bool _sameCategory(Category a, Category b) =>
@@ -343,16 +355,21 @@ class MergeEngine {
           final hlc = _clock.next().value;
           await _db.saveHlcValue(hlc);
           await _db.putItem(item.copyWith(categoryId: winner.id, metaHlc: hlc));
-          await _db.appendChange('item', itemId, sourcePeer: fromPeer,
-              createdAt: DateTime.now().millisecondsSinceEpoch);
+          await _db.appendChange(
+            'item',
+            itemId,
+            sourcePeer: fromPeer,
+            createdAt: DateTime.now().millisecondsSinceEpoch,
+          );
         }
         final hlc = _clock.next().value;
         await _db.saveHlcValue(hlc);
-        await _db.putCategory(
-            loser.copyWith(deleted: true, metaHlc: hlc));
+        await _db.putCategory(loser.copyWith(deleted: true, metaHlc: hlc));
         await _db.appendChange('category', loser.id, sourcePeer: fromPeer);
-        _logger.info('merge: category name collision resolved',
-            fields: {'loser': loser.id, 'winner': winner.id});
+        _logger.info(
+          'merge: category name collision resolved',
+          fields: {'loser': loser.id, 'winner': winner.id},
+        );
       }
     }
   }
@@ -389,12 +406,12 @@ class MetaGroup {
   final String metaHlc;
 
   factory MetaGroup.from(Item i) => MetaGroup(
-        categoryId: i.categoryId,
-        pinned: i.pinned,
-        deleted: i.deleted,
-        deletedHlc: i.deletedHlc,
-        metaHlc: i.metaHlc,
-      );
+    categoryId: i.categoryId,
+    pinned: i.pinned,
+    deleted: i.deleted,
+    deletedHlc: i.deletedHlc,
+    metaHlc: i.metaHlc,
+  );
 
   /// Equal-HLC combination: survives if either side kept it.
   factory MetaGroup.combine(Item a, Item b) {

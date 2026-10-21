@@ -38,14 +38,18 @@ void main() {
   group('desktop popup shortcuts (LNX-003)', () {
     testWidgets('Escape hides the popup', (tester) async {
       var closed = 0;
-      await tester.pumpWidget(_host(ChatPopup(
-        entries: const <ChatEntry>[],
-        status: ConnectionStatus.connected,
-        onOpenApp: () {},
-        onSend: (_) {},
-        onSaveToNotepad: (_) {},
-        onClose: () => closed++,
-      )));
+      await tester.pumpWidget(
+        _host(
+          ChatPopup(
+            entries: const <ChatEntry>[],
+            status: ConnectionStatus.connected,
+            onOpenApp: () {},
+            onSend: (_) {},
+            onSaveToNotepad: (_) {},
+            onClose: () => closed++,
+          ),
+        ),
+      );
 
       await tester.sendKeyEvent(LogicalKeyboardKey.escape);
       await tester.pump();
@@ -55,14 +59,18 @@ void main() {
 
     testWidgets('Ctrl+Shift+V sends the clipboard', (tester) async {
       var sent = 0;
-      await tester.pumpWidget(_host(ChatPopup(
-        entries: const <ChatEntry>[],
-        status: ConnectionStatus.connected,
-        onOpenApp: () {},
-        onSend: (_) => sent++,
-        onSaveToNotepad: (_) {},
-        onSendClipboard: () => sent++,
-      )));
+      await tester.pumpWidget(
+        _host(
+          ChatPopup(
+            entries: const <ChatEntry>[],
+            status: ConnectionStatus.connected,
+            onOpenApp: () {},
+            onSend: (_) => sent++,
+            onSaveToNotepad: (_) {},
+            onSendClipboard: () => sent++,
+          ),
+        ),
+      );
 
       await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
       await tester.sendKeyDownEvent(LogicalKeyboardKey.shiftLeft);
@@ -74,16 +82,21 @@ void main() {
       expect(sent, 1);
     });
 
-    testWidgets('Ctrl+S saves the newest message to the Notepad',
-        (tester) async {
+    testWidgets('Ctrl+S saves the newest message to the Notepad', (
+      tester,
+    ) async {
       final saved = <String>[];
-      await tester.pumpWidget(_host(ChatPopup(
-        entries: <ChatEntry>[_entry('m1', 'older'), _entry('m2', 'newest')],
-        status: ConnectionStatus.connected,
-        onOpenApp: () {},
-        onSend: (_) {},
-        onSaveToNotepad: (entry) => saved.add(entry.id),
-      )));
+      await tester.pumpWidget(
+        _host(
+          ChatPopup(
+            entries: <ChatEntry>[_entry('m1', 'older'), _entry('m2', 'newest')],
+            status: ConnectionStatus.connected,
+            onOpenApp: () {},
+            onSend: (_) {},
+            onSaveToNotepad: (entry) => saved.add(entry.id),
+          ),
+        ),
+      );
 
       await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
       await tester.sendKeyEvent(LogicalKeyboardKey.keyS);
@@ -95,13 +108,17 @@ void main() {
 
     testWidgets('with no messages, Ctrl+S does nothing', (tester) async {
       final saved = <String>[];
-      await tester.pumpWidget(_host(ChatPopup(
-        entries: const <ChatEntry>[],
-        status: ConnectionStatus.connected,
-        onOpenApp: () {},
-        onSend: (_) {},
-        onSaveToNotepad: (entry) => saved.add(entry.id),
-      )));
+      await tester.pumpWidget(
+        _host(
+          ChatPopup(
+            entries: const <ChatEntry>[],
+            status: ConnectionStatus.connected,
+            onOpenApp: () {},
+            onSend: (_) {},
+            onSaveToNotepad: (entry) => saved.add(entry.id),
+          ),
+        ),
+      );
 
       await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
       await tester.sendKeyEvent(LogicalKeyboardKey.keyS);

@@ -74,8 +74,9 @@ class NotepadScreen extends StatefulWidget {
 }
 
 class _NotepadScreenState extends State<NotepadScreen> {
-  late final TextEditingController _searchController =
-      TextEditingController(text: widget.searchQuery);
+  late final TextEditingController _searchController = TextEditingController(
+    text: widget.searchQuery,
+  );
 
   @override
   void didUpdateWidget(NotepadScreen oldWidget) {
@@ -187,8 +188,8 @@ class _NotepadScreenState extends State<NotepadScreen> {
     }
     return LayoutBuilder(
       builder: (context, constraints) {
-        final wide = widget.showSidebar &&
-            constraints.maxWidth >= TdBreakpoint.phoneMax;
+        final wide =
+            widget.showSidebar && constraints.maxWidth >= TdBreakpoint.phoneMax;
         if (!wide) return _listBody(showTabs: true);
         return Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -249,47 +250,46 @@ class _NotepadScreenState extends State<NotepadScreen> {
           child: widget.isLoading
               ? const TdLoadingState(label: 'Loading notes', lines: 4)
               : notes.isEmpty
-                  ? Align(
-                      alignment: Alignment.topLeft,
-                      child: TdEmptyState(
-                        message: widget.searchQuery.trim().isEmpty
-                            ? 'No notes yet. Notes you create or share '
-                                'appear here.'
-                            : 'No notes match your search.',
-                        actionLabel: widget.onCreateNote == null
-                            ? null
-                            : 'New note',
-                        onAction: widget.onCreateNote,
-                      ),
-                    )
-                  : ListView.separated(
-                      padding: const EdgeInsets.all(TdSpace.s16),
-                      itemCount: notes.length,
-                      separatorBuilder: (_, __) =>
-                          const SizedBox(height: TdSpace.s8),
-                      itemBuilder: (context, index) {
-                        final note = notes[index];
-                        return TdNoteCard(
-                          key: ValueKey<String>('note-${note.id}'),
-                          title: note.title,
-                          body: note.text,
-                          url: note.url,
-                          pinned: note.pinned,
-                          conflict: note.isConflictCopy,
-                          metaLabel: _metaLabel(note),
-                          onTap: widget.onOpenNote == null
-                              ? null
-                              : () => widget.onOpenNote!(note),
-                          onLongPress: _hasNoteMenu
-                              ? () => _showNoteMenu(note)
-                              : null,
-                          onOpenLink: note.url == null ||
-                                  widget.onOpenLink == null
-                              ? null
-                              : () => widget.onOpenLink!(note.url!),
-                        );
-                      },
-                    ),
+              ? Align(
+                  alignment: Alignment.topLeft,
+                  child: TdEmptyState(
+                    message: widget.searchQuery.trim().isEmpty
+                        ? 'No notes yet. Notes you create or share '
+                              'appear here.'
+                        : 'No notes match your search.',
+                    actionLabel: widget.onCreateNote == null
+                        ? null
+                        : 'New note',
+                    onAction: widget.onCreateNote,
+                  ),
+                )
+              : ListView.separated(
+                  padding: const EdgeInsets.all(TdSpace.s16),
+                  itemCount: notes.length,
+                  separatorBuilder: (_, __) =>
+                      const SizedBox(height: TdSpace.s8),
+                  itemBuilder: (context, index) {
+                    final note = notes[index];
+                    return TdNoteCard(
+                      key: ValueKey<String>('note-${note.id}'),
+                      title: note.title,
+                      body: note.text,
+                      url: note.url,
+                      pinned: note.pinned,
+                      conflict: note.isConflictCopy,
+                      metaLabel: _metaLabel(note),
+                      onTap: widget.onOpenNote == null
+                          ? null
+                          : () => widget.onOpenNote!(note),
+                      onLongPress: _hasNoteMenu
+                          ? () => _showNoteMenu(note)
+                          : null,
+                      onOpenLink: note.url == null || widget.onOpenLink == null
+                          ? null
+                          : () => widget.onOpenLink!(note.url!),
+                    );
+                  },
+                ),
         ),
       ],
     );
@@ -382,7 +382,11 @@ class _NotepadScreenState extends State<NotepadScreen> {
       title: 'Category not deleted',
       content: const Text('Inbox is fixed and cannot be renamed or deleted.'),
       actions: const <TdDialogAction<void>>[
-        TdDialogAction(label: 'OK', result: null, variant: TdButtonVariant.primary),
+        TdDialogAction(
+          label: 'OK',
+          result: null,
+          variant: TdButtonVariant.primary,
+        ),
       ],
     );
   }

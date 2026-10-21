@@ -56,7 +56,10 @@ class TlsIdentity {
       try {
         final der = CryptoUtils.getBytesFromPEMString(cert);
         final fp = sha256.convert(der).toString();
-        logger?.info('tls: loaded identity', fields: {'fp8': fp.substring(0, 8)});
+        logger?.info(
+          'tls: loaded identity',
+          fields: {'fp8': fp.substring(0, 8)},
+        );
         return TlsIdentity(
           certificatePem: cert,
           privateKeyPem: key,
@@ -65,8 +68,10 @@ class TlsIdentity {
       } on Object catch (e) {
         // A corrupt identity is not silently replaced: move it aside first and
         // generate a new one, which forces re-pairing explicitly.
-        logger?.warn('tls: identity unreadable, regenerating',
-            fields: {'error': e.runtimeType});
+        logger?.warn(
+          'tls: identity unreadable, regenerating',
+          fields: {'error': e.runtimeType},
+        );
         final backup = DateTime.now().millisecondsSinceEpoch;
         await certFile.rename('${certFile.path}.corrupt-$backup');
         if (await keyFile.exists()) {
@@ -110,7 +115,10 @@ class TlsIdentity {
         // Best effort; the directory itself is user-private under XDG.
       }
     }
-    logger?.info('tls: generated identity', fields: {'fp8': fp.substring(0, 8)});
+    logger?.info(
+      'tls: generated identity',
+      fields: {'fp8': fp.substring(0, 8)},
+    );
     return TlsIdentity(
       certificatePem: cert,
       privateKeyPem: key,
@@ -122,7 +130,9 @@ class TlsIdentity {
   /// SHA-256 equals [pin]. This is the *only* certificate callback TwinDrop
   /// ever installs; returning true unconditionally is forbidden (`docs/08`).
   static HttpClient pinnedHttpClient(String pin, {Duration? timeout}) {
-    final client = HttpClient(context: SecurityContext(withTrustedRoots: false));
+    final client = HttpClient(
+      context: SecurityContext(withTrustedRoots: false),
+    );
     client.badCertificateCallback = (cert, host, port) {
       return sha256.convert(cert.der).toString() == pin;
     };

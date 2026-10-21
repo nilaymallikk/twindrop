@@ -107,7 +107,7 @@ final class NotFoundError extends TwinDropError {
 /// Pairing/invalid-action rate limit or lockout (`PAIR-010`).
 final class RateLimitedError extends TwinDropError {
   const RateLimitedError({this.retryAfterSeconds = 60})
-      : super('too many attempts');
+    : super('too many attempts');
 
   final int retryAfterSeconds;
 
@@ -119,19 +119,19 @@ final class RateLimitedError extends TwinDropError {
 
   @override
   int get httpStatus => 429;
-
 }
 
 /// Pairing failed. Deliberately generic so failures are not distinguishable
 /// (`docs/05` §Abuse controls).
 final class PairingFailedError extends TwinDropError {
   const PairingFailedError({this.expired = false, super.cause})
-      : super('pairing failed');
+    : super('pairing failed');
 
   final bool expired;
 
   @override
-  String get code => expired ? ErrorCodes.pairingExpired : ErrorCodes.pairingFailed;
+  String get code =>
+      expired ? ErrorCodes.pairingExpired : ErrorCodes.pairingFailed;
 
   @override
   int get httpStatus => 400;
@@ -141,8 +141,10 @@ final class PairingFailedError extends TwinDropError {
 /// Never auto-accepted: the user must re-pair deliberately (`docs/08`).
 final class CertificateMismatchError extends TwinDropError {
   const CertificateMismatchError({super.cause})
-      : super('the desktop certificate does not match the saved pin; re-pair '
-            'to continue');
+    : super(
+        'the desktop certificate does not match the saved pin; re-pair '
+        'to continue',
+      );
 
   @override
   String get code => ErrorCodes.certificateMismatch;

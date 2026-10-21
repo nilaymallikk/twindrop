@@ -78,10 +78,8 @@ class ChatPopup extends StatelessWidget {
             shift: true,
           ): onSendClipboard!,
         if (entries.isNotEmpty)
-          const SingleActivator(
-            LogicalKeyboardKey.keyS,
-            control: true,
-          ): () => onSaveToNotepad(entries.last),
+          const SingleActivator(LogicalKeyboardKey.keyS, control: true): () =>
+              onSaveToNotepad(entries.last),
       },
       child: Focus(
         autofocus: true,

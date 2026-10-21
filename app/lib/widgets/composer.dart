@@ -155,9 +155,11 @@ class _TdComposerState extends State<TdComposer> {
       builder: (context, state) {
         final background = canSend
             ? (state.isActive
-                ? Color.alphaBlend(
-                    tokens.onAccent.withValues(alpha: 0.12), tokens.accent)
-                : tokens.accent)
+                  ? Color.alphaBlend(
+                      tokens.onAccent.withValues(alpha: 0.12),
+                      tokens.accent,
+                    )
+                  : tokens.accent)
             : tokens.raised;
         return Container(
           width: context.tdControlHeight,

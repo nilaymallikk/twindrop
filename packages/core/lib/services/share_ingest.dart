@@ -3,6 +3,7 @@ import '../db/store_ops.dart';
 import '../models/enums.dart';
 import '../models/errors.dart';
 import '../models/item.dart';
+
 import 'dart:convert';
 
 import '../util/hashing.dart';
@@ -13,12 +14,7 @@ import 'notepad_service.dart';
 import 'service_base.dart';
 import 'settings_store.dart';
 
-enum ShareOutcome {
-  savedToNotepad,
-  sentAsChat,
-  duplicate,
-  needsChoice,
-}
+enum ShareOutcome { savedToNotepad, sentAsChat, duplicate, needsChoice }
 
 class ShareResult {
   const ShareResult({
@@ -54,11 +50,11 @@ class ShareIngest extends CoreService {
     required SettingsStore settings,
     DateTime Function()? now,
     Duration dedupeWindow = const Duration(seconds: 10),
-  })  : _notepad = notepad,
-        _chat = chat,
-        _settings = settings,
-        _now = now ?? DateTime.now,
-        _dedupeWindow = dedupeWindow;
+  }) : _notepad = notepad,
+       _chat = chat,
+       _settings = settings,
+       _now = now ?? DateTime.now,
+       _dedupeWindow = dedupeWindow;
 
   final NotepadService _notepad;
   final ChatService _chat;

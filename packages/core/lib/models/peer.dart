@@ -67,41 +67,40 @@ class Peer {
     int? revokedAt,
     bool clearTokenHash = false,
     bool clearRevokedAt = false,
-  }) =>
-      Peer(
-        id: id,
-        name: name ?? this.name,
-        kind: kind ?? this.kind,
-        roleOfPeer: roleOfPeer ?? this.roleOfPeer,
-        // `null` means "unchanged"; clearing needs an explicit flag so a
-        // revoked peer really loses its token hash.
-        tokenHash: clearTokenHash ? null : (tokenHash ?? this.tokenHash),
-        tokenRef: tokenRef ?? this.tokenRef,
-        certFp: certFp ?? this.certFp,
-        lastHost: lastHost ?? this.lastHost,
-        lastPort: lastPort ?? this.lastPort,
-        lastSeen: lastSeen ?? this.lastSeen,
-        remoteSeq: remoteSeq ?? this.remoteSeq,
-        ackedSeq: ackedSeq ?? this.ackedSeq,
-        protocolVersion: protocolVersion ?? this.protocolVersion,
-        revokedAt: clearRevokedAt ? null : (revokedAt ?? this.revokedAt),
-        createdAt: createdAt,
-      );
+  }) => Peer(
+    id: id,
+    name: name ?? this.name,
+    kind: kind ?? this.kind,
+    roleOfPeer: roleOfPeer ?? this.roleOfPeer,
+    // `null` means "unchanged"; clearing needs an explicit flag so a
+    // revoked peer really loses its token hash.
+    tokenHash: clearTokenHash ? null : (tokenHash ?? this.tokenHash),
+    tokenRef: tokenRef ?? this.tokenRef,
+    certFp: certFp ?? this.certFp,
+    lastHost: lastHost ?? this.lastHost,
+    lastPort: lastPort ?? this.lastPort,
+    lastSeen: lastSeen ?? this.lastSeen,
+    remoteSeq: remoteSeq ?? this.remoteSeq,
+    ackedSeq: ackedSeq ?? this.ackedSeq,
+    protocolVersion: protocolVersion ?? this.protocolVersion,
+    revokedAt: clearRevokedAt ? null : (revokedAt ?? this.revokedAt),
+    createdAt: createdAt,
+  );
 
   Map<String, dynamic> toJson() => <String, dynamic>{
-        'id': id,
-        'name': name,
-        'kind': kind.wire,
-        'roleOfPeer': roleOfPeer.wire,
-        if (lastHost != null) 'lastHost': lastHost,
-        if (lastPort != null) 'lastPort': lastPort,
-        if (lastSeen != null) 'lastSeen': lastSeen,
-        'remoteSeq': remoteSeq,
-        'ackedSeq': ackedSeq,
-        'protocolVersion': protocolVersion,
-        if (revokedAt != null) 'revokedAt': revokedAt,
-        'createdAt': createdAt,
-      };
+    'id': id,
+    'name': name,
+    'kind': kind.wire,
+    'roleOfPeer': roleOfPeer.wire,
+    if (lastHost != null) 'lastHost': lastHost,
+    if (lastPort != null) 'lastPort': lastPort,
+    if (lastSeen != null) 'lastSeen': lastSeen,
+    'remoteSeq': remoteSeq,
+    'ackedSeq': ackedSeq,
+    'protocolVersion': protocolVersion,
+    if (revokedAt != null) 'revokedAt': revokedAt,
+    'createdAt': createdAt,
+  };
 
   @override
   String toString() => 'Peer($id, $name, ${kind.wire}, revoked=$isRevoked)';

@@ -28,7 +28,9 @@ Future<void> main() async {
     enableDiscovery: false,
   );
 
-  phone.connection!.statusStream.listen((s) => print('PHONE STATUS -> ${s.wire}'));
+  phone.connection!.statusStream.listen(
+    (s) => print('PHONE STATUS -> ${s.wire}'),
+  );
 
   await desk.start();
   await phone.start();
@@ -56,27 +58,35 @@ Future<void> main() async {
   );
   final result = await paired.timeout(const Duration(seconds: 20));
   await approved.future.timeout(const Duration(seconds: 10));
-  print('PAIRED host=${result.host}:${result.port} fp=${result.fingerprint} '
-      'phoneCode=$phoneCode');
+  print(
+    'PAIRED host=${result.host}:${result.port} fp=${result.fingerprint} '
+    'phoneCode=$phoneCode',
+  );
 
   final active = await phone.peers.active();
   print('PHONE active peers=${active.length}');
   for (final p in active) {
-    print('  peer id=${p.id} name=${p.name} host=${p.lastHost} port=${p.lastPort} '
-        'fp=${p.certFp} tokenRef=${p.tokenRef} revoked=${p.isRevoked}');
+    print(
+      '  peer id=${p.id} name=${p.name} host=${p.lastHost} port=${p.lastPort} '
+      'fp=${p.certFp} tokenRef=${p.tokenRef} revoked=${p.isRevoked}',
+    );
   }
   final token = await phone.tokenStore.read('peer.${result.hostDeviceId}');
   print('PHONE token present=${token != null}');
   print('PHONE tokenRef candidates: peerTokenRef(host)=${result.hostDeviceId}');
   print('PHONE conn status=${phone.connection!.status.wire}');
-  print('PHONE diagnostics connected=${(await phone.diagnostics()).connectedPeerIds}');
+  print(
+    'PHONE diagnostics connected=${(await phone.diagnostics()).connectedPeerIds}',
+  );
 
   for (var i = 0; i < 12; i++) {
     await Future<void>.delayed(const Duration(seconds: 1));
     final d = await desk.diagnostics();
     final p = await phone.diagnostics();
-    print('t=${i + 1}s deskConn=${d.connectedPeerIds} phoneConn=${p.connectedPeerIds} '
-        'phoneStatus=${phone.connection!.status.wire}');
+    print(
+      't=${i + 1}s deskConn=${d.connectedPeerIds} phoneConn=${p.connectedPeerIds} '
+      'phoneStatus=${phone.connection!.status.wire}',
+    );
     if (d.connectedPeerIds.isNotEmpty && p.connectedPeerIds.isNotEmpty) {
       print('CONNECTED');
       break;

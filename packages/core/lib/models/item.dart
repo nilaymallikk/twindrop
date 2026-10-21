@@ -111,7 +111,9 @@ class Item {
       categoryId: categoryId ?? this.categoryId,
       originDevice: originDevice ?? this.originDevice,
       originName: originName ?? this.originName,
-      sourceItemId: clearSourceItemId ? null : (sourceItemId ?? this.sourceItemId),
+      sourceItemId: clearSourceItemId
+          ? null
+          : (sourceItemId ?? this.sourceItemId),
       createdAt: createdAt ?? this.createdAt,
       contentHash: contentHash ?? this.contentHash,
       prevHash: prevHash ?? this.prevHash,
@@ -128,28 +130,28 @@ class Item {
   /// Canonical JSON used by the WS change payload and the quarantine log.
   /// Field names are stable wire names.
   Map<String, dynamic> toJson() => <String, dynamic>{
-        'id': id,
-        'type': type.wire,
-        'kind': kind.wire,
-        'text': text,
-        if (title != null) 'title': title,
-        if (url != null) 'url': url,
-        if (sourceApp != null) 'sourceApp': sourceApp,
-        if (categoryId != null) 'categoryId': categoryId,
-        'originDevice': originDevice,
-        'originName': originName,
-        if (sourceItemId != null) 'sourceItemId': sourceItemId,
-        'createdAt': createdAt,
-        'contentHash': contentHash,
-        if (prevHash != null) 'prevHash': prevHash,
-        'contentHlc': contentHlc,
-        'pinned': pinned,
-        'deleted': deleted,
-        if (deletedHlc != null) 'deletedHlc': deletedHlc,
-        'metaHlc': metaHlc,
-        'restored': restored,
-        'isConflictCopy': isConflictCopy,
-      };
+    'id': id,
+    'type': type.wire,
+    'kind': kind.wire,
+    'text': text,
+    if (title != null) 'title': title,
+    if (url != null) 'url': url,
+    if (sourceApp != null) 'sourceApp': sourceApp,
+    if (categoryId != null) 'categoryId': categoryId,
+    'originDevice': originDevice,
+    'originName': originName,
+    if (sourceItemId != null) 'sourceItemId': sourceItemId,
+    'createdAt': createdAt,
+    'contentHash': contentHash,
+    if (prevHash != null) 'prevHash': prevHash,
+    'contentHlc': contentHlc,
+    'pinned': pinned,
+    'deleted': deleted,
+    if (deletedHlc != null) 'deletedHlc': deletedHlc,
+    'metaHlc': metaHlc,
+    'restored': restored,
+    'isConflictCopy': isConflictCopy,
+  };
 
   static Item fromJson(Map<String, dynamic> j) {
     T? opt<T>(String k) => j[k] as T?;

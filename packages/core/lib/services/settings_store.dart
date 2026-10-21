@@ -61,13 +61,13 @@ class SettingsStore {
 
   Future<ShareDefaultAction> shareDefaultAction() async =>
       ShareDefaultAction.parse(
-          await _db.getSetting(SettingsKeys.shareDefaultAction) ?? '');
+        await _db.getSetting(SettingsKeys.shareDefaultAction) ?? '',
+      );
 
   Future<void> setShareDefaultAction(ShareDefaultAction action) =>
       _db.setSetting(SettingsKeys.shareDefaultAction, action.wire);
 
-  Future<bool> cleanLinks() =>
-      getBool(SettingsKeys.cleanLinks, fallback: true);
+  Future<bool> cleanLinks() => getBool(SettingsKeys.cleanLinks, fallback: true);
 
   Future<void> setCleanLinks(bool value) =>
       setBool(SettingsKeys.cleanLinks, value);

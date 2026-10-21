@@ -33,11 +33,11 @@ class ChangeRecord {
   final Map<String, dynamic>? row;
 
   Map<String, dynamic> toJson() => <String, dynamic>{
-        'seq': seq,
-        'et': entityType,
-        'id': entityId,
-        if (row != null) 'row': row,
-      };
+    'seq': seq,
+    'et': entityType,
+    'id': entityId,
+    if (row != null) 'row': row,
+  };
 
   static ChangeRecord fromJson(Map<String, dynamic> j) {
     final seq = j['seq'];
@@ -73,14 +73,17 @@ class ChangePage {
   final int next;
   final bool more;
 
-  static const ChangePage empty =
-      ChangePage(records: <ChangeRecord>[], next: 0, more: false);
+  static const ChangePage empty = ChangePage(
+    records: <ChangeRecord>[],
+    next: 0,
+    more: false,
+  );
 
   Map<String, dynamic> toJson() => <String, dynamic>{
-        'entries': [for (final r in records) r.toJson()],
-        'next': next,
-        'more': more,
-      };
+    'entries': [for (final r in records) r.toJson()],
+    'next': next,
+    'more': more,
+  };
 
   static ChangePage fromJson(Map<String, dynamic> j) {
     final rawEntries = j['entries'];
@@ -130,11 +133,11 @@ class SyncEngine {
     required HlcClock clock,
     required ChangeBus bus,
     required Logger logger,
-  })  : _db = db,
-        _merge = merge,
-        _clock = clock,
-        _bus = bus,
-        _logger = logger;
+  }) : _db = db,
+       _merge = merge,
+       _clock = clock,
+       _bus = bus,
+       _logger = logger;
 
   final AppDatabase _db;
   final MergeEngine _merge;
@@ -169,12 +172,14 @@ class SyncEngine {
         final category = await _db.categoryById(entry.entityId);
         row = category?.toJson();
       }
-      records.add(ChangeRecord(
-        seq: entry.seq,
-        entityType: entry.entityType,
-        entityId: entry.entityId,
-        row: row,
-      ));
+      records.add(
+        ChangeRecord(
+          seq: entry.seq,
+          entityType: entry.entityType,
+          entityId: entry.entityId,
+          row: row,
+        ),
+      );
     }
     final next = pageRows.isEmpty ? after : pageRows.last.seq;
     return ChangePage(records: records, next: next, more: more);
@@ -218,10 +223,10 @@ class SyncEngine {
             replayed++;
             continue;
           }
-          if (record.entityType != 'item' &&
-              record.entityType != 'category') {
+          if (record.entityType != 'item' && record.entityType != 'category') {
             throw UnsupportedVersionError(
-                'unknown entity type ${record.entityType}');
+              'unknown entity type ${record.entityType}',
+            );
           }
           final row = record.row;
           if (row == null) {
@@ -235,8 +240,7 @@ class SyncEngine {
             try {
               item = Item.fromJson(row);
             } on Object {
-              await _quarantine(
-                  fromPeerId, record, QuarantineReason.malformed);
+              await _quarantine(fromPeerId, record, QuarantineReason.malformed);
               await _db.markAppliedRemote(fromPeerId, record.seq);
               quarantined++;
               continue;
@@ -255,8 +259,7 @@ class SyncEngine {
             try {
               category = Category.fromJson(row);
             } on Object {
-              await _quarantine(
-                  fromPeerId, record, QuarantineReason.malformed);
+              await _quarantine(fromPeerId, record, QuarantineReason.malformed);
               await _db.markAppliedRemote(fromPeerId, record.seq);
               quarantined++;
               continue;
@@ -291,12 +294,15 @@ class SyncEngine {
     if (applied > 0 || quarantined > 0) {
       _bus.notify();
     }
-    _logger.debug('sync: applied page', fields: {
-      'applied': applied,
-      'quarantined': quarantined,
-      'replayed': replayed,
-      'remoteSeq': newRemoteSeq,
-    });
+    _logger.debug(
+      'sync: applied page',
+      fields: {
+        'applied': applied,
+        'quarantined': quarantined,
+        'replayed': replayed,
+        'remoteSeq': newRemoteSeq,
+      },
+    );
     return ApplyResult(
       applied: applied,
       quarantined: quarantined,
@@ -316,20 +322,25 @@ class SyncEngine {
   }
 
   Future<void> _quarantine(
-      String peerId, ChangeRecord record, QuarantineReason reason) async {
-    await _db.quarantine(QuarantineEntry(
-      id: 0,
-      peerId: peerId,
-      entityType: record.entityType,
-      entityId: record.entityId,
-      reason: reason.wire,
-      payloadJson: jsonEncode(record.row ?? const <String, dynamic>{}),
-      receivedAt: DateTime.now().millisecondsSinceEpoch,
-    ));
-    _logger.warn('sync: quarantined change', fields: {
-      'entity': record.entityType,
-      'reason': reason.wire,
-    });
+    String peerId,
+    ChangeRecord record,
+    QuarantineReason reason,
+  ) async {
+    await _db.quarantine(
+      QuarantineEntry(
+        id: 0,
+        peerId: peerId,
+        entityType: record.entityType,
+        entityId: record.entityId,
+        reason: reason.wire,
+        payloadJson: jsonEncode(record.row ?? const <String, dynamic>{}),
+        receivedAt: DateTime.now().millisecondsSinceEpoch,
+      ),
+    );
+    _logger.warn(
+      'sync: quarantined change',
+      fields: {'entity': record.entityType, 'reason': reason.wire},
+    );
   }
 
   /// Remove tombstones that are old enough and acknowledged by every
@@ -358,8 +369,9 @@ class SyncEngine {
         "DELETE FROM change_log WHERE entity_type = 'item' AND entity_id = ?",
         [item.id],
       );
-      await _db.customStatement(
-          'DELETE FROM peer_delivery WHERE item_id = ?', [item.id]);
+      await _db.customStatement('DELETE FROM peer_delivery WHERE item_id = ?', [
+        item.id,
+      ]);
       removed++;
     }
     if (removed > 0) {

@@ -56,8 +56,9 @@ Future<void> _pumpAt(
           : ThemeMode.dark,
       theme: buildTdTheme(
         choice: choice,
-        platformBrightness:
-            choice == AppThemeChoice.light ? Brightness.light : Brightness.dark,
+        platformBrightness: choice == AppThemeChoice.light
+            ? Brightness.light
+            : Brightness.dark,
       ),
       home: Scaffold(body: child),
     ),
@@ -128,122 +129,122 @@ const Category work = Category(
 );
 
 Widget _chat() => ChatScreen(
-      entries: <ChatEntry>[
-        _entry('m1', 'Shared a link from the phone.',
-            url: 'https://example.com/a'),
-        _entry('m2', 'And a reply from the desktop.', mine: false),
-        _entry('m3', 'Queued while the desktop was away.',
-            delivery: DeliveryState.queued),
-      ],
-      status: ConnectionStatus.connected,
-      peerName: 'Phone',
-      onSend: (_) {},
-      onSaveToNotepad: (_) {},
-    );
+  entries: <ChatEntry>[
+    _entry('m1', 'Shared a link from the phone.', url: 'https://example.com/a'),
+    _entry('m2', 'And a reply from the desktop.', mine: false),
+    _entry(
+      'm3',
+      'Queued while the desktop was away.',
+      delivery: DeliveryState.queued,
+    ),
+  ],
+  status: ConnectionStatus.connected,
+  peerName: 'Phone',
+  onSend: (_) {},
+  onSaveToNotepad: (_) {},
+);
 
 Widget _notepad() => NotepadScreen(
-      categories: const <Category>[inbox, work],
-      notes: <Item>[
-        _note('n1', 'Release checklist', 'Ship the AppImage and the APK.'),
-        _note('n2', 'Reel to watch', 'https://example.com/reel', pinned: true),
-      ],
-      selectedCategoryId: 'inbox',
-      categoryNames: const <String, String>{'inbox': 'Inbox', 'work': 'Work'},
-      showSidebar: true,
-    );
+  categories: const <Category>[inbox, work],
+  notes: <Item>[
+    _note('n1', 'Release checklist', 'Ship the AppImage and the APK.'),
+    _note('n2', 'Reel to watch', 'https://example.com/reel', pinned: true),
+  ],
+  selectedCategoryId: 'inbox',
+  categoryNames: const <String, String>{'inbox': 'Inbox', 'work': 'Work'},
+  showSidebar: true,
+);
 
 Widget _settings() => SettingsScreen(
-      status: ConnectionStatus.connected,
-      peerName: 'Phone',
-      peerLabel: '192.168.1.23:47321',
-      deviceId: '01a15d25-ebdb-7ce7-80a3-f05411833218',
-      deviceName: 'fedora',
-      localAddresses: const <String>['192.168.1.23'],
-      lastSyncLabel: '2 minutes ago',
-      queueCount: 0,
-      serverState: 'Running on port 47321',
-      ipPort: '192.168.1.23:47321',
-      themeChoice: AppThemeChoice.dark,
-      onThemeChanged: (_) {},
-      notifications: true,
-      onNotificationsChanged: (_) {},
-      shareAction: ShareDefaultAction.notepad,
-      onShareActionChanged: (_) {},
-      cleanLinks: true,
-      onCleanLinksChanged: (_) {},
-      paused: false,
-      onPauseChanged: (_) {},
-      appVersion: '1.0.0',
-      isDesktop: true,
-    );
+  status: ConnectionStatus.connected,
+  peerName: 'Phone',
+  peerLabel: '192.168.1.23:47321',
+  deviceId: '01a15d25-ebdb-7ce7-80a3-f05411833218',
+  deviceName: 'fedora',
+  localAddresses: const <String>['192.168.1.23'],
+  lastSyncLabel: '2 minutes ago',
+  queueCount: 0,
+  serverState: 'Running on port 47321',
+  ipPort: '192.168.1.23:47321',
+  themeChoice: AppThemeChoice.dark,
+  onThemeChanged: (_) {},
+  notifications: true,
+  onNotificationsChanged: (_) {},
+  shareAction: ShareDefaultAction.notepad,
+  onShareActionChanged: (_) {},
+  cleanLinks: true,
+  onCleanLinksChanged: (_) {},
+  paused: false,
+  onPauseChanged: (_) {},
+  appVersion: '1.0.0',
+  isDesktop: true,
+);
 
 Widget _diagnostics() => DiagnosticsScreen(
-      localAddresses: const <String>['192.168.1.23'],
-      peerLabel: 'Phone',
-      peerLastAddress: '192.168.1.23:47321',
-      mdnsSummary: 'Announcing',
-      pinState: 'Pinned a1b2c3d4e5f6…',
-      serverPort: 47321,
-      firewallHint: 'sudo firewall-cmd --add-port=47321/tcp',
-      onTestConnection: () async => 'Reachable in 12 ms.',
-      onManualAddress: (_) async {},
-      onRetry: () async {},
-    );
+  localAddresses: const <String>['192.168.1.23'],
+  peerLabel: 'Phone',
+  peerLastAddress: '192.168.1.23:47321',
+  mdnsSummary: 'Announcing',
+  pinState: 'Pinned a1b2c3d4e5f6…',
+  serverPort: 47321,
+  firewallHint: 'sudo firewall-cmd --add-port=47321/tcp',
+  onTestConnection: () async => 'Reachable in 12 ms.',
+  onManualAddress: (_) async {},
+  onRetry: () async {},
+);
 
 Widget _pairing() => DesktopPairingScreen(
-      data: const DesktopPairingData(
-        stage: DesktopPairingStage.approval,
-        requestDeviceName: 'Pixel 8',
-        requestPlatform: 'android',
-        confirmationCode: '4271',
-        manualAddress: '192.168.1.23:47321',
-      ),
-      onStart: () {},
-      onCancel: () {},
-      onApprove: (_) {},
-      onReject: (_) {},
-    );
+  data: const DesktopPairingData(
+    stage: DesktopPairingStage.approval,
+    requestDeviceName: 'Pixel 8',
+    requestPlatform: 'android',
+    confirmationCode: '4271',
+    manualAddress: '192.168.1.23:47321',
+  ),
+  onStart: () {},
+  onCancel: () {},
+  onApprove: (_) {},
+  onReject: (_) {},
+);
 
 Widget _onboarding() => PhoneOnboardingScreen(
-      data: const PhoneOnboardingData(
-        stage: PhoneOnboardingStage.welcome,
-      ),
-      onStartScan: () {},
-      onSubmitQr: (_) {},
-      onManualEntry: () {},
-      onConfirmFingerprint: (_) {},
-      onSubmitManual: (_, __) {},
-      onPermissionDecided: (_) {},
-      onSkip: (_) {},
-      onCancel: () {},
-      onDone: () async {},
-    );
+  data: const PhoneOnboardingData(stage: PhoneOnboardingStage.welcome),
+  onStartScan: () {},
+  onSubmitQr: (_) {},
+  onManualEntry: () {},
+  onConfirmFingerprint: (_) {},
+  onSubmitManual: (_, __) {},
+  onPermissionDecided: (_) {},
+  onSkip: (_) {},
+  onCancel: () {},
+  onDone: () async {},
+);
 
 Widget _sharePanel() => const SharePanelView(
-      payload: <String, dynamic>{
-        'shareId': 's-1',
-        'text': 'https://example.com/reel',
-        'sourcePackage': 'com.instagram.android',
-        'paired': true,
-        'desktopName': 'fedora',
-      },
-      busy: false,
-      onUndo: _noop,
-      onAlsoSendAsChat: _noop,
-      onChangeCategory: _noop,
-    );
+  payload: <String, dynamic>{
+    'shareId': 's-1',
+    'text': 'https://example.com/reel',
+    'sourcePackage': 'com.instagram.android',
+    'paired': true,
+    'desktopName': 'fedora',
+  },
+  busy: false,
+  onUndo: _noop,
+  onAlsoSendAsChat: _noop,
+  onChangeCategory: _noop,
+);
 
 Widget _popup() => ChatPopup(
-      entries: <ChatEntry>[
-        _entry('m1', 'Shared a link from the phone.', url: 'https://example.com/a'),
-        _entry('m2', 'And a reply from the desktop.', mine: false),
-      ],
-      status: ConnectionStatus.connected,
-      peerName: 'Phone',
-      onOpenApp: () {},
-      onSend: (_) {},
-      onSaveToNotepad: (_) {},
-    );
+  entries: <ChatEntry>[
+    _entry('m1', 'Shared a link from the phone.', url: 'https://example.com/a'),
+    _entry('m2', 'And a reply from the desktop.', mine: false),
+  ],
+  status: ConnectionStatus.connected,
+  peerName: 'Phone',
+  onOpenApp: () {},
+  onSend: (_) {},
+  onSaveToNotepad: (_) {},
+);
 
 void _noop() {}
 

@@ -20,8 +20,9 @@ extension StoreOps on AppDatabase {
   // ---------------------------------------------------------------- items ---
 
   Future<Item?> itemById(String id) async {
-    final row =
-        await (select(items)..where((t) => t.id.equals(id))).getSingleOrNull();
+    final row = await (select(
+      items,
+    )..where((t) => t.id.equals(id))).getSingleOrNull();
     return row?.toDomain();
   }
 
@@ -30,10 +31,8 @@ extension StoreOps on AppDatabase {
   }
 
   Future<void> putItemIfAbsent(Item item) async {
-    await into(items).insert(
-      _itemCompanion(item),
-      mode: InsertMode.insertOrIgnore,
-    );
+    await into(items)
+        .insert(_itemCompanion(item), mode: InsertMode.insertOrIgnore);
   }
 
   /// Items ordered newest-first. Messages use [type] = [ItemType.message] and
@@ -59,10 +58,12 @@ extension StoreOps on AppDatabase {
     }
     if (beforeCreatedAt != null) {
       if (beforeId != null) {
-        q.where((t) =>
-            t.createdAt.isSmallerThanValue(beforeCreatedAt) |
-            (t.createdAt.equals(beforeCreatedAt) &
-                t.id.isSmallerThanValue(beforeId)));
+        q.where(
+          (t) =>
+              t.createdAt.isSmallerThanValue(beforeCreatedAt) |
+              (t.createdAt.equals(beforeCreatedAt) &
+                  t.id.isSmallerThanValue(beforeId)),
+        );
       } else {
         q.where((t) => t.createdAt.isSmallerThanValue(beforeCreatedAt));
       }
@@ -79,9 +80,11 @@ extension StoreOps on AppDatabase {
 
   /// All live item ids in a category (used by category deletion/reassignment).
   Future<List<String>> itemIdsInCategory(String categoryId) async {
-    final rows = await (select(items)
-          ..where((t) => t.categoryId.equals(categoryId) & t.deleted.equals(false)))
-        .get();
+    final rows =
+        await (select(items)..where(
+              (t) => t.categoryId.equals(categoryId) & t.deleted.equals(false),
+            ))
+            .get();
     return rows.map((r) => r.id).toList(growable: false);
   }
 
@@ -92,8 +95,9 @@ extension StoreOps on AppDatabase {
   // ----------------------------------------------------------- categories ---
 
   Future<Category?> categoryById(String id) async {
-    final row = await (select(categories)..where((t) => t.id.equals(id)))
-        .getSingleOrNull();
+    final row = await (select(
+      categories,
+    )..where((t) => t.id.equals(id))).getSingleOrNull();
     return row?.toDomain();
   }
 
@@ -162,8 +166,11 @@ extension StoreOps on AppDatabase {
   }) async {
     final q = select(changeLogs)..where((t) => t.seq.isBiggerThanValue(after));
     if (excludeSourcePeer != null) {
-      q.where((t) =>
-          t.sourcePeer.isNull() | t.sourcePeer.equals(excludeSourcePeer).not());
+      q.where(
+        (t) =>
+            t.sourcePeer.isNull() |
+            t.sourcePeer.equals(excludeSourcePeer).not(),
+      );
     }
     q
       ..orderBy([(t) => OrderingTerm(expression: t.seq)])
@@ -196,9 +203,11 @@ extension StoreOps on AppDatabase {
   // ---------------------------------------------------------- applied_remote ---
 
   Future<bool> hasAppliedRemote(String peerId, int peerSeq) async {
-    final row = await (select(appliedRemotes)
-          ..where((t) => t.peerId.equals(peerId) & t.peerSeq.equals(peerSeq)))
-        .getSingleOrNull();
+    final row =
+        await (select(appliedRemotes)..where(
+              (t) => t.peerId.equals(peerId) & t.peerSeq.equals(peerSeq),
+            ))
+            .getSingleOrNull();
     return row != null;
   }
 
@@ -227,10 +236,13 @@ extension StoreOps on AppDatabase {
   }
 
   Future<void> setDeliveryState(
-      String peerId, Iterable<String> itemIds, DeliveryState state) async {
+    String peerId,
+    Iterable<String> itemIds,
+    DeliveryState state,
+  ) async {
     for (final id in itemIds) {
-      await (update(peerDeliveries)..where(
-              (t) => t.peerId.equals(peerId) & t.itemId.equals(id)))
+      await (update(peerDeliveries)
+            ..where((t) => t.peerId.equals(peerId) & t.itemId.equals(id)))
           .write(PeerDeliveriesCompanion(state: Value(state.wire)));
     }
   }
@@ -257,16 +269,16 @@ extension StoreOps on AppDatabase {
   }
 
   Future<List<DeliveryInfo>> deliveriesForItem(String itemId) async {
-    final rows = await (select(peerDeliveries)
-          ..where((t) => t.itemId.equals(itemId)))
-        .get();
+    final rows = await (select(
+      peerDeliveries,
+    )..where((t) => t.itemId.equals(itemId))).get();
     return rows.map((r) => r.toDomain()).toList(growable: false);
   }
 
   Future<List<DeliveryInfo>> deliveriesForPeer(String peerId) async {
-    final rows = await (select(peerDeliveries)
-          ..where((t) => t.peerId.equals(peerId)))
-        .get();
+    final rows = await (select(
+      peerDeliveries,
+    )..where((t) => t.peerId.equals(peerId))).get();
     return rows.map((r) => r.toDomain()).toList(growable: false);
   }
 
@@ -294,16 +306,19 @@ extension StoreOps on AppDatabase {
   }
 
   Future<List<QuarantineEntry>> quarantined() async {
-    final rows = await (select(quarantines)
-          ..orderBy([(t) => OrderingTerm(expression: t.id, mode: OrderingMode.desc)]))
-        .get();
+    final rows =
+        await (select(quarantines)..orderBy([
+              (t) => OrderingTerm(expression: t.id, mode: OrderingMode.desc),
+            ]))
+            .get();
     return rows.map((r) => r.toDomain()).toList(growable: false);
   }
 
   Future<int> quarantineCount() async {
-    final row = await customSelect('SELECT COUNT(*) AS c FROM quarantine',
-            readsFrom: {quarantines})
-        .getSingle();
+    final row = await customSelect(
+      'SELECT COUNT(*) AS c FROM quarantine',
+      readsFrom: {quarantines},
+    ).getSingle();
     return row.read<int>('c');
   }
 
@@ -314,8 +329,9 @@ extension StoreOps on AppDatabase {
   // ---------------------------------------------------------------- peers ---
 
   Future<Peer?> peerById(String id) async {
-    final row =
-        await (select(peers)..where((t) => t.id.equals(id))).getSingleOrNull();
+    final row = await (select(
+      peers,
+    )..where((t) => t.id.equals(id))).getSingleOrNull();
     return row?.toDomain();
   }
 
@@ -328,9 +344,9 @@ extension StoreOps on AppDatabase {
   }
 
   Future<Peer?> peerByTokenHash(String tokenHash) async {
-    final row = await (select(peers)
-          ..where((t) => t.tokenHash.equals(tokenHash)))
-        .getSingleOrNull();
+    final row = await (select(
+      peers,
+    )..where((t) => t.tokenHash.equals(tokenHash))).getSingleOrNull();
     return row?.toDomain();
   }
 
@@ -362,15 +378,17 @@ extension StoreOps on AppDatabase {
     await (delete(peerDeliveries)..where((t) => t.peerId.equals(id))).go();
   }
 
-  Future<void> touchPeerSeen(String id, int seenAt,
-      {String? host, int? port}) async {
+  Future<void> touchPeerSeen(
+    String id,
+    int seenAt, {
+    String? host,
+    int? port,
+  }) async {
     final peer = await peerById(id);
     if (peer == null) return;
-    await putPeer(peer.copyWith(
-      lastSeen: seenAt,
-      lastHost: host,
-      lastPort: port,
-    ));
+    await putPeer(
+      peer.copyWith(lastSeen: seenAt, lastHost: host, lastPort: port),
+    );
   }
 
   // --------------------------------------------------------------- settings ---
@@ -381,28 +399,28 @@ extension StoreOps on AppDatabase {
 }
 
 Insertable<ItemRow> _itemCompanion(Item i) => ItemsCompanion.insert(
-      id: i.id,
-      type: i.type.wire,
-      kind: i.kind.wire,
-      textBody: i.text,
-      title: Value(i.title),
-      url: Value(i.url),
-      sourceApp: Value(i.sourceApp),
-      categoryId: Value(i.categoryId),
-      originDevice: i.originDevice,
-      originName: i.originName,
-      sourceItemId: Value(i.sourceItemId),
-      createdAt: i.createdAt,
-      contentHash: i.contentHash,
-      prevHash: Value(i.prevHash),
-      contentHlc: i.contentHlc,
-      pinned: Value(i.pinned),
-      deleted: Value(i.deleted),
-      deletedHlc: Value(i.deletedHlc),
-      metaHlc: i.metaHlc,
-      restored: Value(i.restored),
-      isConflictCopy: Value(i.isConflictCopy),
-    );
+  id: i.id,
+  type: i.type.wire,
+  kind: i.kind.wire,
+  textBody: i.text,
+  title: Value(i.title),
+  url: Value(i.url),
+  sourceApp: Value(i.sourceApp),
+  categoryId: Value(i.categoryId),
+  originDevice: i.originDevice,
+  originName: i.originName,
+  sourceItemId: Value(i.sourceItemId),
+  createdAt: i.createdAt,
+  contentHash: i.contentHash,
+  prevHash: Value(i.prevHash),
+  contentHlc: i.contentHlc,
+  pinned: Value(i.pinned),
+  deleted: Value(i.deleted),
+  deletedHlc: Value(i.deletedHlc),
+  metaHlc: i.metaHlc,
+  restored: Value(i.restored),
+  isConflictCopy: Value(i.isConflictCopy),
+);
 
 /// Convenience used by services: notify the UI bus after a commit.
 extension BusOps on ChangeBus {

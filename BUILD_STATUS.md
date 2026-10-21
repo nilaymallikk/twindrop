@@ -56,6 +56,7 @@
 |---|---|---|
 | `dart analyze` (packages/core) | **pass** | 0 errors (warnings only) |
 | `flutter analyze` (app) | **pass** | 0 errors (info-level lints only) |
+| `dart format --set-exit-if-changed` | **pass** | 125 source files formatted, 0 left to change |
 | `dart test` (packages/core) | **pass** | 392 tests, 0 failed, 0 skipped |
 | `flutter test` (app) | **pass** | 43 tests, 0 failed (18 golden files) |
 | `python3 tool/contrast_check.py design/tokens.json` | **pass** | all 26 text/background pairs ≥ 4.5:1 in both themes |
@@ -89,8 +90,11 @@ rather than only the flattering one.
 ## Artifacts
 | Artifact | Path | Bytes | SHA-256 | Launched/installed? |
 |---|---|---:|---|---|
-| AppImage | `dist/TwinDrop-x86_64.AppImage` | 44 680 384 | `7dc46ebbb24315fc40f2f49dfc6b358d9118c36e8c267ba730ccdb2c899601d7` | **yes** — see below |
-| APK | `dist/twindrop.apk` | 81 169 578 | `73a2cedc18d3af29782baa3669d922f64d42d92fc91eaeb01fb278d0f822c4d2` | **no** — no device attached |
+| AppImage | `dist/TwinDrop-x86_64.AppImage` | 44 680 384 | `a5f131224bf946172b39af780c155e84d62aaf1d9a7c2f43c0735a4d7deab71a` | **yes** — see below |
+| APK | `dist/twindrop.apk` | 81 169 578 | `2d943206ad2083e31a0a29e997172e1ff87343720ac5c815cb1960f59968a92f` | **no** — no device attached |
+| Release bundle | `dist/TwinDrop-v1.0.0-linux-x86_64.tar.gz` | 81 393 417 | `e6cbb0941300a9a301a8998e55779cb8aff6dd8623fd26a9a886f6db6b56e159` | — |
+| Release APK copy | `dist/TwinDrop-v1.0.0-android.apk` | 81 169 578 | `2d943206ad2083e31a0a29e997172e1ff87343720ac5c815cb1960f59968a92f` | — |
+| Checksum list | `dist/SHA256SUMS` | — | — | `sha256sum -c SHA256SUMS` → all 4 **OK** |
 
 ### APK contents verified with `aapt2 dump badging` / `aapt2 dump xmltree`
 - `package app.twindrop`, versionName `1.0.0`, minSdk **26**, targetSdk **36** (docs/06 §1).
@@ -110,13 +114,13 @@ rather than only the flattering one.
 ### AppImage launch evidence (Fedora GNOME, Wayland, `DISPLAY=:0`)
 ```
 $ ./dist/TwinDrop-x86_64.AppImage --hidden
-(app.twindrop:213980): Atk-CRITICAL **: atk_socket_embed: assertion 'plug_id != NULL' failed
+(app.twindrop:234203): Atk-CRITICAL **: atk_socket_embed: assertion 'plug_id != NULL' failed
 [IMPORTANT:flutter/shell/platform/embedder/embedder_surface_gl_impeller.cc(126)] Using the Impeller rendering backend (OpenGLESSDF).
 ```
 - The image mounted through FUSE and ran `/tmp/.mount_TwinDr*/usr/lib/twindrop/twindrop --hidden`.
-- The process was still alive 11 s after launch (no crash, no missing-library error).
+- The process was still alive 12 s after launch (no crash, no missing-library error).
 - The tray icon registered with the GNOME StatusNotifierWatcher:
-  `org.kde.StatusNotifierItem-213980-1` (PID 213980 = TwinDrop) in
+  `org.kde.StatusNotifierItem-234203-1` (PID 234203 = TwinDrop) in
   `RegisteredStatusNotifierItems`.
 - The replica was created and initialised: `~/.local/share/app.twindrop/twindrop.db`
   with 15 tables, `categories = [('inbox','Inbox',1)]`, `change_log = [(1,'category','inbox')]`,

@@ -32,8 +32,7 @@ class Logger {
   static void _stderrSink(String line) => stderr.writeln(line);
 
   /// A logger that drops everything (tests / phone UI default).
-  static final Logger silent =
-      Logger(level: LogLevel.error, sink: (_) {});
+  static final Logger silent = Logger(level: LogLevel.error, sink: (_) {});
 
   static final RegExp _url = RegExp(r'\bhttps?://[^\s]+', caseSensitive: false);
   static final RegExp _hexRun = RegExp(r'\b[0-9a-fA-F]{20,}\b');

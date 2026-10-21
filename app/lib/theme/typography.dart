@@ -60,29 +60,27 @@ class TdType extends ThemeExtension<TdType> {
       required FontWeight weight,
       double letterSpacing = 0,
       Color? color,
-    }) =>
-        base.copyWith(
-          fontFamily: TdFonts.sans,
-          fontSize: size,
-          height: height / size,
-          fontWeight: weight,
-          letterSpacing: letterSpacing,
-          color: color,
-        );
+    }) => base.copyWith(
+      fontFamily: TdFonts.sans,
+      fontSize: size,
+      height: height / size,
+      fontWeight: weight,
+      letterSpacing: letterSpacing,
+      color: color,
+    );
     TextStyle mono({
       required double size,
       required double height,
       double letterSpacing = 0,
       Color? color,
-    }) =>
-        base.copyWith(
-          fontFamily: TdFonts.mono,
-          fontSize: size,
-          height: height / size,
-          fontWeight: FontWeight.w400,
-          letterSpacing: letterSpacing,
-          color: color,
-        );
+    }) => base.copyWith(
+      fontFamily: TdFonts.mono,
+      fontSize: size,
+      height: height / size,
+      fontWeight: FontWeight.w400,
+      letterSpacing: letterSpacing,
+      color: color,
+    );
 
     return TdType(
       meta: mono(size: 12, height: 16, color: tokens.muted),
@@ -151,8 +149,7 @@ class TdType extends ThemeExtension<TdType> {
   @override
   TdType lerp(TdType? other, double t) {
     if (other == null) return this;
-    TextStyle mix(TextStyle a, TextStyle b) =>
-        TextStyle.lerp(a, b, t) ?? a;
+    TextStyle mix(TextStyle a, TextStyle b) => TextStyle.lerp(a, b, t) ?? a;
     return TdType(
       meta: mix(meta, other.meta),
       secondary: mix(secondary, other.secondary),

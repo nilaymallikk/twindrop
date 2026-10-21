@@ -2,10 +2,10 @@ package app.twindrop
 
 import android.app.Application
 import android.content.Context
+import io.flutter.FlutterInjector
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.embedding.engine.FlutterEngineGroup
 import io.flutter.embedding.engine.dart.DartExecutor
-import io.flutter.embedding.engine.loader.FlutterInjector
 
 /**
  * Process-wide owner of the Flutter engines that are not tied to MainActivity.

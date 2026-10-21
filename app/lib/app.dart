@@ -168,6 +168,7 @@ class _Root extends StatelessWidget {
           onOpenLink: (url) => _openLink(context, url),
           onOpenApp: () => controller.desktopHooks.onShowMain?.call(),
           onClose: () => controller.desktopHooks.onHideWindow?.call(),
+          onSendClipboard: () => _sendClipboard(context),
           composerFocusNode: composerFocus,
           pasteSuggestion: null,
         ),
@@ -540,6 +541,17 @@ class _Root extends StatelessWidget {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Copied.'), behavior: SnackBarBehavior.floating),
     );
+  }
+
+  /// Ctrl+Shift+V in the popup: send the clipboard as a message (LNX-003).
+  Future<void> _sendClipboard(BuildContext context) async {
+    final data = await Clipboard.getData(Clipboard.kTextPlain);
+    final text = data?.text?.trim();
+    if (text == null || text.isEmpty) {
+      controller.showToast('The clipboard has no text.');
+      return;
+    }
+    await controller.sendMessage(text);
   }
 
   Future<void> _openLink(BuildContext context, String url) async {

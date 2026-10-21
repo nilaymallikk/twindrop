@@ -5,7 +5,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.WindowManager
 import android.widget.Toast
-
 /**
  * Share-sheet entry point (docs/06 §1): read the payload, persist it to the durable
  * native queue first, then show the small Flutter panel. Finishing here returns the
@@ -14,7 +13,9 @@ import android.widget.Toast
 class ShareReceiverActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        window.addFlags(WindowManager.LayoutParams.FLAG_ACTIVITY_NO_ANIMATION)
+        // The share sheet must not animate: the panel appears over the source
+        // app (docs/06 §1).
+        window.setWindowAnimations(0)
         if (savedInstanceState != null) {
             finish()
             return

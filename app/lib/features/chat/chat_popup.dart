@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:twindrop_core/models/enums.dart';
 
 import '../../theme/context_ext.dart';
-import '../../theme/tokens.dart';
 import '../../widgets/primitives.dart';
 import '../models.dart';
 import 'chat_screen.dart';
@@ -34,6 +34,7 @@ class ChatPopup extends StatelessWidget {
     this.pasteSuggestion,
     this.hasMore = false,
     this.onLoadOlder,
+    this.onSendClipboard,
   });
 
   final List<ChatEntry> entries;
@@ -57,43 +58,68 @@ class ChatPopup extends StatelessWidget {
   final bool hasMore;
   final VoidCallback? onLoadOlder;
 
+  /// Ctrl+Shift+V — send the clipboard as a message (LNX-003).
+  final VoidCallback? onSendClipboard;
+
   @override
   Widget build(BuildContext context) {
     final tokens = context.td;
     const radius = 12.0;
-    return Center(
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 380, maxHeight: 520),
-        child: SizedBox(
-          width: double.infinity,
-          height: double.infinity,
-          child: TdSurface(
-            color: tokens.bg,
-            radius: radius,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(radius),
-              child: ChatScreen(
-                entries: entries,
-                status: status,
-                peerName: peerName,
-                isLoading: isLoading,
-                errorMessage: errorMessage,
-                onRetry: onRetry,
-                onTroubleshoot: onTroubleshoot,
-                onSend: onSend,
-                onSaveToNotepad: onSaveToNotepad,
-                onDelete: onDelete,
-                onCopy: onCopy,
-                onOpenLink: onOpenLink,
-                onShowNotepad: onShowNotepad,
-                onShowSettings: onShowSettings,
-                isPopup: true,
-                onClose: onClose,
-                composerFocusNode: composerFocusNode,
-                pasteSuggestion: pasteSuggestion,
-                hasMore: hasMore,
-                onLoadOlder: onLoadOlder,
-                onOpenApp: onOpenApp,
+    return CallbackShortcuts(
+      // LNX-003: the popup is keyboard driven. The Focus must sit *inside* the
+      // shortcuts so the primary focus node is a descendant of them.
+      bindings: <ShortcutActivator, VoidCallback>{
+        if (onClose != null)
+          const SingleActivator(LogicalKeyboardKey.escape): onClose!,
+        if (onSendClipboard != null)
+          const SingleActivator(
+            LogicalKeyboardKey.keyV,
+            control: true,
+            shift: true,
+          ): onSendClipboard!,
+        if (entries.isNotEmpty)
+          const SingleActivator(
+            LogicalKeyboardKey.keyS,
+            control: true,
+          ): () => onSaveToNotepad(entries.last),
+      },
+      child: Focus(
+        autofocus: true,
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 380, maxHeight: 520),
+            child: SizedBox(
+              width: double.infinity,
+              height: double.infinity,
+              child: TdSurface(
+                color: tokens.bg,
+                radius: radius,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(radius),
+                  child: ChatScreen(
+                    entries: entries,
+                    status: status,
+                    peerName: peerName,
+                    isLoading: isLoading,
+                    errorMessage: errorMessage,
+                    onRetry: onRetry,
+                    onTroubleshoot: onTroubleshoot,
+                    onSend: onSend,
+                    onSaveToNotepad: onSaveToNotepad,
+                    onDelete: onDelete,
+                    onCopy: onCopy,
+                    onOpenLink: onOpenLink,
+                    onShowNotepad: onShowNotepad,
+                    onShowSettings: onShowSettings,
+                    isPopup: true,
+                    onClose: onClose,
+                    composerFocusNode: composerFocusNode,
+                    pasteSuggestion: pasteSuggestion,
+                    hasMore: hasMore,
+                    onLoadOlder: onLoadOlder,
+                    onOpenApp: onOpenApp,
+                  ),
+                ),
               ),
             ),
           ),

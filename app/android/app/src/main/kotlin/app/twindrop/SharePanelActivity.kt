@@ -30,7 +30,12 @@ class SharePanelActivity : FlutterActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val payload = buildPayload(intent)
-        currentShareId = payload?.get("shareId") as? String
+        if (payload == null) {
+            super.onCreate(savedInstanceState)
+            finish()
+            return
+        }
+        currentShareId = payload["shareId"] as? String
         if (currentShareId == null) {
             super.onCreate(savedInstanceState)
             finish()

@@ -61,7 +61,8 @@
 | `dart run tool/smoke_two_peer.dart` | **pass** | `SMOKE_OK` — two in-process peers, real pinned TLS over loopback, pairing, message both ways, exactly-once |
 | `flutter build linux --release` | **pass** | `app/build/linux/x64/release/bundle/twindrop` |
 | `packaging/appimage/build.sh` | **pass** | `dist/TwinDrop-x86_64.AppImage` |
-| `flutter build apk --release` | see Artifacts | |
+| `flutter build apk --release` | **pass** | `dist/twindrop.apk` — after fixing four real build errors (see "Fixes") |
+| `aapt2 dump badging dist/twindrop.apk` | **pass** | `package app.twindrop`, minSdk 26, targetSdk 36, no storage/location/contacts permission |
 | `tool/repair_sysroot_links.py` | **pass** | 1 broken link repaired (`libcairo-gobject.so.2`) |
 
 ## Tests
@@ -80,7 +81,22 @@
 | Artifact | Path | Bytes | SHA-256 | Launched/installed? |
 |---|---|---:|---|---|
 | AppImage | `dist/TwinDrop-x86_64.AppImage` | 44 680 384 | `20ed2fc0fe7fa4e9e7afd994033b2df05246be6a0f3ab5c7273e6593d1bf9d55` | **yes** — see below |
-| APK | `dist/twindrop.apk` | see below | see below | no device attached |
+| APK | `dist/twindrop.apk` | 81 169 578 | `6df5a6d70e715c3f33f5b7bfc254be382a961ad06d4de901b886a97927a4a483` | **no** — no device attached |
+
+### APK contents verified with `aapt2 dump badging` / `aapt2 dump xmltree`
+- `package app.twindrop`, versionName `1.0.0`, minSdk **26**, targetSdk **36** (docs/06 §1).
+- `ShareReceiverActivity` exported with `android.intent.action.SEND` + `android.intent.category.DEFAULT`
+  → the app appears in the share sheet for text (SHARE-001).
+- `SharePanelActivity` (internal), `KeepAliveService` with
+  `foregroundServiceType=specialUse` and the `PROPERTY_SPECIAL_USE_FGS_SUBTYPE` property.
+- Permissions: INTERNET, ACCESS_NETWORK_STATE, ACCESS_WIFI_STATE, CHANGE_WIFI_MULTICAST_STATE,
+  FOREGROUND_SERVICE(+SPECIAL_USE), POST_NOTIFICATIONS, RECEIVE_BOOT_COMPLETED,
+  REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, CAMERA. **No storage, location or contacts.**
+- The IBM Plex fonts and the six tray icons are inside
+  `assets/flutter_assets/assets/` (DES-003, DES-007).
+- The APK is signed with the **debug key**: no keystore was provided. It is not
+  distributable as-is; dropping an `android/key.properties` switches the build to a
+  real release key automatically.
 
 ### AppImage launch evidence (Fedora GNOME, Wayland, `DISPLAY=:0`)
 ```
@@ -98,6 +114,13 @@ $ ./dist/TwinDrop-x86_64.AppImage --hidden
   `settings` holding `device.id = 01a15d25-ebdb-7ce7-80a3-f05411833218` (UUIDv7) and
   `hlc.last = 001792564128739-00001-01a15d25-ebdb-7ce7` (the `docs/04` HLC format).
 - The only stderr noise is the Atk accessibility warning (no a11y bus in this session).
+
+### AppImage main window
+Launching without `--hidden` opens the real window:
+```
+$ wmctrl -l
+0x00a0000d  0 fedora TwinDrop
+```
 
 ## End-to-end verification (never mark ✔ without evidence)
 | Check | Environment | Status | Evidence |
@@ -146,6 +169,25 @@ $ ./dist/TwinDrop-x86_64.AppImage --hidden
   not written (`desktop_pairing_screen.dart`, `phone_onboarding_screen.dart`,
   `diagnostics_screen.dart`) and the two missing Android entry points
   (`keepalive_main.dart`, `share_panel_main.dart`).
+- **The Android release build did not compile.** Four real errors:
+  1. `flutter_local_notifications` needs core library desugaring → enabled it plus
+     `desugar_jdk_libs`.
+  2. `ShareIntents.kt` had an *unclosed comment*: Kotlin nests block comments, so the
+     `text/*` inside the KDoc opened a nested comment that swallowed the rest of the file
+     (this cascaded into nine "Unresolved reference" errors).
+  3. `ShareReceiverActivity` used the non-existent
+     `WindowManager.LayoutParams.FLAG_ACTIVITY_NO_ANIMATION` → `window.setWindowAnimations(0)`.
+  4. `SharePanelActivity` passed a nullable payload where a non-null map was required, and
+     `TwindropApp` imported `FlutterInjector` from the wrong package → fixed both.
+  5. The manifest referenced `@style/Theme.SharePanel`, which did not exist → added it to
+     `values/styles.xml` and `values-night/styles.xml`.
+- **LNX-003 popup shortcuts were missing.** Esc / Ctrl+S / Ctrl+Shift+V did nothing.
+  Implemented with `CallbackShortcuts`; the `Focus` must sit *inside* the shortcuts or the
+  primary focus node is not a descendant of them and the keys never arrive.
+- The desktop pairing screen **overflowed** its column on a 600 px window → it scrolls now.
+- The Android build now uses `minSdk = 26` (docs/06 §1) and picks up an optional
+  `android/key.properties` for a real release signature, falling back to the debug key
+  with a loud warning when it is absent.
 
 ## Next concrete task
 - Raise core line coverage from 55.1 % to ≥ 80 %: `runtime.dart`, `export_service.dart`,

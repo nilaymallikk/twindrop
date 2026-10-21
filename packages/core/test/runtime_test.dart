@@ -249,11 +249,13 @@ void main() {
       );
       addTearDown(runtime.dispose);
 
+      await runtime.start();
       await runtime.pause();
       expect(await runtime.settings.paused(), isTrue);
       expect(runtime.status, ConnectionStatus.paused);
       await runtime.resume();
       expect(await runtime.settings.paused(), isFalse);
+      await runtime.stopConnection();
     });
   });
 
@@ -308,6 +310,8 @@ void main() {
       expect(await settings.cleanLinks(), isFalse);
 
       expect(await settings.notificationsEnabled(), isTrue);
+      expect(await settings.keepAliveConsent(), isTrue);
+      await settings.setKeepAliveConsent(false);
       expect(await settings.keepAliveConsent(), isFalse);
       expect(await settings.shareDefaultAction(), ShareDefaultAction.notepad);
       await settings.setShareDefaultAction(ShareDefaultAction.chat);

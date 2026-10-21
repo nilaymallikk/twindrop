@@ -37,24 +37,29 @@ class DesktopPairingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.td;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        Text(
-          'Pair a phone',
-          style: context.tdType.screen,
-        ),
-        const SizedBox(height: TdSpace.s4),
-        Text(
-          'Open TwinDrop on the phone and scan this code, or type the address '
-          'below. Both devices must be on the same Wi-Fi.',
-          style: context.tdType.secondary,
-        ),
-        const SizedBox(height: TdSpace.s24),
-        _body(context),
-      ],
+    // The approval stage carries a QR code, a code and an error message at
+    // once, so the column must be allowed to scroll instead of overflowing on
+    // a short window (AGENTS rule 9).
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(vertical: TdSpace.s8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Text(
+            'Pair a phone',
+            style: context.tdType.screen,
+          ),
+          const SizedBox(height: TdSpace.s4),
+          Text(
+            'Open TwinDrop on the phone and scan this code, or type the '
+            'address below. Both devices must be on the same Wi-Fi.',
+            style: context.tdType.secondary,
+          ),
+          const SizedBox(height: TdSpace.s24),
+          _body(context),
+        ],
+      ),
     );
   }
 

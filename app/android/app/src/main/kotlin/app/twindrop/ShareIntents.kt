@@ -4,7 +4,8 @@ import android.content.Intent
 
 /**
  * Parsing of ACTION_SEND intents into the small payload that TwinDrop stores.
- * Only `text/*` is supported (docs/06 §1, SHARE-008); nothing is fetched or downloaded.
+ * Only `text/plain` is supported (docs/06 §1, SHARE-008); nothing is fetched or
+ * downloaded.
  */
 object ShareIntents {
     sealed class ParseResult {

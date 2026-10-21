@@ -102,10 +102,7 @@ void main() {
     // `FormatException`. The assertion below pins the current behaviour;
     // see the finding in the test report (validators.dart:166).
     test('rejects an empty name', () async {
-      expect(
-        () => notepad.createCategory(''),
-        throwsA(isA<FormatException>()),
-      );
+      expect(() => notepad.createCategory(''), throwsA(isA<FormatException>()));
     });
 
     test('rejects a whitespace-only name', () async {

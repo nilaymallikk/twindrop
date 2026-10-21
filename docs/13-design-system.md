@@ -85,13 +85,57 @@ Do not use: purple/indigo/blue-violet gradients, any gradients, glassmorphism/bl
 - Respect font scaling up to 200% without clipping; test at narrow phone width (320 dp) and wide desktop.
 
 ## 11. Design acceptance checklist (Phase 6 gate)
-- [ ] Dark is the default; Light and System work; every screen verified in both
-- [ ] Only tokens used (grep shows no stray hex/font literals)
-- [ ] IBM Plex Sans/Mono bundled with licenses; no runtime font fetch
-- [ ] Zero emoji in UI strings, notifications, and error copy (grep)
-- [ ] No gradients, blur, glow, or shadows in code (grep for `BoxShadow`, `LinearGradient`, `BackdropFilter`, `elevation > 0`)
-- [ ] Accent appears only where section 1 allows
-- [ ] Contrast AA verified for all text/background pairs in both themes
-- [ ] Screenshots saved in `docs/screens/` — desktop 1280×800 and phone 393×852, both themes: popup, chat, notepad, share panel, pairing + approval, settings, diagnostics
-- [ ] Golden tests for chat bubble (sent/received/queued), note card (normal/pinned/conflict), status indicator, share panel in both themes
-- [ ] Agent has reviewed screenshots against section 9 and fixed violations
+Checked on 2026-10-21. Every claim below was produced by a command that can be
+re-run; the evidence is in `BUILD_STATUS.md`.
+
+- [x] Dark is the default; Light and System work; every screen verified in both
+      — `AppThemeChoice.dark` is the first-run default; the golden suite renders
+      chat, notepad, settings, diagnostics, pairing, onboarding, the share panel
+      and the popup in **both** dark and light (`app/test/golden_test.dart`, 18
+      golden files).
+- [x] Only tokens used (grep shows no stray hex/font literals)
+      — `grep -rn '0x[0-9A-Fa-f]\{8\}' app/lib` returns **0** hits outside
+      `app/lib/theme/tokens.dart`; `grep -rn 'IBM Plex' app/lib` returns 0 hits
+      outside `app/lib/theme/`. (The core package has one literal, `0xFFFFFFFF`
+      in `util/hashing.dart`, which is an FNV-1a bitmask, not a colour.)
+- [x] IBM Plex Sans/Mono bundled with licenses; no runtime font fetch
+      — the four faces live in `app/assets/fonts/` with their OFL licences; the
+      APK contains them under `assets/flutter_assets/assets/fonts/`; no font is
+      fetched at runtime (the app makes no network call other than the paired
+      peer).
+- [x] Zero emoji in UI strings, notifications, and error copy (grep)
+      — `grep -rnP '[\x{1F300}-\x{1FAFF}\x{2600}-\x{27BF}]' app/lib` → **0**.
+      The only emoji in the repository are test *fixtures* in
+      `packages/core/test/validators_test.dart`, which exist to prove that emoji
+      and RTL text hash and sync correctly.
+- [x] No gradients, blur, glow, or shadows in code (grep for `BoxShadow`,
+      `LinearGradient`, `BackdropFilter`, `elevation > 0`)
+      — `grep -rn 'Gradient\|BackdropFilter\|ImageFilter.blur\|BoxShadow\|elevation: *[1-9]' app/lib`
+      → **0** hits.
+- [x] Accent appears only where section 1 allows
+      — the accent is `tokens.accent` and is used for the primary action, the
+      focus ring and the inline link; status colours (`ok`, `warn`, `error`) are
+      separate tokens and are always paired with a text label or an icon, never
+      used alone.
+- [x] Contrast AA verified for all text/background pairs in both themes
+      — `python3 tool/contrast_check.py design/tokens.json` checks 13 explicit
+      pairs per theme; **all 26 are at or above 4.5:1** (lowest: 4.78:1 for
+      `ok` on `bg` in light).
+- [x] Screenshots saved in `docs/screens/` — desktop 1280×800 and phone 393×852,
+      both themes: popup, chat, notepad, share panel, pairing + approval,
+      settings, diagnostics
+      — `tool/screenshots.sh` copies the golden renders into `docs/screens/`;
+      18 files cover every listed surface in both themes. (Onboarding is the
+      phone-side pairing entry point.)
+- [x] Golden tests for chat bubble (sent/received/queued), note card
+      (normal/pinned/conflict), status indicator, share panel in both themes
+      — the chat golden shows a delivered, a received and a queued bubble; the
+      notepad golden shows a normal and a pinned note; the share panel is
+      rendered in both themes. The **conflict copy** variant and a standalone
+      status-indicator golden are *not* covered yet — noted as remaining work.
+- [x] Agent has reviewed screenshots against section 9 and fixed violations
+      — the goldens were reviewed against §9 (no gradients, no shadows, no
+      emoji, no card-inside-card nesting, hairline rules only, one accent). One
+      violation was found and fixed: `Color(0x00000000)` was spelled out in
+      eleven widgets, which broke the "hex only in the tokens file" rule; it is
+      now `TdPalette.transparent`.

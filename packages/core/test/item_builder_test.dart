@@ -14,7 +14,10 @@ void main() {
       );
       expect(item.url, 'https://example.com/page');
       expect(item.kind, ItemKind.link);
-      expect(item.text, 'look at https://example.com/page and https://other.example');
+      expect(
+        item.text,
+        'look at https://example.com/page and https://other.example',
+      );
     });
 
     test('keeps a non-web scheme as plain text', () {
@@ -175,14 +178,14 @@ void main() {
 
   group('editedContent', () {
     Item base() => buildNewItem(
-          type: ItemType.note,
-          text: 'v1',
-          title: 'Title',
-          deviceId: 'device-a',
-          deviceName: 'Device A',
-          hlc: '000000000001000-00001-a',
-          createdAt: 1000,
-        );
+      type: ItemType.note,
+      text: 'v1',
+      title: 'Title',
+      deviceId: 'device-a',
+      deviceName: 'Device A',
+      hlc: '000000000001000-00001-a',
+      createdAt: 1000,
+    );
 
     test('keeps the hash chain and updates the content hash', () {
       final current = base();

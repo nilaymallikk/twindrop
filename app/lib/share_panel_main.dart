@@ -65,7 +65,7 @@ class _SharePanelAppState extends State<SharePanelApp> {
         choice: AppThemeChoice.dark,
         platformBrightness: Brightness.dark,
       ),
-      home: _SharePanelHome(
+      home: SharePanelView(
         payload: _payload,
         busy: _busy,
         onUndo: _undo,
@@ -162,8 +162,9 @@ class _SharePanelAppState extends State<SharePanelApp> {
 }
 
 /// The compact card itself.
-class _SharePanelHome extends StatelessWidget {
-  const _SharePanelHome({
+class SharePanelView extends StatelessWidget {
+  const SharePanelView({
+    super.key,
     required this.payload,
     required this.busy,
     required this.onUndo,

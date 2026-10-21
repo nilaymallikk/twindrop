@@ -38,10 +38,9 @@ void main() {
     });
 
     test('stores only the sha256 hash, never the token itself', () async {
-      await peers.addPairedPeer(makePeer(
-        id: peerId,
-        tokenHash: DeviceTokens.hash(token),
-      ));
+      await peers.addPairedPeer(
+        makePeer(id: peerId, tokenHash: DeviceTokens.hash(token)),
+      );
       final stored = await db.peerById(peerId);
       expect(stored!.tokenHash, isNotNull);
       expect(stored.tokenHash, isNot(token));
@@ -64,9 +63,10 @@ void main() {
         auth.authenticateHeader(null),
         throwsA(isA<UnauthorizedError>()),
       );
-      expect((await _catchError(() => auth.authenticateHeader(null)))
-          .httpStatus,
-          401);
+      expect(
+        (await _catchError(() => auth.authenticateHeader(null))).httpStatus,
+        401,
+      );
     });
 
     test('rejects a malformed Authorization header', () async {
@@ -94,32 +94,31 @@ void main() {
     });
 
     test('accepts a valid token and resolves the peer identity', () async {
-      await peers.addPairedPeer(makePeer(
-        id: peerId,
-        tokenHash: DeviceTokens.hash(token),
-      ));
+      await peers.addPairedPeer(
+        makePeer(id: peerId, tokenHash: DeviceTokens.hash(token)),
+      );
       final peer = await auth.authenticateToken(token);
       expect(peer.id, peerId);
       expect(peer.isRevoked, isFalse);
     });
 
-    test('resolves the identity from the token, not from a claimed id',
-        () async {
-      await peers.addPairedPeer(makePeer(
-        id: peerId,
-        tokenHash: DeviceTokens.hash(token),
-      ));
-      final peer = await auth.authenticateHeader('Bearer $token');
-      expect(peer.id, peerId);
-    });
+    test(
+      'resolves the identity from the token, not from a claimed id',
+      () async {
+        await peers.addPairedPeer(
+          makePeer(id: peerId, tokenHash: DeviceTokens.hash(token)),
+        );
+        final peer = await auth.authenticateHeader('Bearer $token');
+        expect(peer.id, peerId);
+      },
+    );
   });
 
   group('revocation', () {
     test('a revoked token no longer authenticates', () async {
-      await peers.addPairedPeer(makePeer(
-        id: peerId,
-        tokenHash: DeviceTokens.hash(token),
-      ));
+      await peers.addPairedPeer(
+        makePeer(id: peerId, tokenHash: DeviceTokens.hash(token)),
+      );
       expect((await auth.authenticateToken(token)).id, peerId);
 
       final revoked = await peers.revoke(peerId);
@@ -133,36 +132,42 @@ void main() {
         reason: 'a revoked device must never authenticate again',
       );
       final error = await _catchError(() => auth.authenticateToken(token));
-      expect(error.httpStatus, 403,
-          reason: 'a revoked device is forbidden (4403 on the socket)');
+      expect(
+        error.httpStatus,
+        403,
+        reason: 'a revoked device is forbidden (4403 on the socket)',
+      );
       expect(error, isA<ForbiddenError>());
     });
 
     test('a revoked peer is excluded from the active list', () async {
-      await peers.addPairedPeer(makePeer(
-        id: peerId,
-        tokenHash: DeviceTokens.hash(token),
-      ));
+      await peers.addPairedPeer(
+        makePeer(id: peerId, tokenHash: DeviceTokens.hash(token)),
+      );
       expect((await peers.active()).length, 1);
       await peers.revoke(peerId);
       expect((await peers.active()).length, 0);
-      expect((await peers.list()).length, 1,
-          reason: 'the row is kept for the diagnostics screen');
+      expect(
+        (await peers.list()).length,
+        1,
+        reason: 'the row is kept for the diagnostics screen',
+      );
     });
 
-    test('revocation emits the peer id so live sockets can be closed',
-        () async {
-      final emitted = <String>[];
-      final sub = peers.revokedStream.listen(emitted.add);
-      addTearDown(sub.cancel);
-      await peers.addPairedPeer(makePeer(
-        id: peerId,
-        tokenHash: DeviceTokens.hash(token),
-      ));
-      await peers.revoke(peerId);
-      await Future<void>.delayed(Duration.zero);
-      expect(emitted, contains(peerId));
-    });
+    test(
+      'revocation emits the peer id so live sockets can be closed',
+      () async {
+        final emitted = <String>[];
+        final sub = peers.revokedStream.listen(emitted.add);
+        addTearDown(sub.cancel);
+        await peers.addPairedPeer(
+          makePeer(id: peerId, tokenHash: DeviceTokens.hash(token)),
+        );
+        await peers.revoke(peerId);
+        await Future<void>.delayed(Duration.zero);
+        expect(emitted, contains(peerId));
+      },
+    );
 
     test('revoking an unknown peer is a no-op', () async {
       expect(await peers.revoke('does-not-exist'), isNull);
@@ -228,10 +233,14 @@ void main() {
             ? await client.postUrl(uri).timeout(const Duration(seconds: 10))
             : await client.getUrl(uri).timeout(const Duration(seconds: 10));
         if (bearer != null) {
-          request.headers.set(HttpHeaders.authorizationHeader, 'Bearer $bearer');
+          request.headers.set(
+            HttpHeaders.authorizationHeader,
+            'Bearer $bearer',
+          );
         }
-        final response =
-            await request.close().timeout(const Duration(seconds: 10));
+        final response = await request.close().timeout(
+          const Duration(seconds: 10),
+        );
         await response.drain<void>();
         return response.statusCode;
       } finally {
@@ -255,26 +264,38 @@ void main() {
     });
 
     test('a revoked token is rejected with 403', () async {
-      await peers.addPairedPeer(makePeer(
-        id: peerId,
-        tokenHash: DeviceTokens.hash(token),
-        certFp: identity.fingerprint,
-      ));
+      await peers.addPairedPeer(
+        makePeer(
+          id: peerId,
+          tokenHash: DeviceTokens.hash(token),
+          certFp: identity.fingerprint,
+        ),
+      );
       await peers.revoke(peerId);
       expect(
-        await statusOf('/v1/devices/self/revoke', method: 'POST', bearer: token),
+        await statusOf(
+          '/v1/devices/self/revoke',
+          method: 'POST',
+          bearer: token,
+        ),
         403,
       );
     });
 
     test('a valid token passes the auth check', () async {
-      await peers.addPairedPeer(makePeer(
-        id: peerId,
-        tokenHash: DeviceTokens.hash(token),
-        certFp: identity.fingerprint,
-      ));
+      await peers.addPairedPeer(
+        makePeer(
+          id: peerId,
+          tokenHash: DeviceTokens.hash(token),
+          certFp: identity.fingerprint,
+        ),
+      );
       expect(
-        await statusOf('/v1/devices/self/revoke', method: 'POST', bearer: token),
+        await statusOf(
+          '/v1/devices/self/revoke',
+          method: 'POST',
+          bearer: token,
+        ),
         200,
       );
     });
@@ -283,22 +304,31 @@ void main() {
       expect(await statusOf('/v1/health'), 200);
     });
 
-    test('a device can revoke itself and the token dies immediately',
-        () async {
-      await peers.addPairedPeer(makePeer(
-        id: peerId,
-        tokenHash: DeviceTokens.hash(token),
-        certFp: identity.fingerprint,
-      ));
+    test('a device can revoke itself and the token dies immediately', () async {
+      await peers.addPairedPeer(
+        makePeer(
+          id: peerId,
+          tokenHash: DeviceTokens.hash(token),
+          certFp: identity.fingerprint,
+        ),
+      );
       expect(
-        await statusOf('/v1/devices/self/revoke', method: 'POST', bearer: token),
+        await statusOf(
+          '/v1/devices/self/revoke',
+          method: 'POST',
+          bearer: token,
+        ),
         200,
       );
 
       final peer = await db.peerById(peerId);
       expect(peer!.isRevoked, isTrue);
       expect(
-        await statusOf('/v1/devices/self/revoke', method: 'POST', bearer: token),
+        await statusOf(
+          '/v1/devices/self/revoke',
+          method: 'POST',
+          bearer: token,
+        ),
         403,
         reason: 'the old token must be dead right after the revoke',
       );
@@ -315,30 +345,39 @@ void main() {
       );
       try {
         final request = await client
-            .postUrl(Uri.parse(
-                'https://127.0.0.1:${host.port}/v1/devices/self/revoke'))
+            .postUrl(
+              Uri.parse(
+                'https://127.0.0.1:${host.port}/v1/devices/self/revoke',
+              ),
+            )
             .timeout(const Duration(seconds: 10));
-        final response =
-            await request.close().timeout(const Duration(seconds: 10));
+        final response = await request.close().timeout(
+          const Duration(seconds: 10),
+        );
         final body = await response.transform(utf8.decoder).join();
         expect(response.statusCode, 401);
         final decoded = jsonDecode(body) as Map<String, dynamic>;
         final error = ApiError.fromJson(decoded);
         expect(error.code, ErrorCodes.unauthorized);
         expect(error.message, isNotEmpty);
-        expect(error.message.toLowerCase(), isNot(contains(token)),
-            reason: 'the error body must never echo the token');
+        expect(
+          error.message.toLowerCase(),
+          isNot(contains(token)),
+          reason: 'the error body must never echo the token',
+        );
       } finally {
         client.close(force: true);
       }
     });
 
     test('a valid token opens an authenticated WebSocket session', () async {
-      await peers.addPairedPeer(makePeer(
-        id: peerId,
-        tokenHash: DeviceTokens.hash(token),
-        certFp: identity.fingerprint,
-      ));
+      await peers.addPairedPeer(
+        makePeer(
+          id: peerId,
+          tokenHash: DeviceTokens.hash(token),
+          certFp: identity.fingerprint,
+        ),
+      );
       final client = TlsIdentity.pinnedHttpClient(
         identity.fingerprint,
         timeout: const Duration(seconds: 5),
@@ -359,12 +398,16 @@ void main() {
         final frame = FrameCodec.decode(data as String);
         if (frame is ReadyFrame && !ready.isCompleted) ready.complete(frame);
       });
-      socket.add(FrameCodec.encode(HelloFrame(
-        deviceId: peerId,
-        name: 'Phone',
-        kind: PeerKind.phone,
-        appVersion: '0.1.0',
-      )));
+      socket.add(
+        FrameCodec.encode(
+          HelloFrame(
+            deviceId: peerId,
+            name: 'Phone',
+            kind: PeerKind.phone,
+            appVersion: '0.1.0',
+          ),
+        ),
+      );
 
       final frame = await ready.future.timeout(const Duration(seconds: 10));
       expect(frame, isA<ReadyFrame>());
@@ -372,11 +415,13 @@ void main() {
     });
 
     test('a revoked token cannot open a WebSocket session', () async {
-      await peers.addPairedPeer(makePeer(
-        id: peerId,
-        tokenHash: DeviceTokens.hash(token),
-        certFp: identity.fingerprint,
-      ));
+      await peers.addPairedPeer(
+        makePeer(
+          id: peerId,
+          tokenHash: DeviceTokens.hash(token),
+          certFp: identity.fingerprint,
+        ),
+      );
       await peers.revoke(peerId);
 
       final client = TlsIdentity.pinnedHttpClient(
@@ -415,11 +460,13 @@ void main() {
     });
 
     test('revocation closes the live socket with 4403', () async {
-      await peers.addPairedPeer(makePeer(
-        id: peerId,
-        tokenHash: DeviceTokens.hash(token),
-        certFp: identity.fingerprint,
-      ));
+      await peers.addPairedPeer(
+        makePeer(
+          id: peerId,
+          tokenHash: DeviceTokens.hash(token),
+          certFp: identity.fingerprint,
+        ),
+      );
       final client = TlsIdentity.pinnedHttpClient(
         identity.fingerprint,
         timeout: const Duration(seconds: 5),
@@ -449,12 +496,16 @@ void main() {
           if (!closed.isCompleted) closed.complete();
         },
       );
-      socket.add(FrameCodec.encode(HelloFrame(
-        deviceId: peerId,
-        name: 'Phone',
-        kind: PeerKind.phone,
-        appVersion: '0.1.0',
-      )));
+      socket.add(
+        FrameCodec.encode(
+          HelloFrame(
+            deviceId: peerId,
+            name: 'Phone',
+            kind: PeerKind.phone,
+            appVersion: '0.1.0',
+          ),
+        ),
+      );
       await ready.future.timeout(const Duration(seconds: 10));
 
       await peers.revoke(peerId);

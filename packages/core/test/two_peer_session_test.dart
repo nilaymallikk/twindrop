@@ -153,27 +153,31 @@ void main() {
     await host.start();
 
     // The desktop knows the phone (and stores only the token hash).
-    await desktopPeers.addPairedPeer(Peer(
-      id: phoneId,
-      name: 'Phone',
-      kind: PeerKind.phone,
-      roleOfPeer: PeerRole.guest,
-      tokenHash: DeviceTokens.hash(token),
-      createdAt: 1000,
-    ));
+    await desktopPeers.addPairedPeer(
+      Peer(
+        id: phoneId,
+        name: 'Phone',
+        kind: PeerKind.phone,
+        roleOfPeer: PeerRole.guest,
+        tokenHash: DeviceTokens.hash(token),
+        createdAt: 1000,
+      ),
+    );
 
     // The phone knows the desktop and holds the pin.
-    await phonePeers.addPairedPeer(Peer(
-      id: desktopId,
-      name: 'Desktop',
-      kind: PeerKind.desktop,
-      roleOfPeer: PeerRole.host,
-      tokenRef: peerTokenRef(desktopId),
-      certFp: identity.fingerprint,
-      lastHost: '127.0.0.1',
-      lastPort: host.port,
-      createdAt: 1000,
-    ));
+    await phonePeers.addPairedPeer(
+      Peer(
+        id: desktopId,
+        name: 'Desktop',
+        kind: PeerKind.desktop,
+        roleOfPeer: PeerRole.host,
+        tokenRef: peerTokenRef(desktopId),
+        certFp: identity.fingerprint,
+        lastHost: '127.0.0.1',
+        lastPort: host.port,
+        createdAt: 1000,
+      ),
+    );
     tokenStore = MemoryTokenStore();
     await tokenStore.write(peerTokenRef(desktopId), token);
 
@@ -207,32 +211,38 @@ void main() {
         () async => connection.status == ConnectionStatus.connected,
         timeout: const Duration(seconds: 20),
       );
-      expect(connected, isTrue,
-          reason: 'the phone never reached the connected state');
+      expect(
+        connected,
+        isTrue,
+        reason: 'the phone never reached the connected state',
+      );
       expect(host.connectedPeerIds, contains(phoneId));
     });
 
-    test('a message from the desktop arrives on the phone exactly once',
-        () async {
-      await connection.start();
-      expect(
-        await waitUntil(
-          () async => connection.status == ConnectionStatus.connected,
-          timeout: const Duration(seconds: 20),
-        ),
-        isTrue,
-      );
+    test(
+      'a message from the desktop arrives on the phone exactly once',
+      () async {
+        await connection.start();
+        expect(
+          await waitUntil(
+            () async => connection.status == ConnectionStatus.connected,
+            timeout: const Duration(seconds: 20),
+          ),
+          isTrue,
+        );
 
-      final message = await desktopChat.sendMessage('hello from the desktop');
-      final delivered =
-          await waitUntil(() => _hasMessage(phoneDb, message.id));
-      expect(delivered, isTrue, reason: 'the message never arrived');
+        final message = await desktopChat.sendMessage('hello from the desktop');
+        final delivered = await waitUntil(
+          () => _hasMessage(phoneDb, message.id),
+        );
+        expect(delivered, isTrue, reason: 'the message never arrived');
 
-      final messages = await phoneChat.listMessages();
-      expect(messages.length, 1);
-      expect(messages.first.text, 'hello from the desktop');
-      expect(messages.first.originDevice, desktopId);
-    });
+        final messages = await phoneChat.listMessages();
+        expect(messages.length, 1);
+        expect(messages.first.text, 'hello from the desktop');
+        expect(messages.first.originDevice, desktopId);
+      },
+    );
 
     test('a message from the phone arrives on the desktop', () async {
       await connection.start();

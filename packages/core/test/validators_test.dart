@@ -78,14 +78,16 @@ void main() {
     });
 
     test('keeps the first URL when several are present', () {
-      final link =
-          firstValidUrl('first https://one.example then https://two.example');
+      final link = firstValidUrl(
+        'first https://one.example then https://two.example',
+      );
       expect(link!.url, 'https://one.example');
     });
 
     test('skips a rejected scheme and finds the next valid URL', () {
       final link = firstValidUrl(
-          'danger javascript:alert(1) but real https://ok.example/page');
+        'danger javascript:alert(1) but real https://ok.example/page',
+      );
       expect(link!.url, 'https://ok.example/page');
     });
 
@@ -158,7 +160,8 @@ void main() {
     test('keeps every other parameter (only igsh/igshid are tracking)', () {
       expect(
         cleanInstagramUrl(
-            'https://www.instagram.com/reel/ABC/?igsh=XYZ&utm_source=ig_web_copy_link'),
+          'https://www.instagram.com/reel/ABC/?igsh=XYZ&utm_source=ig_web_copy_link',
+        ),
         'https://www.instagram.com/reel/ABC/?utm_source=ig_web_copy_link',
       );
       expect(
@@ -212,11 +215,13 @@ void main() {
       expect(isValidMessageText('a'), isTrue);
     });
 
-    test('accepts a message of exactly the byte limit and rejects one byte more',
-        () {
-      expect(isValidMessageText('a' * maxMessageBytes), isTrue);
-      expect(isValidMessageText('a' * (maxMessageBytes + 1)), isFalse);
-    });
+    test(
+      'accepts a message of exactly the byte limit and rejects one byte more',
+      () {
+        expect(isValidMessageText('a' * maxMessageBytes), isTrue);
+        expect(isValidMessageText('a' * (maxMessageBytes + 1)), isFalse);
+      },
+    );
 
     test('measures the message limit in UTF-8 bytes, not characters', () {
       // U+1F600 is 4 UTF-8 bytes.
@@ -227,11 +232,13 @@ void main() {
       );
     });
 
-    test('accepts a note of exactly the byte limit and rejects one byte more',
-        () {
-      expect(isValidNoteText('a' * maxNoteBytes), isTrue);
-      expect(isValidNoteText('a' * (maxNoteBytes + 1)), isFalse);
-    });
+    test(
+      'accepts a note of exactly the byte limit and rejects one byte more',
+      () {
+        expect(isValidNoteText('a' * maxNoteBytes), isTrue);
+        expect(isValidNoteText('a' * (maxNoteBytes + 1)), isFalse);
+      },
+    );
 
     test('validateMessageText throws instead of truncating', () {
       expect(() => validateMessageText(''), throwsFormatException);
@@ -256,8 +263,10 @@ void main() {
       expect(isValidTitle(''), isTrue);
       expect(isValidTitle('a' * maxTitleChars), isTrue);
       expect(isValidTitle('a' * (maxTitleChars + 1)), isFalse);
-      expect(() => validateTitle('a' * (maxTitleChars + 1)),
-          throwsFormatException);
+      expect(
+        () => validateTitle('a' * (maxTitleChars + 1)),
+        throwsFormatException,
+      );
       expect(() => validateTitle('a' * maxTitleChars), returnsNormally);
     });
 
@@ -306,7 +315,11 @@ void main() {
       final b = contentHashOf(text: 'héllo 👋', title: 'T', url: null);
       expect(a, b);
       expect(a.length, 64);
-      final c = contentHashOf(text: 'héllo 👋', title: 'T', url: 'https://x.dev');
+      final c = contentHashOf(
+        text: 'héllo 👋',
+        title: 'T',
+        url: 'https://x.dev',
+      );
       expect(c, isNot(a));
     });
   });

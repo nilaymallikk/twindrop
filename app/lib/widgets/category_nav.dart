@@ -78,7 +78,7 @@ class TdCategoryTabs extends StatelessWidget {
                         bottom: BorderSide(
                           color: selected
                               ? tokens.paper
-                              : const Color(0x00000000),
+                              : TdPalette.transparent,
                           width: 2,
                         ),
                       ),
@@ -106,7 +106,7 @@ class TdCategoryTabs extends StatelessWidget {
                     decoration: BoxDecoration(
                       border: Border(
                         bottom: BorderSide(
-                          color: const Color(0x00000000),
+                          color: TdPalette.transparent,
                           width: 2,
                         ),
                       ),

@@ -15,7 +15,8 @@ Map<String, dynamic> payloadJson({
   int version = 1,
   List<String> hosts = const ['192.168.1.10'],
   int port = 47321,
-  String fingerprint = 'a1b2c3d4e5f60718293a4b5c6d7e8f90a1b2c3d4e5f60718293a4b5c6d7e8f90',
+  String fingerprint =
+      'a1b2c3d4e5f60718293a4b5c6d7e8f90a1b2c3d4e5f60718293a4b5c6d7e8f90',
   String? token,
   String exp = '2099-01-01T00:00:00.000Z',
   String name = 'Desktop',
@@ -73,7 +74,9 @@ void main() {
     test('rejects a payload with whitespace', () {
       final raw = encodePayload(payloadJson());
       expect(
-        () => PairingPayload.parse('${raw.substring(0, 10)} ${raw.substring(10)}'),
+        () => PairingPayload.parse(
+          '${raw.substring(0, 10)} ${raw.substring(10)}',
+        ),
         throwsA(isA<ProtocolError>()),
       );
     });
@@ -114,9 +117,11 @@ void main() {
         throwsA(isA<ProtocolError>()),
       );
       expect(
-        () => PairingPayload.parse(encodePayload(payloadJson(
-          hosts: List<String>.generate(9, (i) => '192.168.1.$i'),
-        ))),
+        () => PairingPayload.parse(
+          encodePayload(
+            payloadJson(hosts: List<String>.generate(9, (i) => '192.168.1.$i')),
+          ),
+        ),
         throwsA(isA<ProtocolError>()),
       );
     });
@@ -124,7 +129,8 @@ void main() {
     test('rejects a host that is not an IP address', () {
       expect(
         () => PairingPayload.parse(
-            encodePayload(payloadJson(hosts: const ['desktop.local']))),
+          encodePayload(payloadJson(hosts: const ['desktop.local'])),
+        ),
         throwsA(isA<ProtocolError>()),
       );
     });
@@ -142,13 +148,15 @@ void main() {
 
     test('rejects a fingerprint that is not a sha256 hex string', () {
       expect(
-        () => PairingPayload.parse(encodePayload(payloadJson(fingerprint: 'abc'))),
+        () => PairingPayload.parse(
+          encodePayload(payloadJson(fingerprint: 'abc')),
+        ),
         throwsA(isA<ProtocolError>()),
       );
       expect(
-        () => PairingPayload.parse(encodePayload(
-          payloadJson(fingerprint: 'A1B2' + '0' * 60),
-        )),
+        () => PairingPayload.parse(
+          encodePayload(payloadJson(fingerprint: 'A1B2' + '0' * 60)),
+        ),
         throwsA(isA<ProtocolError>()),
       );
     });
@@ -192,7 +200,8 @@ void main() {
 
     test('rejects a device id that is not a UUID', () {
       expect(
-        () => PairingPayload.parse(encodePayload(payloadJson(id: 'not-a-uuid'))),
+        () =>
+            PairingPayload.parse(encodePayload(payloadJson(id: 'not-a-uuid'))),
         throwsA(isA<ProtocolError>()),
       );
     });
@@ -287,8 +296,10 @@ void main() {
 
     test('rejects a code of the wrong length or with invalid characters', () {
       expect(ManualPairingCode.decode('ABCD'), isNull);
-      expect(ManualPairingCode.decode('ABCD EFGH IJKL MNOP QRST UVWX YZ01 2345'),
-          isNull);
+      expect(
+        ManualPairingCode.decode('ABCD EFGH IJKL MNOP QRST UVWX YZ01 2345'),
+        isNull,
+      );
     });
   });
 
@@ -310,14 +321,13 @@ void main() {
       );
     });
 
-    PairRequest requestWith(String token, {String? clientId}) =>
-        PairRequest(
-          pairingToken: token,
-          clientInstanceId: clientId ?? testUuid(1),
-          displayName: 'Phone',
-          platform: 'android',
-          protocolVersion: FrameCodec.protocolVersion,
-        );
+    PairRequest requestWith(String token, {String? clientId}) => PairRequest(
+      pairingToken: token,
+      clientInstanceId: clientId ?? testUuid(1),
+      displayName: 'Phone',
+      platform: 'android',
+      protocolVersion: FrameCodec.protocolVersion,
+    );
 
     test('a session lasts five minutes', () {
       final session = pairing.startSession();
@@ -346,8 +356,9 @@ void main() {
 
     test('a valid request is accepted and needs an approval', () async {
       final session = pairing.startSession();
-      final response =
-          await pairing.handleRequest(requestWith(session.payload.pairingToken));
+      final response = await pairing.handleRequest(
+        requestWith(session.payload.pairingToken),
+      );
       expect(response.requestId, isNotEmpty);
       expect(response.pollSecret, isNotEmpty);
 
@@ -365,8 +376,9 @@ void main() {
 
     test('the confirmation code is the same on both sides', () async {
       final session = pairing.startSession();
-      final response =
-          await pairing.handleRequest(requestWith(session.payload.pairingToken));
+      final response = await pairing.handleRequest(
+        requestWith(session.payload.pairingToken),
+      );
       final desktopCode = pairing.pendingRequests.first.confirmationCode;
       final phoneCode = confirmationCode(
         pairingTokenBytes: session.payload.pairingTokenBytes,
@@ -378,8 +390,9 @@ void main() {
 
     test('approval creates a peer that stores only the token hash', () async {
       final session = pairing.startSession();
-      final response =
-          await pairing.handleRequest(requestWith(session.payload.pairingToken));
+      final response = await pairing.handleRequest(
+        requestWith(session.payload.pairingToken),
+      );
       final peer = await pairing.approve(response.requestId);
       expect(peer.tokenHash, isNotNull);
       expect(peer.tokenHash!.length, 64);
@@ -392,8 +405,9 @@ void main() {
 
     test('the device token is handed out exactly once', () async {
       final session = pairing.startSession();
-      final response =
-          await pairing.handleRequest(requestWith(session.payload.pairingToken));
+      final response = await pairing.handleRequest(
+        requestWith(session.payload.pairingToken),
+      );
       await pairing.approve(response.requestId);
 
       final first = pairing.status(response.requestId, response.pollSecret);
@@ -408,8 +422,9 @@ void main() {
 
     test('a wrong poll secret is rejected', () async {
       final session = pairing.startSession();
-      final response =
-          await pairing.handleRequest(requestWith(session.payload.pairingToken));
+      final response = await pairing.handleRequest(
+        requestWith(session.payload.pairingToken),
+      );
       await pairing.approve(response.requestId);
       expect(
         () => pairing.status(response.requestId, 'wrong-secret'),
@@ -419,8 +434,9 @@ void main() {
 
     test('the pairing token is single use', () async {
       final session = pairing.startSession();
-      final response =
-          await pairing.handleRequest(requestWith(session.payload.pairingToken));
+      final response = await pairing.handleRequest(
+        requestWith(session.payload.pairingToken),
+      );
       await pairing.approve(response.requestId);
 
       // The session is closed after the approval.
@@ -433,10 +449,12 @@ void main() {
 
     test('the same client polling twice gets the same request', () async {
       final session = pairing.startSession();
-      final first =
-          await pairing.handleRequest(requestWith(session.payload.pairingToken));
-      final second =
-          await pairing.handleRequest(requestWith(session.payload.pairingToken));
+      final first = await pairing.handleRequest(
+        requestWith(session.payload.pairingToken),
+      );
+      final second = await pairing.handleRequest(
+        requestWith(session.payload.pairingToken),
+      );
       expect(second.requestId, first.requestId);
       expect(second.pollSecret, first.pollSecret);
       expect(pairing.pendingRequests.length, 1);
@@ -444,8 +462,9 @@ void main() {
 
     test('a rejected request never hands out a token', () async {
       final session = pairing.startSession();
-      final response =
-          await pairing.handleRequest(requestWith(session.payload.pairingToken));
+      final response = await pairing.handleRequest(
+        requestWith(session.payload.pairingToken),
+      );
       await pairing.reject(response.requestId);
       final status = pairing.status(response.requestId, response.pollSecret);
       expect(status.state, PairingState.rejected);
@@ -479,25 +498,29 @@ void main() {
 
       for (var i = 0; i < 5; i++) {
         await expectLater(
-          pairing.handleRequest(PairRequest(
-            pairingToken: 'wrong-token-value-$i',
-            clientInstanceId: testUuid(1),
-            displayName: 'Phone',
-            platform: 'android',
-            protocolVersion: FrameCodec.protocolVersion,
-          )),
+          pairing.handleRequest(
+            PairRequest(
+              pairingToken: 'wrong-token-value-$i',
+              clientInstanceId: testUuid(1),
+              displayName: 'Phone',
+              platform: 'android',
+              protocolVersion: FrameCodec.protocolVersion,
+            ),
+          ),
           throwsA(isA<PairingFailedError>()),
         );
       }
 
       await expectLater(
-        pairing.handleRequest(PairRequest(
-          pairingToken: 'wrong-token-value-6',
-          clientInstanceId: 'client-1',
-          displayName: 'Phone',
-          platform: 'android',
-          protocolVersion: FrameCodec.protocolVersion,
-        )),
+        pairing.handleRequest(
+          PairRequest(
+            pairingToken: 'wrong-token-value-6',
+            clientInstanceId: 'client-1',
+            displayName: 'Phone',
+            platform: 'android',
+            protocolVersion: FrameCodec.protocolVersion,
+          ),
+        ),
         throwsA(isA<RateLimitedError>()),
       );
     });

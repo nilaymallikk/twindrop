@@ -42,7 +42,7 @@ class TdLinkChip extends StatelessWidget {
     final text = label ?? domainOf(url);
     final interactive = onTap != null;
     final foreground = inverted ? tokens.onPaper : tokens.text;
-    final idleBackground = inverted ? const Color(0x00000000) : tokens.surface;
+    final idleBackground = inverted ? TdPalette.transparent : tokens.surface;
     final activeBackground =
         inverted ? tokens.onPaper.withValues(alpha: 0.10) : tokens.raised;
     final idleBorder = inverted

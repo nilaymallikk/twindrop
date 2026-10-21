@@ -67,7 +67,7 @@ class _TdButtonState extends State<TdButton> {
           : tokens.raised,
       TdButtonVariant.tertiary ||
       TdButtonVariant.destructive =>
-        _hovered && enabled ? tokens.raised : const Color(0x00000000),
+        _hovered && enabled ? tokens.raised : TdPalette.transparent,
     };
     final foreground = !enabled
         ? tokens.muted
@@ -83,7 +83,7 @@ class _TdButtonState extends State<TdButton> {
             : tokens.accent)
         : (widget.variant == TdButtonVariant.secondary && enabled
             ? tokens.paper
-            : const Color(0x00000000));
+            : TdPalette.transparent);
 
     final labelStyle = type.label.copyWith(color: foreground);
     final content = Row(
@@ -206,7 +206,7 @@ class _TdIconButtonState extends State<TdIconButton> {
         ? tokens.raised
         : _hovered && enabled
             ? tokens.raised
-            : const Color(0x00000000);
+            : TdPalette.transparent;
 
     final button = Container(
       width: side,
@@ -216,7 +216,7 @@ class _TdIconButtonState extends State<TdIconButton> {
         color: background,
         borderRadius: TdRadius.allSm,
         border: Border.all(
-          color: _focused ? tokens.accent : const Color(0x00000000),
+          color: _focused ? tokens.accent : TdPalette.transparent,
           width: 1,
         ),
       ),
@@ -317,7 +317,7 @@ class _TdInlineActionState extends State<TdInlineAction> {
       decoration: BoxDecoration(
         borderRadius: TdRadius.allXs,
         border: Border.all(
-          color: _focused ? tokens.accent : const Color(0x00000000),
+          color: _focused ? tokens.accent : TdPalette.transparent,
           width: 1,
         ),
       ),

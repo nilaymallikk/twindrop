@@ -46,7 +46,7 @@ class TdToggle extends StatelessWidget {
         onTap: enabled ? () => onChanged!(!value) : null,
         child: Container(
           constraints: BoxConstraints(minWidth: side, minHeight: side),
-          color: const Color(0x00000000),
+          color: TdPalette.transparent,
           alignment: Alignment.center,
           child: AnimatedContainer(
             duration: context.tdFast,

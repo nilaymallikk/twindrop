@@ -56,11 +56,12 @@
 |---|---|---|
 | `dart analyze` (packages/core) | **pass** | 0 errors (warnings only) |
 | `flutter analyze` (app) | **pass** | 0 errors (info-level lints only) |
-| `dart test` (packages/core) | **pass** | 307 tests, 0 failed, 0 skipped |
-| `flutter test` (app) | **pass** | 11 tests, 0 failed |
-| `dart run tool/smoke_two_peer.dart` | **pass** | `SMOKE_OK` — two in-process peers, real pinned TLS over loopback, pairing, message both ways, exactly-once |
+| `dart test` (packages/core) | **pass** | 392 tests, 0 failed, 0 skipped |
+| `flutter test` (app) | **pass** | 43 tests, 0 failed (18 golden files) |
+| `python3 tool/contrast_check.py design/tokens.json` | **pass** | all 26 text/background pairs ≥ 4.5:1 in both themes |
 | `flutter build linux --release` | **pass** | `app/build/linux/x64/release/bundle/twindrop` |
 | `packaging/appimage/build.sh` | **pass** | `dist/TwinDrop-x86_64.AppImage` |
+| `dart run tool/smoke_two_peer.dart` | **pass** | `SMOKE_OK` — two in-process peers, real pinned TLS over loopback, pairing, message both ways, exactly-once |
 | `flutter build apk --release` | **pass** | `dist/twindrop.apk` — after fixing four real build errors (see "Fixes") |
 | `aapt2 dump badging dist/twindrop.apk` | **pass** | `package app.twindrop`, minSdk 26, targetSdk 36, no storage/location/contacts permission |
 | `tool/repair_sysroot_links.py` | **pass** | 1 broken link repaired (`libcairo-gobject.so.2`) |
@@ -68,14 +69,22 @@
 ## Tests
 | Suite | Passed | Failed | Skipped | Coverage |
 |---|---:|---:|---:|---|
-| core unit (`packages/core/test`, 15 files) | 307 | 0 | 0 | 55.1 % of hand-written lines (1923/3493); 44.6 % including the generated `database.g.dart` |
-| app widget (`app/test`, 2 files) | 11 | 0 | 0 | — |
+| core unit (`packages/core/test`, 20 files) | 392 | 0 | 0 | **80.9 %** of hand-written lines (2825/3493); 59.3 % including the generated `database.g.dart` |
+| app widget + golden (`app/test`, 4 files) | 43 | 0 | 0 | 18 golden files, dark and light |
 | integration (two peers, loopback) | 1 (`SMOKE_OK`) | 0 | 0 | — |
 
-> **Coverage is below the 80 % target in `AGENTS.md`.** The uncovered areas are
-> `net/discovery.dart` (mDNS, needs a real multicast socket), `net/pairing_client.dart`,
-> `runtime.dart` (the facade), `services/export_service.dart` and
-> `services/settings_store.dart`. Not yet met — recorded here rather than claimed.
+Coverage is measured with:
+```
+cd packages/core && dart test --coverage=/tmp/corecov \
+  && dart run coverage:format_coverage --lcov --in=/tmp/corecov --out=/tmp/lcov.info --report-on=lib
+```
+The generated `packages/core/lib/db/database.g.dart` (2678 lines) is drift output, not
+hand-written logic, so the 80.9 % figure excludes it; both numbers are reported above
+rather than only the flattering one.
+
+> The one file still uncovered is `net/discovery.dart` (mDNS, 202 lines): it needs a
+> real multicast socket on a real interface, which this environment cannot simulate
+> faithfully. Everything else in the core is above 65 %.
 
 ## Artifacts
 | Artifact | Path | Bytes | SHA-256 | Launched/installed? |
@@ -150,7 +159,8 @@ $ wmctrl -l
   and KDE tray checks are **BLOCKED**.
 - The release APK is unsigned: no keystore has been provided. It installs with
   `adb install` only after signing, or as a debug-signed build for local checks.
-- Core line coverage is 55.1 % of hand-written code, below the 80 % target in `AGENTS.md`.
+- `net/discovery.dart` (mDNS) has no unit coverage: it needs a real multicast socket
+  on a real interface.
 
 ## Fixes made in this session
 - **Runaway sync ping-pong.** `SyncEngine.applyPage` notified the change bus on *every*
@@ -190,8 +200,10 @@ $ wmctrl -l
   with a loud warning when it is absent.
 
 ## Next concrete task
-- Raise core line coverage from 55.1 % to ≥ 80 %: `runtime.dart`, `export_service.dart`,
-  `settings_store.dart`, `pairing_client.dart`, `connection_manager.dart`.
 - Sign the release APK with a real keystore (needs a human: the keystore and its
   passwords).
 - Run the device-only acceptance list from `docs/09` on a physical Android phone.
+- Cover `net/discovery.dart` (mDNS) — the only core file still at 0 %.
+- Add the remaining Phase 6 goldens: the conflict-copy note card and a standalone
+  status indicator.
+- Write `INSTALL.md` and an About screen (Phase 10 leftovers).

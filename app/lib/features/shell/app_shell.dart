@@ -294,7 +294,7 @@ class _BottomNav extends StatelessWidget {
                       top: BorderSide(
                         color: selected
                             ? tokens.paper
-                            : const Color(0x00000000),
+                            : TdPalette.transparent,
                         width: 2,
                       ),
                     ),

@@ -39,8 +39,11 @@ void main() {
         '123456789012345-000001-dev', // counter too long
         '123456789012345-0000a-dev', // non-numeric counter
       ]) {
-        expect(() => Hlc.parse(bad), throwsFormatException,
-            reason: 'should reject "$bad"');
+        expect(
+          () => Hlc.parse(bad),
+          throwsFormatException,
+          reason: 'should reject "$bad"',
+        );
       }
     });
 
@@ -55,8 +58,7 @@ void main() {
       expect(Hlc.tryParse('not-a-hlc'), isNull);
       expect(Hlc.tryParse(''), isNull);
       expect(Hlc.tryParse(null), isNull);
-      expect(Hlc.tryParse('123456789012345-00001-dev'),
-          isNotNull);
+      expect(Hlc.tryParse('123456789012345-00001-dev'), isNotNull);
     });
   });
 
@@ -104,7 +106,8 @@ void main() {
           expect(
             byValue.sign,
             byCompare.sign,
-            reason: 'string order must match numeric order for '
+            reason:
+                'string order must match numeric order for '
                 '${x.value} vs ${y.value}',
           );
         }
@@ -113,8 +116,7 @@ void main() {
   });
 
   group('HlcClock.next', () {
-    test('starts at counter 1 and increments inside the same millisecond',
-        () {
+    test('starts at counter 1 and increments inside the same millisecond', () {
       final clock = HlcClock(deviceId: 'dev', nowMs: () => 1000);
       final first = clock.next();
       expect(first.wallMs, 1000);
@@ -193,8 +195,7 @@ void main() {
       expect(next > observed, isTrue);
     });
 
-    test('keeps the local clock when it is 10 minutes ahead of the remote',
-        () {
+    test('keeps the local clock when it is 10 minutes ahead of the remote', () {
       final clock = HlcClock(deviceId: 'local', nowMs: () => 2000000);
       final observed = clock.observe(Hlc(1000, 3, 'remote'));
       expect(observed.wallMs, 2000000);
@@ -202,8 +203,7 @@ void main() {
       expect(observed > Hlc(1000, 3, 'remote'), isTrue);
     });
 
-    test('takes the highest counter when both clocks share the wall time',
-        () {
+    test('takes the highest counter when both clocks share the wall time', () {
       final clock = HlcClock(
         deviceId: 'local',
         last: Hlc(1000, 3, 'local'),
@@ -238,14 +238,8 @@ void main() {
       expect(compareHlcValues(null, 'garbage'), lessThan(0));
       expect(compareHlcValues('garbage', 'garbage'), 0);
       // A malformed value never beats a valid one.
-      expect(
-        compareHlcValues('garbage', hlcValue(1, 1, 'a')),
-        lessThan(0),
-      );
-      expect(
-        compareHlcValues(hlcValue(1, 1, 'a'), 'garbage'),
-        greaterThan(0),
-      );
+      expect(compareHlcValues('garbage', hlcValue(1, 1, 'a')), lessThan(0));
+      expect(compareHlcValues(hlcValue(1, 1, 'a'), 'garbage'), greaterThan(0));
       expect(
         compareHlcValues(hlcValue(2000, 1, 'a'), hlcValue(1000, 1, 'a')),
         greaterThan(0),

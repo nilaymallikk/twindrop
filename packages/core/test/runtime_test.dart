@@ -117,8 +117,11 @@ void main() {
       addTearDown(runtime.dispose);
 
       await runtime.start();
-      expect(runtime.host!.isRunning, isFalse,
-          reason: 'SEC-007: no server without a paired peer');
+      expect(
+        runtime.host!.isRunning,
+        isFalse,
+        reason: 'SEC-007: no server without a paired peer',
+      );
       expect(runtime.status, ConnectionStatus.unpaired);
     });
 
@@ -154,13 +157,15 @@ void main() {
       );
       addTearDown(runtime.dispose);
 
-      await runtime.peers.addPairedPeer(Peer(
-        id: 'phone-1',
-        name: 'Phone',
-        kind: PeerKind.phone,
-        roleOfPeer: PeerRole.guest,
-        createdAt: 1000,
-      ));
+      await runtime.peers.addPairedPeer(
+        Peer(
+          id: 'phone-1',
+          name: 'Phone',
+          kind: PeerKind.phone,
+          roleOfPeer: PeerRole.guest,
+          createdAt: 1000,
+        ),
+      );
       expect((await runtime.peers.active()).length, 1);
       await runtime.revokePeer('phone-1');
       expect((await runtime.peers.active()).length, 0);
@@ -196,7 +201,9 @@ void main() {
         throwsA(isA<ValidationError>()),
         reason: 'the same Android share must not create two notes',
       );
-      final notes = await runtime.notepad.listNotes(categoryId: Category.inboxId);
+      final notes = await runtime.notepad.listNotes(
+        categoryId: Category.inboxId,
+      );
       expect(notes.length, 1);
     });
   });
@@ -216,8 +223,11 @@ void main() {
       expect(runtime.platform, CorePlatform.phone);
       expect(runtime.connection, isNotNull);
       expect(runtime.discovery, isNull);
-      expect(runtime.identity, isNull,
-          reason: 'the phone never owns a TLS identity');
+      expect(
+        runtime.identity,
+        isNull,
+        reason: 'the phone never owns a TLS identity',
+      );
       expect(runtime.host, isNull);
       expect(runtime.tokenStore, isA<MemoryTokenStore>());
     });
@@ -335,15 +345,17 @@ void main() {
       expect(await runtime.quarantine.count(), 0);
       expect(await runtime.quarantine.list(), isEmpty);
 
-      await runtime.db.quarantine(QuarantineEntry(
-        id: 0,
-        peerId: 'peer-b',
-        entityType: 'item',
-        entityId: 'item-1',
-        reason: QuarantineReason.invalidUrl.wire,
-        payloadJson: '{}',
-        receivedAt: 1000,
-      ));
+      await runtime.db.quarantine(
+        QuarantineEntry(
+          id: 0,
+          peerId: 'peer-b',
+          entityType: 'item',
+          entityId: 'item-1',
+          reason: QuarantineReason.invalidUrl.wire,
+          payloadJson: '{}',
+          receivedAt: 1000,
+        ),
+      );
       expect(await runtime.quarantine.count(), 1);
       expect((await runtime.quarantine.list()).first.entityId, 'item-1');
 

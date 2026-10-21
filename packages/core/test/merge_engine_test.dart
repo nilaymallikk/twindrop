@@ -33,23 +33,25 @@ void main() {
       expect(await db.itemById(remote.id), isNotNull);
     });
 
-    test('keeps the local content when both sides have the same hash',
-        () async {
-      final local = makeItem(
-        id: testUuid(2),
-        text: 'same',
-        contentHlc: hlcValue(1000, 1, 'a'),
-      );
-      await db.putItem(local);
-      final remote = makeItem(
-        id: testUuid(2),
-        text: 'same',
-        contentHlc: hlcValue(5000, 1, 'b'),
-      );
-      final result = await merge.mergeItem(remote, fromPeer: 'peer-b');
-      expect(result.conflictCopyCreated, isFalse);
-      expect(result.item!.text, 'same');
-    });
+    test(
+      'keeps the local content when both sides have the same hash',
+      () async {
+        final local = makeItem(
+          id: testUuid(2),
+          text: 'same',
+          contentHlc: hlcValue(1000, 1, 'a'),
+        );
+        await db.putItem(local);
+        final remote = makeItem(
+          id: testUuid(2),
+          text: 'same',
+          contentHlc: hlcValue(5000, 1, 'b'),
+        );
+        final result = await merge.mergeItem(remote, fromPeer: 'peer-b');
+        expect(result.conflictCopyCreated, isFalse);
+        expect(result.item!.text, 'same');
+      },
+    );
 
     test('takes the remote content on a fast-forward', () async {
       final local = makeItem(
@@ -65,8 +67,11 @@ void main() {
         contentHlc: hlcValue(2000, 1, 'b'),
       );
       final result = await merge.mergeItem(remote, fromPeer: 'peer-b');
-      expect(result.conflictCopyCreated, isFalse,
-          reason: 'a fast-forward is not a conflict');
+      expect(
+        result.conflictCopyCreated,
+        isFalse,
+        reason: 'a fast-forward is not a conflict',
+      );
       expect(result.item!.text, 'v2');
       expect(result.item!.prevHash, local.contentHash);
     });
@@ -108,14 +113,20 @@ void main() {
       final result = await merge.mergeItem(remote, fromPeer: 'peer-b');
 
       expect(result.conflictCopyCreated, isTrue);
-      expect(result.item!.text, 'remote text',
-          reason: 'the higher content HLC wins');
+      expect(
+        result.item!.text,
+        'remote text',
+        reason: 'the higher content HLC wins',
+      );
       expect(result.item!.contentHlc, remote.contentHlc);
 
       final copy = await db.itemById(result.conflictCopy!.id);
       expect(copy, isNotNull);
-      expect(copy!.text, 'local text',
-          reason: 'the losing content must not be lost');
+      expect(
+        copy!.text,
+        'local text',
+        reason: 'the losing content must not be lost',
+      );
       expect(copy.isConflictCopy, isTrue);
       expect(copy.type, ItemType.note);
       expect(copy.title, 'Conflict copy: local text');
@@ -160,11 +171,17 @@ void main() {
       final resultB = await mergeB.mergeItem(older, fromPeer: 'peer-a');
 
       expect(resultA.item!.text, 'newer text');
-      expect(resultB.item!.text, 'newer text',
-          reason: 'both devices must converge on the same winner');
+      expect(
+        resultB.item!.text,
+        'newer text',
+        reason: 'both devices must converge on the same winner',
+      );
       expect(resultA.conflictCopy!.id, resultB.conflictCopy!.id);
       expect(resultA.conflictCopy!.text, resultB.conflictCopy!.text);
-      expect(resultA.conflictCopy!.id, conflictCopyIdFor(id, older.contentHash));
+      expect(
+        resultA.conflictCopy!.id,
+        conflictCopyIdFor(id, older.contentHash),
+      );
     });
 
     test('does not create the conflict copy twice', () async {
@@ -184,8 +201,11 @@ void main() {
       final first = await merge.mergeItem(remote, fromPeer: 'peer-b');
       expect(first.conflictCopyCreated, isTrue);
       final second = await merge.mergeItem(remote, fromPeer: 'peer-b');
-      expect(second.conflictCopyCreated, isFalse,
-          reason: 'the content now matches, so there is no loser left');
+      expect(
+        second.conflictCopyCreated,
+        isFalse,
+        reason: 'the content now matches, so there is no loser left',
+      );
       expect(second.conflictCopy, isNull);
       // The copy created by the first merge is still there - exactly one.
       final copy = await db.itemById(first.conflictCopy!.id);
@@ -300,8 +320,7 @@ void main() {
         metaHlc: hlcValue(1000, 1, 'b'),
       );
       final result = await merge.mergeItem(remote, fromPeer: 'peer-b');
-      expect(result.item!.deleted, isTrue,
-          reason: 'the newer tombstone wins');
+      expect(result.item!.deleted, isTrue, reason: 'the newer tombstone wins');
       expect(result.restored, isFalse);
     });
 
@@ -325,8 +344,11 @@ void main() {
         metaHlc: hlcValue(1000, 1, 'b'),
       );
       final result = await merge.mergeItem(remote, fromPeer: 'peer-b');
-      expect(result.restored, isTrue,
-          reason: 'content is never lost to a concurrent delete');
+      expect(
+        result.restored,
+        isTrue,
+        reason: 'content is never lost to a concurrent delete',
+      );
       expect(result.item!.deleted, isFalse);
       expect(result.item!.restored, isTrue);
       expect(result.item!.text, 'v2');
@@ -335,11 +357,13 @@ void main() {
 
   group('mergeCategory', () {
     test('the newer meta HLC wins', () async {
-      await db.putCategory(makeCategory(
-        id: testUuid(20),
-        name: 'Research',
-        metaHlc: hlcValue(1000, 1, 'a'),
-      ));
+      await db.putCategory(
+        makeCategory(
+          id: testUuid(20),
+          name: 'Research',
+          metaHlc: hlcValue(1000, 1, 'a'),
+        ),
+      );
       final result = await merge.mergeCategory(
         makeCategory(
           id: testUuid(20),
@@ -353,11 +377,13 @@ void main() {
     });
 
     test('the older meta HLC loses', () async {
-      await db.putCategory(makeCategory(
-        id: testUuid(21),
-        name: 'Research Notes',
-        metaHlc: hlcValue(2000, 1, 'a'),
-      ));
+      await db.putCategory(
+        makeCategory(
+          id: testUuid(21),
+          name: 'Research Notes',
+          metaHlc: hlcValue(2000, 1, 'a'),
+        ),
+      );
       final result = await merge.mergeCategory(
         makeCategory(
           id: testUuid(21),
@@ -371,12 +397,14 @@ void main() {
     });
 
     test('the Inbox is never deleted by a merge', () async {
-      await db.putCategory(makeCategory(
-        id: Category.inboxId,
-        name: 'Inbox',
-        isInbox: true,
-        metaHlc: hlcValue(1000, 1, 'a'),
-      ));
+      await db.putCategory(
+        makeCategory(
+          id: Category.inboxId,
+          name: 'Inbox',
+          isInbox: true,
+          metaHlc: hlcValue(1000, 1, 'a'),
+        ),
+      );
       final result = await merge.mergeCategory(
         makeCategory(
           id: Category.inboxId,
@@ -393,48 +421,56 @@ void main() {
       expect(stored!.deleted, isFalse);
     });
 
-    test('concurrently created categories with the same name collapse', () async {
-      // Two devices created "Research" at the same time with different ids.
-      const winnerId = '018f0000-0000-7000-8000-000000000001';
-      const loserId = '018f0000-0000-7000-8000-000000000002';
-      await db.putCategory(makeCategory(
-        id: winnerId,
-        name: 'Research',
-        metaHlc: hlcValue(1000, 1, 'a'),
-      ));
-      await db.putCategory(makeCategory(
-        id: loserId,
-        name: 'research',
-        metaHlc: hlcValue(1000, 2, 'a'),
-      ));
-      await db.putItem(makeItem(
-        id: testUuid(30),
-        text: 'note in the loser',
-        categoryId: loserId,
-        contentHlc: hlcValue(1000, 1, 'a'),
-      ));
+    test(
+      'concurrently created categories with the same name collapse',
+      () async {
+        // Two devices created "Research" at the same time with different ids.
+        const winnerId = '018f0000-0000-7000-8000-000000000001';
+        const loserId = '018f0000-0000-7000-8000-000000000002';
+        await db.putCategory(
+          makeCategory(
+            id: winnerId,
+            name: 'Research',
+            metaHlc: hlcValue(1000, 1, 'a'),
+          ),
+        );
+        await db.putCategory(
+          makeCategory(
+            id: loserId,
+            name: 'research',
+            metaHlc: hlcValue(1000, 2, 'a'),
+          ),
+        );
+        await db.putItem(
+          makeItem(
+            id: testUuid(30),
+            text: 'note in the loser',
+            categoryId: loserId,
+            contentHlc: hlcValue(1000, 1, 'a'),
+          ),
+        );
 
-      final result = await merge.mergeCategory(
-        makeCategory(
-          id: loserId,
-          name: 'research',
-          metaHlc: hlcValue(2000, 1, 'b'),
-        ),
-        fromPeer: 'peer-b',
-      );
-      expect(result.category, isNotNull);
+        final result = await merge.mergeCategory(
+          makeCategory(
+            id: loserId,
+            name: 'research',
+            metaHlc: hlcValue(2000, 1, 'b'),
+          ),
+          fromPeer: 'peer-b',
+        );
+        expect(result.category, isNotNull);
 
-      // The category with the smaller id survives.
-      final winner = await db.categoryById(winnerId);
-      final loser = await db.categoryById(loserId);
-      expect(winner!.deleted, isFalse);
-      expect(loser!.deleted, isTrue,
-          reason: 'the loser is tombstoned');
-      // The notes of the loser move to the winner.
-      final moved = await db.itemById(testUuid(30));
-      expect(moved!.categoryId, winnerId);
-      expect(moved.deleted, isFalse);
-    });
+        // The category with the smaller id survives.
+        final winner = await db.categoryById(winnerId);
+        final loser = await db.categoryById(loserId);
+        expect(winner!.deleted, isFalse);
+        expect(loser!.deleted, isTrue, reason: 'the loser is tombstoned');
+        // The notes of the loser move to the winner.
+        final moved = await db.itemById(testUuid(30));
+        expect(moved!.categoryId, winnerId);
+        expect(moved.deleted, isFalse);
+      },
+    );
   });
 
   group('merge helpers', () {

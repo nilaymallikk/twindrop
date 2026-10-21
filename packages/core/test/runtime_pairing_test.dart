@@ -3,8 +3,6 @@ import 'dart:io';
 import 'package:test/test.dart';
 import 'package:twindrop_core/core.dart';
 
-import 'support/test_support.dart';
-
 void main() {
   late Directory desktopDir;
   late Directory phoneDir;
@@ -87,8 +85,7 @@ void main() {
   });
 
   group('phone pairs with the desktop', () {
-    test('the QR payload completes the pairing and stores the pin',
-        () async {
+    test('the QR payload completes the pairing and stores the pin', () async {
       final desktop = await openDesktop();
       final phone = await openPhone();
 
@@ -96,13 +93,11 @@ void main() {
       final qr = session.payload.encode();
 
       final codes = <String>[];
-      final pending = desktop.pairingService!.requests
-          .firstWhere((info) => info.state == PairingState.pendingApproval);
-
-      final pairing = phone.pairWithQr(
-        payload: qr,
-        onCode: codes.add,
+      final pending = desktop.pairingService!.requests.firstWhere(
+        (info) => info.state == PairingState.pendingApproval,
       );
+
+      final pairing = phone.pairWithQr(payload: qr, onCode: codes.add);
 
       final request = await pending.timeout(const Duration(seconds: 15));
       final peer = await desktop.approvePairing(request.requestId);
@@ -136,8 +131,9 @@ void main() {
       final phone = await openPhone();
 
       final session = await desktop.startPairingSession();
-      final pending = desktop.pairingService!.requests
-          .firstWhere((info) => info.state == PairingState.pendingApproval);
+      final pending = desktop.pairingService!.requests.firstWhere(
+        (info) => info.state == PairingState.pendingApproval,
+      );
       final pairing = phone.pairWithQr(
         payload: session.payload.encode(),
         onCode: (_) {},

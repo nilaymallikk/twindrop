@@ -49,8 +49,10 @@ void main() {
       expect(identity.fingerprint.length, 64);
       expect(identity.fingerprint, matches(RegExp(r'^[0-9a-f]{64}$')));
       expect(identity.hint, identity.fingerprint.substring(0, 8));
-      expect(identity.shortFingerprint,
-          identity.fingerprint.substring(0, 6).toUpperCase());
+      expect(
+        identity.shortFingerprint,
+        identity.fingerprint.substring(0, 6).toUpperCase(),
+      );
       expect(File('${tlsDir.path}/cert.pem').existsSync(), isTrue);
       expect(File('${tlsDir.path}/key.pem').existsSync(), isTrue);
     });
@@ -64,8 +66,11 @@ void main() {
         tlsDir,
         sanIps: const ['127.0.0.1'],
       );
-      expect(second.fingerprint, first.fingerprint,
-          reason: 'the pin must never change silently');
+      expect(
+        second.fingerprint,
+        first.fingerprint,
+        reason: 'the pin must never change silently',
+      );
       expect(second.certificatePem, first.certificatePem);
     });
 
@@ -88,7 +93,10 @@ void main() {
         tlsDir,
         sanIps: const ['127.0.0.1'],
       );
-      expect(await TlsIdentity.privateKeyReadable(identity.privateKeyPem), isTrue);
+      expect(
+        await TlsIdentity.privateKeyReadable(identity.privateKeyPem),
+        isTrue,
+      );
       expect(await TlsIdentity.privateKeyReadable('not a key'), isFalse);
     });
   });
@@ -123,8 +131,11 @@ void main() {
       );
       final der = CryptoUtils.getBytesFromPEMString(identity.certificatePem);
       final tampered = List<int>.from(der)..[0] = (der[0] + 1) % 256;
-      expect(TlsIdentity.matchesPin(tampered, identity.fingerprint), isFalse,
-          reason: 'a single changed byte must invalidate the pin');
+      expect(
+        TlsIdentity.matchesPin(tampered, identity.fingerprint),
+        isFalse,
+        reason: 'a single changed byte must invalidate the pin',
+      );
     });
 
     test('rejects an empty or truncated certificate', () async {
@@ -133,10 +144,15 @@ void main() {
         sanIps: const ['127.0.0.1'],
       );
       final der = CryptoUtils.getBytesFromPEMString(identity.certificatePem);
-      expect(TlsIdentity.matchesPin(const <int>[], identity.fingerprint), isFalse);
       expect(
-        TlsIdentity.matchesPin(der.sublist(0, der.length - 1),
-            identity.fingerprint),
+        TlsIdentity.matchesPin(const <int>[], identity.fingerprint),
+        isFalse,
+      );
+      expect(
+        TlsIdentity.matchesPin(
+          der.sublist(0, der.length - 1),
+          identity.fingerprint,
+        ),
         isFalse,
       );
     });
@@ -160,7 +176,9 @@ void main() {
       final request = await client
           .getUrl(Uri.parse('https://127.0.0.1:${server.port}/v1/health'))
           .timeout(const Duration(seconds: 10));
-      final response = await request.close().timeout(const Duration(seconds: 10));
+      final response = await request.close().timeout(
+        const Duration(seconds: 10),
+      );
       expect(response.statusCode, HttpStatus.ok);
       await response.drain<void>();
     });
@@ -180,10 +198,7 @@ void main() {
       addTearDown(() => client.close(force: true));
 
       await expectLater(
-        fetch(
-          client,
-          Uri.parse('https://127.0.0.1:${server.port}/v1/health'),
-        ),
+        fetch(client, Uri.parse('https://127.0.0.1:${server.port}/v1/health')),
         throwsA(isA<HandshakeException>()),
         reason: 'a wrong pin must fail the handshake, never be accepted',
       );
@@ -197,8 +212,9 @@ void main() {
       // The desktop rotates its certificate: the phone still holds the old
       // pin, so the connection must fail instead of silently trusting the new
       // certificate.
-      final rotatedDir =
-          await Directory.systemTemp.createTemp('twindrop_tls_rotated_');
+      final rotatedDir = await Directory.systemTemp.createTemp(
+        'twindrop_tls_rotated_',
+      );
       addTearDown(() => rotatedDir.delete(recursive: true));
       final rotated = await TlsIdentity.loadOrCreate(
         rotatedDir,
@@ -216,10 +232,7 @@ void main() {
       addTearDown(() => client.close(force: true));
 
       await expectLater(
-        fetch(
-          client,
-          Uri.parse('https://127.0.0.1:${server.port}/v1/health'),
-        ),
+        fetch(client, Uri.parse('https://127.0.0.1:${server.port}/v1/health')),
         throwsA(isA<HandshakeException>()),
       );
     });
@@ -229,8 +242,9 @@ void main() {
         tlsDir,
         sanIps: const ['127.0.0.1'],
       );
-      final otherDir =
-          await Directory.systemTemp.createTemp('twindrop_tls_other_');
+      final otherDir = await Directory.systemTemp.createTemp(
+        'twindrop_tls_other_',
+      );
       addTearDown(() => otherDir.delete(recursive: true));
       final other = await TlsIdentity.loadOrCreate(
         otherDir,
@@ -247,10 +261,7 @@ void main() {
       addTearDown(() => client.close(force: true));
 
       await expectLater(
-        fetch(
-          client,
-          Uri.parse('https://127.0.0.1:${server.port}/v1/health'),
-        ),
+        fetch(client, Uri.parse('https://127.0.0.1:${server.port}/v1/health')),
         throwsA(isA<HandshakeException>()),
       );
     });
@@ -274,25 +285,39 @@ void main() {
           callbacks++;
           final end = (index + 400).clamp(0, source.length);
           final snippet = source.substring(index, end);
-          expect(snippet.contains('=> true'), isFalse,
-              reason: '${file.path}: the callback must never accept blindly');
-          expect(snippet.contains('return true'), isFalse,
-              reason: '${file.path}: the callback must never accept blindly');
-          expect(snippet.contains('sha256'), isTrue,
-              reason: '${file.path}: the callback must hash the certificate');
-          expect(snippet.contains('pin'), isTrue,
-              reason: '${file.path}: the callback must compare with the pin');
+          expect(
+            snippet.contains('=> true'),
+            isFalse,
+            reason: '${file.path}: the callback must never accept blindly',
+          );
+          expect(
+            snippet.contains('return true'),
+            isFalse,
+            reason: '${file.path}: the callback must never accept blindly',
+          );
+          expect(
+            snippet.contains('sha256'),
+            isTrue,
+            reason: '${file.path}: the callback must hash the certificate',
+          );
+          expect(
+            snippet.contains('pin'),
+            isTrue,
+            reason: '${file.path}: the callback must compare with the pin',
+          );
           index = source.indexOf('badCertificateCallback', index + 1);
         }
       }
-      expect(callbacks, greaterThan(0),
-          reason: 'the pinned client must still exist');
+      expect(
+        callbacks,
+        greaterThan(0),
+        reason: 'the pinned client must still exist',
+      );
     });
 
     test('no public-CA trust is configured for the pinned client', () {
-      final source = File(
-        '${packageRoot()}/lib/tls/tls_identity.dart',
-      ).readAsStringSync();
+      final source = File('${packageRoot()}/lib/tls/tls_identity.dart')
+          .readAsStringSync();
       expect(source.contains('withTrustedRoots: false'), isTrue);
     });
   });

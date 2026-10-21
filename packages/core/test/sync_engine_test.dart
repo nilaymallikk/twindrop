@@ -53,8 +53,11 @@ void main() {
       final page = await sync.pullPage(requesterPeerId: peerB, after: 0);
       final ids = page.records.map((r) => r.entityId).toList();
       expect(ids, contains('local-item'));
-      expect(ids, isNot(contains('from-peer-b')),
-          reason: 'the requester must not receive its own changes back');
+      expect(
+        ids,
+        isNot(contains('from-peer-b')),
+        reason: 'the requester must not receive its own changes back',
+      );
     });
 
     test('pullPage serves the rows with the current entity state', () async {
@@ -78,40 +81,47 @@ void main() {
       await db.appendChange('item', 'b');
       final first = await sync.pullPage(requesterPeerId: 'other', after: 0);
       expect(first.records.length, 2);
-      final second =
-          await sync.pullPage(requesterPeerId: 'other', after: first.next);
+      final second = await sync.pullPage(
+        requesterPeerId: 'other',
+        after: first.next,
+      );
       expect(second.records, isEmpty);
       expect(second.more, isFalse);
     });
 
-    test('an applied remote change is appended to our own change log',
-        () async {
-      final remote = makeItem(
-        id: testUuid(3),
-        text: 'from peer',
-        contentHlc: hlcValue(1000, 1, 'b'),
-      );
-      final result = await sync.applyPage(
-        fromPeerId: peerB,
-        page: ChangePage(
-          records: [
-            ChangeRecord(
-              seq: 1,
-              entityType: 'item',
-              entityId: remote.id,
-              row: remote.toJson(),
-            ),
-          ],
-          next: 1,
-          more: false,
-        ),
-      );
-      expect(result.applied, 1);
-      final rows = await db.changesAfter(after: 0);
-      expect(rows.length, 1);
-      expect(rows.first.sourcePeer, peerB,
-          reason: 'the change must propagate to other peers');
-    });
+    test(
+      'an applied remote change is appended to our own change log',
+      () async {
+        final remote = makeItem(
+          id: testUuid(3),
+          text: 'from peer',
+          contentHlc: hlcValue(1000, 1, 'b'),
+        );
+        final result = await sync.applyPage(
+          fromPeerId: peerB,
+          page: ChangePage(
+            records: [
+              ChangeRecord(
+                seq: 1,
+                entityType: 'item',
+                entityId: remote.id,
+                row: remote.toJson(),
+              ),
+            ],
+            next: 1,
+            more: false,
+          ),
+        );
+        expect(result.applied, 1);
+        final rows = await db.changesAfter(after: 0);
+        expect(rows.length, 1);
+        expect(
+          rows.first.sourcePeer,
+          peerB,
+          reason: 'the change must propagate to other peers',
+        );
+      },
+    );
   });
 
   group('applyPage - cursor and atomicity', () {
@@ -160,11 +170,7 @@ void main() {
                 row: good.toJson(),
               ),
               // Unknown entity type: sync must stop, not skip.
-              const ChangeRecord(
-                seq: 2,
-                entityType: 'alien',
-                entityId: 'x',
-              ),
+              const ChangeRecord(seq: 2, entityType: 'alien', entityId: 'x'),
             ],
             next: 2,
             more: false,
@@ -175,8 +181,11 @@ void main() {
 
       final peer = await db.peerById(peerB);
       expect(peer!.remoteSeq, 0, reason: 'the cursor must not move');
-      expect(await db.itemById(good.id), isNull,
-          reason: 'the whole page must be rolled back');
+      expect(
+        await db.itemById(good.id),
+        isNull,
+        reason: 'the whole page must be rolled back',
+      );
       expect(await db.hasAppliedRemote(peerB, 1), isFalse);
     });
 
@@ -198,10 +207,7 @@ void main() {
 
     test('refuses a page from an unknown peer', () async {
       await expectLater(
-        sync.applyPage(
-          fromPeerId: 'nobody',
-          page: ChangePage.empty,
-        ),
+        sync.applyPage(fromPeerId: 'nobody', page: ChangePage.empty),
         throwsA(isA<NotFoundError>()),
       );
     });
@@ -309,8 +315,7 @@ void main() {
       expect(quarantined.first.entityId, hostile.id);
     });
 
-    test('quarantines a malformed row but still advances the cursor',
-        () async {
+    test('quarantines a malformed row but still advances the cursor', () async {
       final result = await sync.applyPage(
         fromPeerId: peerB,
         page: ChangePage(
@@ -375,8 +380,10 @@ void main() {
         ),
       );
       expect(result.quarantined, 1);
-      expect((await db.quarantined()).first.reason,
-          QuarantineReason.malformed.wire);
+      expect(
+        (await db.quarantined()).first.reason,
+        QuarantineReason.malformed.wire,
+      );
     });
   });
 

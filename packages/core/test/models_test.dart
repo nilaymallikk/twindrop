@@ -6,20 +6,20 @@ import 'support/test_support.dart';
 void main() {
   group('Item', () {
     Item sample() => makeItem(
-          id: testUuid(1),
-          text: 'hello',
-          title: 'Title',
-          url: 'https://example.com',
-          categoryId: Category.inboxId,
-          sourceApp: 'com.android.chrome',
-          contentHlc: hlcValue(1000, 1, 'a'),
-          prevHash: 'a' * 64,
-          pinned: true,
-          deleted: true,
-          deletedHlc: hlcValue(2000, 1, 'a'),
-          restored: true,
-          isConflictCopy: true,
-        );
+      id: testUuid(1),
+      text: 'hello',
+      title: 'Title',
+      url: 'https://example.com',
+      categoryId: Category.inboxId,
+      sourceApp: 'com.android.chrome',
+      contentHlc: hlcValue(1000, 1, 'a'),
+      prevHash: 'a' * 64,
+      pinned: true,
+      deleted: true,
+      deletedHlc: hlcValue(2000, 1, 'a'),
+      restored: true,
+      isConflictCopy: true,
+    );
 
     test('round-trips through JSON', () {
       final item = sample();
@@ -134,8 +134,7 @@ void main() {
       final json = peer.toJson();
       expect(json.containsKey('tokenHash'), isFalse);
       expect(json.containsKey('certFp'), isFalse);
-      expect(json.values.map((v) => '$v').join(),
-          isNot(contains('a' * 64)));
+      expect(json.values.map((v) => '$v').join(), isNot(contains('a' * 64)));
     });
 
     test('isRevoked follows revokedAt', () {
@@ -202,8 +201,7 @@ void main() {
     });
 
     test('an unknown quarantine reason falls back to validation_failed', () {
-      expect(QuarantineReason.parse('nope'),
-          QuarantineReason.validationFailed);
+      expect(QuarantineReason.parse('nope'), QuarantineReason.validationFailed);
     });
 
     test('the connection status helpers', () {
@@ -229,12 +227,18 @@ void main() {
       expect(const RateLimitedError().code, ErrorCodes.rateLimited);
       expect(const RateLimitedError().httpStatus, 429);
       expect(const PairingFailedError().code, ErrorCodes.pairingFailed);
-      expect(const PairingFailedError(expired: true).code,
-          ErrorCodes.pairingExpired);
-      expect(const CertificateMismatchError().code,
-          ErrorCodes.certificateMismatch);
-      expect(const UnsupportedVersionError('x').code,
-          ErrorCodes.unsupportedVersion);
+      expect(
+        const PairingFailedError(expired: true).code,
+        ErrorCodes.pairingExpired,
+      );
+      expect(
+        const CertificateMismatchError().code,
+        ErrorCodes.certificateMismatch,
+      );
+      expect(
+        const UnsupportedVersionError('x').code,
+        ErrorCodes.unsupportedVersion,
+      );
       expect(const UnsupportedVersionError('x').httpStatus, 426);
       expect(const NetworkError('x').code, ErrorCodes.networkError);
       expect(const StorageError('x').code, ErrorCodes.storageError);
@@ -254,8 +258,10 @@ void main() {
 
     test('the message never leaks a payload', () {
       expect(const ValidationError('bad').message, 'bad');
-      expect(const CertificateMismatchError().message.toLowerCase(),
-          isNot(contains('token')));
+      expect(
+        const CertificateMismatchError().message.toLowerCase(),
+        isNot(contains('token')),
+      );
     });
   });
 
@@ -266,8 +272,10 @@ void main() {
         itemId: 'i',
         state: DeliveryState.queued,
       );
-      expect(info.copyWith(state: DeliveryState.sent).state,
-          DeliveryState.sent);
+      expect(
+        info.copyWith(state: DeliveryState.sent).state,
+        DeliveryState.sent,
+      );
       expect(info.copyWith().state, DeliveryState.queued);
     });
 

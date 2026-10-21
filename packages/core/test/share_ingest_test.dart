@@ -78,28 +78,32 @@ void main() {
       expect(notes.first.text, 'look at https://example.com/page');
     });
 
-    test('the same URL twice inside the window creates only one note',
-        () async {
-      final first = await share.ingestText(text: 'https://example.com/page');
-      final second = await share.ingestText(text: 'https://example.com/page');
-      expect(first.outcome, ShareOutcome.savedToNotepad);
-      expect(second.outcome, ShareOutcome.duplicate);
-      expect(second.deduplicated, isTrue);
-      expect(second.item!.id, first.item!.id);
+    test(
+      'the same URL twice inside the window creates only one note',
+      () async {
+        final first = await share.ingestText(text: 'https://example.com/page');
+        final second = await share.ingestText(text: 'https://example.com/page');
+        expect(first.outcome, ShareOutcome.savedToNotepad);
+        expect(second.outcome, ShareOutcome.duplicate);
+        expect(second.deduplicated, isTrue);
+        expect(second.item!.id, first.item!.id);
 
-      final notes = await notepad.listNotes(categoryId: Category.inboxId);
-      expect(notes.length, 1);
-    });
+        final notes = await notepad.listNotes(categoryId: Category.inboxId);
+        expect(notes.length, 1);
+      },
+    );
 
-    test('the same URL after the dedupe window creates a second note',
-        () async {
-      await share.ingestText(text: 'https://example.com/page');
-      now = now.add(const Duration(seconds: 11));
-      final second = await share.ingestText(text: 'https://example.com/page');
-      expect(second.outcome, ShareOutcome.savedToNotepad);
-      final notes = await notepad.listNotes(categoryId: Category.inboxId);
-      expect(notes.length, 2);
-    });
+    test(
+      'the same URL after the dedupe window creates a second note',
+      () async {
+        await share.ingestText(text: 'https://example.com/page');
+        now = now.add(const Duration(seconds: 11));
+        final second = await share.ingestText(text: 'https://example.com/page');
+        expect(second.outcome, ShareOutcome.savedToNotepad);
+        final notes = await notepad.listNotes(categoryId: Category.inboxId);
+        expect(notes.length, 2);
+      },
+    );
 
     test('rejects an empty share', () async {
       await expectLater(
@@ -122,16 +126,23 @@ void main() {
       expect(result.item!.text, 'javascript:alert(1)');
     });
 
-    test('cleans the Instagram tracking parameter but keeps the text',
-        () async {
-      const text =
-          'https://www.instagram.com/reel/ABC/?igsh=XYZ&utm_source=ig_web';
-      final result = await share.ingestText(text: text);
-      expect(result.item!.url,
-          'https://www.instagram.com/reel/ABC/?utm_source=ig_web');
-      expect(result.item!.text, text,
-          reason: 'the original text is never rewritten');
-    });
+    test(
+      'cleans the Instagram tracking parameter but keeps the text',
+      () async {
+        const text =
+            'https://www.instagram.com/reel/ABC/?igsh=XYZ&utm_source=ig_web';
+        final result = await share.ingestText(text: text);
+        expect(
+          result.item!.url,
+          'https://www.instagram.com/reel/ABC/?utm_source=ig_web',
+        );
+        expect(
+          result.item!.text,
+          text,
+          reason: 'the original text is never rewritten',
+        );
+      },
+    );
 
     test('the ask action writes nothing', () async {
       final result = await share.ingestText(

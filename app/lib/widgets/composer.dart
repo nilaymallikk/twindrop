@@ -169,7 +169,7 @@ class _TdComposerState extends State<TdComposer> {
             border: Border.all(
               color: state.focused && canSend
                   ? tokens.onAccent
-                  : const Color(0x00000000),
+                  : TdPalette.transparent,
               width: 1,
             ),
           ),

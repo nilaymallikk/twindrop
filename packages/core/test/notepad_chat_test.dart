@@ -68,8 +68,11 @@ void main() {
       final note = await notepad.createNote(text: 'a note');
       final pinned = await notepad.pinNote(note.id, true);
       expect(pinned.pinned, isTrue);
-      expect(pinned.contentHash, note.contentHash,
-          reason: 'pinning must not touch the content group');
+      expect(
+        pinned.contentHash,
+        note.contentHash,
+        reason: 'pinning must not touch the content group',
+      );
 
       final moved = await notepad.moveNote(note.id, category.id);
       expect(moved.categoryId, category.id);
@@ -92,10 +95,16 @@ void main() {
       final deleted = await notepad.deleteNote(note.id);
       expect(deleted.deleted, isTrue);
       expect(deleted.deletedHlc, isNotNull);
-      expect((await notepad.getNote(note.id))!.deleted, isTrue,
-          reason: 'getNote returns the raw row, including the tombstone');
-      expect(await notepad.listNotes(), isEmpty,
-          reason: 'a deleted note is not in the visible list');
+      expect(
+        (await notepad.getNote(note.id))!.deleted,
+        isTrue,
+        reason: 'getNote returns the raw row, including the tombstone',
+      );
+      expect(
+        await notepad.listNotes(),
+        isEmpty,
+        reason: 'a deleted note is not in the visible list',
+      );
 
       final restored = await notepad.restoreNote(note.id);
       expect(restored.deleted, isFalse);

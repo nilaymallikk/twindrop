@@ -60,50 +60,53 @@ void main() {
   });
 
   group('PairingClient.pairWithPayload', () {
-    test('pairs with an approved request and returns the device token',
-        () async {
-      final session = host.pairing.startSession();
-      final client = PairingClient(
-        logger: Logger.silent,
-        pollTimeout: const Duration(seconds: 20),
-      );
-      final codes = <String>[];
+    test(
+      'pairs with an approved request and returns the device token',
+      () async {
+        final session = host.pairing.startSession();
+        final client = PairingClient(
+          logger: Logger.silent,
+          pollTimeout: const Duration(seconds: 20),
+        );
+        final codes = <String>[];
 
-      final pending = host.pairing.requests
-          .firstWhere((info) => info.state == PairingState.pendingApproval);
+        final pending = host.pairing.requests.firstWhere(
+          (info) => info.state == PairingState.pendingApproval,
+        );
 
-      final future = client.pairWithPayload(
-        payload: session.payload,
-        clientDeviceId: testUuid(1),
-        displayName: 'Phone',
-        platform: 'android',
-        onCode: codes.add,
-      );
+        final future = client.pairWithPayload(
+          payload: session.payload,
+          clientDeviceId: testUuid(1),
+          displayName: 'Phone',
+          platform: 'android',
+          onCode: codes.add,
+        );
 
-      final request = await pending.timeout(const Duration(seconds: 15));
-      await host.pairing.approve(request.requestId);
+        final request = await pending.timeout(const Duration(seconds: 15));
+        await host.pairing.approve(request.requestId);
 
-      final result = await future.timeout(const Duration(seconds: 25));
-      expect(result.deviceToken, isNotEmpty);
-      expect(result.deviceToken.length, greaterThanOrEqualTo(40));
-      expect(result.fingerprint, identity.fingerprint);
-      expect(result.hostDeviceId, 'desktop-device');
-      expect(result.hostName, 'Desktop');
-      expect(result.deviceId, testUuid(1));
-      expect(result.host, '127.0.0.1');
-      expect(result.port, host.port);
+        final result = await future.timeout(const Duration(seconds: 25));
+        expect(result.deviceToken, isNotEmpty);
+        expect(result.deviceToken.length, greaterThanOrEqualTo(40));
+        expect(result.fingerprint, identity.fingerprint);
+        expect(result.hostDeviceId, 'desktop-device');
+        expect(result.hostName, 'Desktop');
+        expect(result.deviceId, testUuid(1));
+        expect(result.host, '127.0.0.1');
+        expect(result.port, host.port);
 
-      // The phone shows the same 4-digit code as the desktop.
-      expect(codes.length, 1);
-      expect(codes.single.length, 4);
-      expect(codes.single, request.confirmationCode);
+        // The phone shows the same 4-digit code as the desktop.
+        expect(codes.length, 1);
+        expect(codes.single.length, 4);
+        expect(codes.single, request.confirmationCode);
 
-      // The desktop stores only the hash of the token.
-      final peer = await db.peerById(testUuid(1));
-      expect(peer, isNotNull);
-      expect(peer!.tokenHash, DeviceTokens.hash(result.deviceToken));
-      expect(peer.tokenHash, isNot(result.deviceToken));
-    });
+        // The desktop stores only the hash of the token.
+        final peer = await db.peerById(testUuid(1));
+        expect(peer, isNotNull);
+        expect(peer!.tokenHash, DeviceTokens.hash(result.deviceToken));
+        expect(peer.tokenHash, isNot(result.deviceToken));
+      },
+    );
 
     test('an expired payload is refused before any request', () async {
       final session = host.pairing.startSession();
@@ -154,8 +157,9 @@ void main() {
         logger: Logger.silent,
         pollTimeout: const Duration(seconds: 20),
       );
-      final pending = host.pairing.requests
-          .firstWhere((info) => info.state == PairingState.pendingApproval);
+      final pending = host.pairing.requests.firstWhere(
+        (info) => info.state == PairingState.pendingApproval,
+      );
 
       final future = client.pairWithPayload(
         payload: session.payload,
@@ -205,8 +209,9 @@ void main() {
       final probe = await client.probeManual('127.0.0.1', host.port);
       expect(probe.fingerprint, identity.fingerprint);
 
-      final pending = host.pairing.requests
-          .firstWhere((info) => info.state == PairingState.pendingApproval);
+      final pending = host.pairing.requests.firstWhere(
+        (info) => info.state == PairingState.pendingApproval,
+      );
 
       final future = client.pairManually(
         probe: probe,

@@ -28,7 +28,10 @@ void main() {
 
     test('changes when any field changes', () {
       final base = contentHashOf(text: 'hello', title: null, url: null);
-      expect(contentHashOf(text: 'hello!', title: null, url: null), isNot(base));
+      expect(
+        contentHashOf(text: 'hello!', title: null, url: null),
+        isNot(base),
+      );
       expect(contentHashOf(text: 'hello', title: 'T', url: null), isNot(base));
       expect(
         contentHashOf(text: 'hello', title: null, url: 'https://x.dev'),
@@ -107,9 +110,14 @@ void main() {
   group('ids', () {
     test('newId returns a lowercase UUIDv7', () {
       final id = newId();
-      expect(id, matches(RegExp(
-        r'^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$',
-      )));
+      expect(
+        id,
+        matches(
+          RegExp(
+            r'^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$',
+          ),
+        ),
+      );
       expect(id, isNot(newId()));
     });
 

@@ -36,19 +36,19 @@ void main() {
   });
 
   ConnectionManager buildManager() => ConnectionManager(
-        db: db,
-        sync: sync,
-        bus: bus,
-        peers: peers,
-        tokenStore: MemoryTokenStore(),
-        logger: Logger.silent,
-        deviceId: 'phone-device',
-        deviceName: 'Phone',
-        deviceKind: PeerKind.phone,
-        appVersion: '0.1.0',
-        // A seeded random keeps the jitter deterministic.
-        random: Random(42),
-      );
+    db: db,
+    sync: sync,
+    bus: bus,
+    peers: peers,
+    tokenStore: MemoryTokenStore(),
+    logger: Logger.silent,
+    deviceId: 'phone-device',
+    deviceName: 'Phone',
+    deviceKind: PeerKind.phone,
+    appVersion: '0.1.0',
+    // A seeded random keeps the jitter deterministic.
+    random: Random(42),
+  );
 
   group('backoff', () {
     test('starts at one second', () {

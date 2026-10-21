@@ -42,10 +42,7 @@ void main() {
     });
 
     test('strict mode also removes IP addresses', () {
-      final logger = Logger(
-        redaction: RedactionLevel.strict,
-        sink: (_) {},
-      );
+      final logger = Logger(redaction: RedactionLevel.strict, sink: (_) {});
       final redacted = logger.redactValue('host 192.168.1.10:47321');
       expect(redacted, isNot(contains('192.168.1.10')));
       expect(redacted, contains('[host]'));
@@ -75,9 +72,10 @@ void main() {
     test('a URL in a logged field never reaches the sink', () {
       final lines = <String>[];
       final logger = Logger(sink: lines.add);
-      logger.info('share ingested', fields: {
-        'url': 'https://www.instagram.com/reel/ABC/?igsh=SECRET',
-      });
+      logger.info(
+        'share ingested',
+        fields: {'url': 'https://www.instagram.com/reel/ABC/?igsh=SECRET'},
+      );
       expect(lines.single, isNot(contains('instagram')));
       expect(lines.single, isNot(contains('SECRET')));
     });

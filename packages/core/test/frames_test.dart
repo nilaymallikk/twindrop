@@ -32,23 +32,22 @@ void main() {
     });
 
     test('round-trips a pull frame', () {
-      final decoded =
-          FrameCodec.decode(FrameCodec.encode(PullFrame(after: 7, limit: 50)))
-              as PullFrame;
+      final decoded = FrameCodec.decode(
+        FrameCodec.encode(PullFrame(after: 7, limit: 50)),
+      ) as PullFrame;
       expect(decoded.after, 7);
       expect(decoded.limit, 50);
     });
 
     test('round-trips a changes frame', () {
       final page = ChangePage(
-        records: [
-          ChangeRecord(seq: 1, entityType: 'item', entityId: 'a'),
-        ],
+        records: [ChangeRecord(seq: 1, entityType: 'item', entityId: 'a')],
         next: 1,
         more: false,
       );
-      final decoded =
-          FrameCodec.decode(FrameCodec.encode(ChangesFrame(page))) as ChangesFrame;
+      final decoded = FrameCodec.decode(
+        FrameCodec.encode(ChangesFrame(page)),
+      ) as ChangesFrame;
       expect(decoded.page.records.length, 1);
       expect(decoded.page.records.first.entityId, 'a');
       expect(decoded.page.next, 1);
@@ -56,20 +55,27 @@ void main() {
 
     test('round-trips a notify, ack, ping and pong frame', () {
       expect(
-        (FrameCodec.decode(FrameCodec.encode(NotifyFrame(seq: 3))) as NotifyFrame)
-            .seq,
+        (FrameCodec.decode(
+          FrameCodec.encode(NotifyFrame(seq: 3)),
+        ) as NotifyFrame).seq,
         3,
       );
       expect(
-        (FrameCodec.decode(FrameCodec.encode(AckFrame(seq: 9))) as AckFrame).seq,
+        (FrameCodec.decode(
+          FrameCodec.encode(AckFrame(seq: 9)),
+        ) as AckFrame).seq,
         9,
       );
       expect(
-        (FrameCodec.decode(FrameCodec.encode(PingFrame(ts: 5))) as PingFrame).ts,
+        (FrameCodec.decode(
+          FrameCodec.encode(PingFrame(ts: 5)),
+        ) as PingFrame).ts,
         5,
       );
       expect(
-        (FrameCodec.decode(FrameCodec.encode(PongFrame(ts: 6))) as PongFrame).ts,
+        (FrameCodec.decode(
+          FrameCodec.encode(PongFrame(ts: 6)),
+        ) as PongFrame).ts,
         6,
       );
     });
@@ -81,7 +87,10 @@ void main() {
     });
 
     test('malformed JSON is a protocol error', () {
-      expect(() => FrameCodec.decode('not json'), throwsA(isA<ProtocolError>()));
+      expect(
+        () => FrameCodec.decode('not json'),
+        throwsA(isA<ProtocolError>()),
+      );
       expect(() => FrameCodec.decode('[1,2]'), throwsA(isA<ProtocolError>()));
       expect(() => FrameCodec.decode('{}'), throwsA(isA<ProtocolError>()));
       expect(
@@ -91,7 +100,8 @@ void main() {
     });
 
     test('a frame from a newer protocol stops the sync', () {
-      final raw = '{"t":"hello","v":99,"id":"a","name":"b","kind":"phone",'
+      final raw =
+          '{"t":"hello","v":99,"id":"a","name":"b","kind":"phone",'
           '"app":"1.0"}';
       expect(
         () => FrameCodec.decode(raw),
@@ -105,10 +115,7 @@ void main() {
         () => FrameCodec.decode(big),
         throwsA(isA<PayloadTooLargeError>()),
       );
-      expect(
-        () => FrameCodec.encode(PingFrame(ts: 1)),
-        returnsNormally,
-      );
+      expect(() => FrameCodec.encode(PingFrame(ts: 1)), returnsNormally);
     });
 
     test('an oversize outgoing frame is rejected', () {

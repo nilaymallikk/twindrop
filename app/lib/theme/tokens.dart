@@ -13,6 +13,10 @@ abstract final class TdFonts {
 /// Values come from `design/tokens.json`; the QR pair and the black-theme
 /// extras are fixed in docs/13 §6 and the token note for the P1 black theme.
 abstract final class TdPalette {
+  /// Fully transparent. Lives here so no widget has to spell a colour literal
+  /// (DES-002: the only file with colour literals).
+  static const Color transparent = Color(0x00000000);
+
   // Dark (default).
   static const Color darkBg = Color(0xFF0E0F11);
   static const Color darkSurface = Color(0xFF16181B);

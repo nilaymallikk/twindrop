@@ -44,10 +44,7 @@ void main() {
     test('contains the categories and the notes', () async {
       await notepad.createNote(text: 'first note', title: 'First');
       final category = await notepad.createCategory('Research');
-      await notepad.createNote(
-        text: 'second note',
-        categoryId: category.id,
-      );
+      await notepad.createNote(text: 'second note', categoryId: category.id);
 
       final document = await export.markdown();
       expect(document.mimeType, 'text/markdown');
@@ -124,7 +121,10 @@ void main() {
       expect(payload['formatVersion'], 1);
       expect(payload['deviceName'], 'Device A');
       final categories = payload['categories'] as List<dynamic>;
-      expect(categories.any((c) => (c as Map)['id'] == Category.inboxId), isTrue);
+      expect(
+        categories.any((c) => (c as Map)['id'] == Category.inboxId),
+        isTrue,
+      );
       final notes = payload['notes'] as List<dynamic>;
       expect(notes.length, 1);
       expect((notes.first as Map)['text'], 'first note');

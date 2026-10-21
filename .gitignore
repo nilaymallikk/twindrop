@@ -1,0 +1,60 @@
+# ---- Dart / Flutter ----
+.dart_tool/
+.pub-cache/
+.pub/
+build/
+coverage/
+.flutter-plugins
+.flutter-plugins-dependencies
+*.iml
+.idea/
+.vscode/
+*.g.dart
+*.freezed.dart
+# Generated drift files are committed; generated plugin registrant is not.
+app/linux/flutter/ephemeral/
+app/windows/flutter/ephemeral/
+app/macos/Flutter/ephemeral/
+
+# ---- Android ----
+app/android/local.properties
+app/android/key.properties
+app/android/.gradle/
+app/android/app/.cxx/
+app/android/app/release/
+*.jks
+*.keystore
+*.jks.enc
+
+# ---- Linux / packaging build output ----
+packaging/appimage/AppDir/
+packaging/appimage/*.AppImage
+packaging/appimage/squashfs-root/
+dist/
+*.AppImage
+*.apk
+*.aab
+*.sha256
+
+# ---- Runtime data, secrets, local config ----
+data/
+*.db
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+*.pem
+*.key
+*.crt
+*.p12
+secrets/
+*.env
+.env.*
+app.dill
+app.dill.track.dill
+
+# ---- Misc ----
+*.log
+.DS_Store
+Thumbs.db
+/tmp/

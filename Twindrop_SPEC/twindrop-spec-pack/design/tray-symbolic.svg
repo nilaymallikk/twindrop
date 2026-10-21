@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" role="img" aria-label="TwinDrop">
+  <!-- single-color symbolic icon; render black for light panels, white for dark panels -->
+  <rect x="3" y="3" width="13" height="13" rx="2.5" fill="none" stroke="#000" stroke-width="2"/>
+  <rect x="8" y="8" width="13" height="13" rx="2.5" fill="#000"/>
+</svg>

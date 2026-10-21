@@ -68,3 +68,56 @@ shared SharePanel widget. Dart imports the native queue into SQLite on start
 (core `ShareIngest`, dedupe 10 s) and applies queued panel actions.
 **Reason:** Nothing is lost even if the Flutter engine is slow or killed; panel UI
 stays spec-compliant, reusable and widget-testable; single protocol/SQLite write path.
+
+## D-008 | 2026-10-21 | The change bus is only notified on a real change
+**Question:** `SyncEngine.applyPage` notified the change bus after every applied page,
+including pages that changed nothing.
+**Choice:** Notify only when at least one row was applied or quarantined.
+**Reason:** The bus drives both the UI and the `notify` frame to the peer. Notifying on
+an empty page made two peers pull from each other forever — measured at 1114 empty pages
+in ~2 s, burning CPU and the network. The cursor sync is authoritative, so an empty page
+carries no information the peer does not already have.
+
+## D-009 | 2026-10-21 | The peer socket is closed with the right code
+**Question:** `HostServer._closePeerSocket` took a close code and a reason but dropped
+them, and `PeerSession.dispose()` never called `_closeSocket` at all.
+**Choice:** `PeerSession.dispose({code, reason})` closes the socket with the given code;
+`_closePeerSocket` forwards 4403 (`forbidden` / `revoked`) on revocation.
+**Reason:** `docs/08` requires that revocation closes live sockets with 4403. Without it
+a revoked device kept its socket open even though every new request was rejected.
+
+## D-010 | 2026-10-21 | Phone-side diagnostics report the live session
+**Question:** `DiagnosticsSnapshot.connectedPeerIds` was filled from the host server
+only, so on the phone it was always empty.
+**Choice:** `ConnectionManager` exposes `connectedPeerIds` (the peer of the live
+session) and the runtime uses it on the phone and the host's own set on the desktop.
+**Reason:** The diagnostics screen and the two-peer smoke test need to see the real
+connection state, not a guess from the status enum.
+
+## D-011 | 2026-10-21 | Release APK signing
+**Question:** No release keystore was provided, but `dist/twindrop.apk` has to exist.
+**Choice:** `app/android/app/build.gradle.kts` reads an optional
+`android/key.properties` (`storeFile`, `storePassword`, `keyAlias`, `keyPassword`)
+and uses a real `release` signing config when it exists. Without it the release build
+is signed with the debug key and the build logs a warning.
+**Reason:** The keystore and its passwords are the user's to provide (AGENTS.md, "Things
+only a human can do"). The build must still produce an inspectable artefact, and the
+signing path must be ready the moment the keystore appears.
+
+## D-012 | 2026-10-21 | Desktop popup keyboard shortcuts
+**Question:** `docs/01` LNX-003 requires Esc / Ctrl+S / Ctrl+Shift+V in the tray popup.
+**Choice:** `ChatPopup` wraps its surface in `CallbackShortcuts`, with a `Focus`
+**inside** the shortcuts. Ctrl+S saves the newest message to the Notepad;
+Ctrl+Shift+V sends the clipboard.
+**Reason:** The shortcut map is only consulted for focus nodes that are descendants of
+the `Shortcuts` widget, so the `Focus` has to be the inner widget. Ctrl+S acts on the
+newest message because the popup has no selection concept of its own.
+
+## D-013 | 2026-10-21 | Userland sysroot library links
+**Question:** `cpio -idm` extraction of the Fedora RPMs produced the versioned library
+files but not always the intermediate `.so.N` symlink, so `-lcairo-gobject` failed at
+link time.
+**Choice:** `tool/repair_sysroot_links.py` recreates every missing intermediate link by
+matching the versioned file in the same directory.
+**Reason:** The sysroot has to satisfy the linker, not just `pkg-config`. The script is
+idempotent and only ever creates links to files that already exist in the sysroot.

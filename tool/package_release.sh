@@ -50,9 +50,10 @@ APK_OUT="$DIST/TwinDrop-v$VERSION-android.apk"
 cp -f "$APK" "$APK_OUT"
 
 echo "==> checksums"
+# SHA256SUMS covers exactly the files that are published in the release.
+# The build outputs keep their own per-file .sha256 next to them in dist/.
 ( cd "$DIST" && rm -f SHA256SUMS && sha256sum \
     "TwinDrop-x86_64.AppImage" \
-    "twindrop.apk" \
     "TwinDrop-v$VERSION-linux-x86_64.tar.gz" \
     "TwinDrop-v$VERSION-android.apk" > SHA256SUMS )
 

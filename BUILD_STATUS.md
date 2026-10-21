@@ -57,7 +57,7 @@
 | `dart analyze` (packages/core) | **pass** | 0 errors (warnings only) |
 | `flutter analyze` (app) | **pass** | 0 errors (info-level lints only) |
 | `dart format --set-exit-if-changed` | **pass** | 125 source files formatted, 0 left to change |
-| `dart test` (packages/core) | **pass** | 392 tests, 0 failed, 0 skipped |
+| `dart test` (packages/core) | **pass** | 394 tests, 0 failed, 0 skipped |
 | `flutter test` (app) | **pass** | 43 tests, 0 failed (18 golden files) |
 | `python3 tool/contrast_check.py design/tokens.json` | **pass** | all 26 text/background pairs ≥ 4.5:1 in both themes |
 | `flutter build linux --release` | **pass** | `app/build/linux/x64/release/bundle/twindrop` |
@@ -70,7 +70,7 @@
 ## Tests
 | Suite | Passed | Failed | Skipped | Coverage |
 |---|---:|---:|---:|---|
-| core unit (`packages/core/test`, 20 files) | 392 | 0 | 0 | **80.9 %** of hand-written lines (2825/3493); 59.3 % including the generated `database.g.dart` |
+| core unit (`packages/core/test`, 21 files) | 394 | 0 | 0 | **80.9 %** of hand-written lines (2825/3493); 59.3 % including the generated `database.g.dart` |
 | app widget + golden (`app/test`, 4 files) | 43 | 0 | 0 | 18 golden files, dark and light |
 | integration (two peers, loopback) | 1 (`SMOKE_OK`) | 0 | 0 | — |
 
@@ -150,7 +150,8 @@ $ wmctrl -l
 | AppImage without FUSE (extract-and-run) | build host | **not tested** | `--appimage-extract` path not exercised on the final artefact |
 | Share URL → Inbox (cold start) | — | **BLOCKED** | no physical Android device attached; no emulator with a working camera in this environment |
 | Share URL → Inbox (warm start) | — | **BLOCKED** | same |
-| Offline share syncs once | — | **BLOCKED** | same |
+| Offline share syncs once | in-process, loopback | **tested** | `packages/core/test/share_ingest_test.dart` (one Inbox note, 10 s dedupe window) |
+| Offline message syncs once after a **process restart** | in-process, loopback | **tested** | `packages/core/test/restart_sync_test.dart`: the desktop is paused, the phone writes a message, the phone's whole runtime is disposed and re-opened from the same data directory, the desktop comes back — the message arrives **exactly once** and the local copy is not duplicated |
 | Concurrent edit → conflict copy | in-process | **tested** | `packages/core/test/merge_engine_test.dart` |
 | Real-device pairing | — | **BLOCKED** | no physical Android device attached |
 
@@ -221,8 +222,9 @@ $ wmctrl -l
 ## Next concrete task
 - Sign the release APK with a real keystore (needs a human: the keystore and its
   passwords).
-- Run the device-only acceptance list from `docs/09` on a physical Android phone.
+- Run the device-only acceptance list from `docs/09` on a physical Android phone:
+  the share sheet end to end, the keep-alive foreground service, and real-device
+  pairing.
 - Cover `net/discovery.dart` (mDNS) — the only core file still at 0 %.
 - Add the remaining Phase 6 goldens: the conflict-copy note card and a standalone
   status indicator.
-- Write `INSTALL.md` and an About screen (Phase 10 leftovers).

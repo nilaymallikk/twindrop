@@ -19,11 +19,30 @@ DURATION="${1:-12}"
 
 echo "==> devices"
 adb devices -l
-if [ -z "$(adb devices | sed '1d' | grep -w device)" ]; then
-  echo "ERROR: no device in 'device' state." >&2
-  echo "       Enable USB debugging on the phone and accept the RSA prompt." >&2
-  exit 1
-fi
+
+# Wait for the phone if it is not there yet, so the user only has to plug it
+# in. On Xiaomi/MIUI the phone only exposes the ADB interface when the USB
+# mode is "File transfer", not "Charging only" - that is the usual reason a
+# plugged-in phone stays invisible here.
+waited=0
+while [ -z "$(adb devices | sed '1d' | grep -w device)" ]; do
+  if [ "$waited" -ge 120 ]; then
+    echo "ERROR: no device in 'device' state after ${waited}s." >&2
+    echo "       - Enable USB debugging: Settings > About phone > tap Build" >&2
+    echo "         number 7 times, then Settings > System > Developer options." >&2
+    echo "       - On the USB notification, choose 'File transfer (MTP)'." >&2
+    echo "         'Charging only' does NOT expose the ADB interface." >&2
+    echo "       - Accept the 'Allow USB debugging?' prompt on the phone." >&2
+    echo "       - Use a data-capable cable, not a charge-only one." >&2
+    exit 1
+  fi
+  if [ "$waited" -eq 0 ]; then
+    echo "==> waiting for the phone (plug it in, USB mode = File transfer)..."
+  fi
+  sleep 3
+  waited=$((waited + 3))
+done
+echo "==> device found after ${waited}s"
 
 echo "==> installing $APK"
 adb install -r "$APK"

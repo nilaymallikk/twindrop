@@ -19,6 +19,7 @@ import 'features/settings/settings_screen.dart';
 import 'features/shell/app_shell.dart';
 import 'platform/android/android_platform.dart';
 import 'state/app_controller.dart';
+import 'theme/context_ext.dart';
 import 'theme/theme.dart';
 import 'theme/tokens.dart';
 import 'widgets/states.dart';
@@ -103,6 +104,17 @@ class _TwinDropAppState extends State<TwinDropApp> with WidgetsBindingObserver {
             AppThemeChoice.light => ThemeMode.light,
             AppThemeChoice.system => ThemeMode.system,
             _ => ThemeMode.dark,
+          },
+          // The whole app lives inside a Material. Without one, a `Text` that
+          // is not under a Scaffold inherits Flutter's fallback style, which is
+          // yellow and double-underlined.
+          builder: (context, child) {
+            return Material(
+              color:
+                  Theme.of(context).extension<TdTokens>()?.bg ??
+                  Theme.of(context).scaffoldBackgroundColor,
+              child: child ?? const SizedBox.shrink(),
+            );
           },
           home: _Root(
             controller: controller,

@@ -4,6 +4,8 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
+import android.os.Handler
+import android.os.Looper
 
 /**
  * Network changes are pushed to Dart so the connection manager reconnects immediately
@@ -15,6 +17,14 @@ class NetworkMonitor(
 ) {
     private val connectivity =
         context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+    /**
+     * The connectivity callbacks arrive on a background thread ("ConnectivityThread"),
+     * but a platform-channel call must be made on the main thread: Flutter throws
+     * "Methods marked with @UiThread must be executed on the main thread" and the
+     * process dies. Every callback is therefore hopped onto the main looper here.
+     */
+    private val mainHandler = Handler(Looper.getMainLooper())
 
     private val callback = object : ConnectivityManager.NetworkCallback() {
         override fun onAvailable(network: Network) = emit()
@@ -50,7 +60,13 @@ class NetworkMonitor(
         registered = false
     }
 
-    fun emit() = onChanged(current())
+    /**
+     * Reports the current network state to [onChanged] on the main thread.
+     */
+    fun emit() {
+        val state = current()
+        mainHandler.post { onChanged(state) }
+    }
 
     fun current(): Map<String, Any?> {
         val network = connectivity.activeNetwork

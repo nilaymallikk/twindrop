@@ -165,3 +165,36 @@ text, and `runZonedGuarded` logs uncaught asynchronous errors. On the native sid
 milestone under the `TwinDrop` logcat tag.
 **Reason:** A failure that cannot be seen cannot be diagnosed. The native markers also
 make `adb logcat -s TwinDrop` enough to tell how far the startup got.
+
+## D-018 | 2026-10-21 | The app must render inside a Material
+**Question:** Every text in the app was underlined in yellow and the composer
+raised "No Material widget found. TextField widgets require a Material widget
+ancestor". The theme and the type scale were provably clean, and the goldens were
+clean, because the goldens wrapped the screens in a `Scaffold` while the app
+does not.
+**Choice:** `AppShell` renders a `Material` instead of a `ColoredBox`, the
+`MaterialApp` wraps the navigator in one through its `builder`, and the type
+scale sets `decoration: TextDecoration.none` on its base style.
+**Reason:** A `Text` outside a `Material` inherits Flutter's fallback
+`DefaultTextStyle` — yellow, double-underlined, 48 px monospace — because the
+fallback exists to make the mistake visible. The fix belongs where the mistake
+is: the shell that forgot the `Material`, plus a guard in the type scale so a
+future widget outside a `Material` cannot silently underline the whole app.
+`app/test/theme_material_test.dart` locks it in.
+
+## D-019 | 2026-10-21 | Platform-channel calls happen on the main thread
+**Question:** The Android app died ~40 ms after launch with
+"Methods marked with @UiThread must be executed on the main thread".
+**Choice:** `NetworkMonitor` posts every `ConnectivityManager` callback to the
+main looper before it touches the platform channel.
+**Reason:** Android delivers those callbacks on `ConnectivityThread`, and
+Flutter's `MethodChannel.invokeMethod` must be called from the main thread. The
+hop belongs inside `NetworkMonitor`, so every caller is safe by construction.
+
+## D-020 | 2026-10-21 | The release tarball is byte-reproducible
+**Question:** Two runs of `tool/package_release.sh` produced different checksums
+for the same inputs.
+**Choice:** The tarball is built with `--sort=name`, a fixed `--mtime`, a fixed
+owner and `gzip -n`, and the `VERSION` file carries no timestamp.
+**Reason:** A checksum that changes on every run cannot be used to verify
+anything. The release assets are now reproducible from the same source.

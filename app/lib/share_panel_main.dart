@@ -65,6 +65,12 @@ class _SharePanelAppState extends State<SharePanelApp> {
         choice: AppThemeChoice.dark,
         platformBrightness: Brightness.dark,
       ),
+      // A Material, so the text does not inherit Flutter's yellow fallback
+      // style.
+      builder: (context, child) => Material(
+        color: Theme.of(context).scaffoldBackgroundColor,
+        child: child ?? const SizedBox.shrink(),
+      ),
       home: SharePanelView(
         payload: _payload,
         busy: _busy,
@@ -231,30 +237,37 @@ class SharePanelView extends StatelessWidget {
                 style: context.tdType.meta,
               ),
               const SizedBox(height: TdSpace.s12),
-              Row(
+              // Three actions in a row do not fit on a phone: the labels were
+              // truncated to "Change ...". Undo sits on its own line, the two
+              // content actions share the next one.
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
-                  Expanded(
-                    child: TdButton(
-                      label: 'Undo',
-                      variant: TdButtonVariant.tertiary,
-                      onPressed: busy ? null : onUndo,
-                    ),
+                  TdButton(
+                    label: 'Undo',
+                    variant: TdButtonVariant.tertiary,
+                    expand: true,
+                    onPressed: busy ? null : onUndo,
                   ),
-                  const SizedBox(width: TdSpace.s8),
-                  Expanded(
-                    child: TdButton(
-                      label: 'Change category',
-                      variant: TdButtonVariant.secondary,
-                      onPressed: busy ? null : onChangeCategory,
-                    ),
-                  ),
-                  const SizedBox(width: TdSpace.s8),
-                  Expanded(
-                    child: TdButton(
-                      label: 'Also send as chat',
-                      variant: TdButtonVariant.secondary,
-                      onPressed: busy ? null : onAlsoSendAsChat,
-                    ),
+                  const SizedBox(height: TdSpace.s8),
+                  Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: TdButton(
+                          label: 'Change category',
+                          variant: TdButtonVariant.secondary,
+                          onPressed: busy ? null : onChangeCategory,
+                        ),
+                      ),
+                      const SizedBox(width: TdSpace.s8),
+                      Expanded(
+                        child: TdButton(
+                          label: 'Also send as chat',
+                          variant: TdButtonVariant.secondary,
+                          onPressed: busy ? null : onAlsoSendAsChat,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),

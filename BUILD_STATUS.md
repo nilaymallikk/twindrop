@@ -90,10 +90,10 @@ rather than only the flattering one.
 ## Artifacts
 | Artifact | Path | Bytes | SHA-256 | Launched/installed? |
 |---|---|---:|---|---|
-| AppImage | `dist/TwinDrop-x86_64.AppImage` | 44 561 600 | `f134134c39fa84874d55b3af9aaf9b9c0b044a4cef0e31816bd653dfb46eb490` | **yes** — see below |
-| APK | `dist/twindrop.apk` | 81 052 436 | `9c06cb1561edb2a8a379537dde8764851c08f203bf82a2cde885c1b251efbf33` | **no** — no device attached |
-| Release bundle | `dist/TwinDrop-v1.0.0-linux-x86_64.tar.gz` | 81 356 470 | `61e13ec5d05787f7d104175be12320bd719c390b805ead3834b2a044e47b6ee6` | — |
-| Release APK copy | `dist/TwinDrop-v1.0.0-android.apk` | 81 052 436 | `9c06cb1561edb2a8a379537dde8764851c08f203bf82a2cde885c1b251efbf33` | — |
+| AppImage | `dist/TwinDrop-x86_64.AppImage` | 44 561 600 | `53fde1429c00d0ed05a60691ed2abc60fd2e5d676a42bb3eb4317add39374bc1` | **yes** — see below |
+| APK | `dist/twindrop.apk` | 81 052 436 | `c5c55319790abd690d878cef2a655d5825d17967e5333103750e95c97b8b4df9` | **yes** — installed and launched on a POCO X5 Pro 5G |
+| Release bundle | `dist/TwinDrop-v1.0.0-linux-x86_64.tar.gz` | 81 028 737 | `178baf9a8d5817913f78e48a…` (byte-reproducible) | — |
+| Release APK copy | `dist/TwinDrop-v1.0.0-android.apk` | 81 052 436 | `c5c55319790abd690d878cef2a655d5825d17967e5333103750e95c97b8b4df9` | **yes** — installed and launched on a POCO X5 Pro 5G |
 | Checksum list | `dist/SHA256SUMS` | — | — | `sha256sum -c SHA256SUMS` → all 3 published files **OK** |
 
 Published as the GitHub release **v1.0.0**:
@@ -153,34 +153,39 @@ $ wmctrl -l
 | Tray on GNOME (Ubuntu) / KDE | — | **BLOCKED** | only one Linux session (Fedora GNOME Wayland) is available on this host |
 | AppImage runs on clean VM | — | **BLOCKED** | no second machine/VM available; the image was launched on the build host only |
 | AppImage without FUSE (extract-and-run) | build host | **not tested** | `--appimage-extract` path not exercised on the final artefact |
-| Share URL → Inbox (cold start) | — | **BLOCKED** | no physical Android device attached; no emulator with a working camera in this environment |
-| Share URL → Inbox (warm start) | — | **BLOCKED** | same |
+| Share URL → Inbox (cold start) | POCO X5 Pro 5G, Android 16 | **tested** | `adb shell am start -a android.intent.action.SEND -t text/plain --es android.intent.extra.TEXT <url>` → the note appears in the Inbox on the device |
+| Share URL → Inbox (warm start) | POCO X5 Pro 5G | **tested** | the app was already running; the share still lands as exactly one Inbox note |
+| The app appears in the share sheet | POCO X5 Pro 5G | **tested** | the system share sheet lists "TwinDrop" with its icon; `cmd package query-activities -a android.intent.action.SEND -t text/plain` resolves `app.twindrop/.ShareReceiverActivity` |
+| The confirmation panel (Undo · Change category · Also send as chat) | POCO X5 Pro 5G | **tested** | the panel shows "Saved to Inbox", the preview and the truthful "Will sync to fedora." line, auto-dismissing after ~4 s |
 | Offline share syncs once | in-process, loopback | **tested** | `packages/core/test/share_ingest_test.dart` (one Inbox note, 10 s dedupe window) |
 | Offline message syncs once after a **process restart** | in-process, loopback | **tested** | `packages/core/test/restart_sync_test.dart`: the desktop is paused, the phone writes a message, the phone's whole runtime is disposed and re-opened from the same data directory, the desktop comes back — the message arrives **exactly once** and the local copy is not duplicated |
 | Concurrent edit → conflict copy | in-process | **tested** | `packages/core/test/merge_engine_test.dart` |
-| Real-device pairing | — | **BLOCKED** | no physical Android device attached |
+| Real-device pairing | POCO X5 Pro 5G | **tested** | the phone is paired with the desktop ("fedora"), the chat syncs both ways and the notepad shows the shared links |
+| The app quits on launch | POCO X5 Pro 5G | **tested** | was a fatal crash on a background thread (see the blockers); the app now stays alive and renders |
+| Text is readable (no yellow underlines) | POCO X5 Pro 5G | **tested** | the app rendered outside a `Material`, so every text inherited Flutter's yellow fallback style |
 
 ## Blockers / limitations
 - No sudo on the host; system packages cannot be installed. Mitigation: userland
   sysroot + toolchain under `/data/toolchain` (D-002).
-- **The Android APK quits immediately on a real phone** (reported 2026-10-21 after the
-  v1.0.0 release). The Dart phone startup path is proven good by
-  `app/test/phone_startup_test.dart` (the controller initialises, the replica opens,
-  the Inbox is created, no error), the manifest and the native libraries were inspected
-  and are correct, and the `main(List<String> args)` entrypoint was verified against
-  the engine's own trampoline (`dart:isolate._delayEntrypointInvocation`) — the engine
-  does call it with an empty list, so the entrypoint is not the problem. The remaining
-  suspects are native or plugin-side, and this environment cannot run an Android
-  emulator (the emulator's own graphics stack segfaults here, see below), so the cause
-  is not yet identified.
-  Mitigations shipped in the next build: the four unused Android plugins
-  (`flutter_riverpod`, `share_plus`, `package_info_plus`, `cupertino_icons`) are
-  removed — every plugin in the dependency list is registered at process start — and a
-  startup failure can no longer be silent: `main()` shows the error, and the native
-  side logs every milestone and any uncaught crash under the `TwinDrop` logcat tag.
-  `tool/crashlog.sh` captures the evidence from a device in one command.
-- No physical Android device attached. Every device-only check (share sheet, keep-alive
-  foreground service, real-device pairing) is **BLOCKED**, not merely untested.
+- **Two real Android bugs were found on a device and fixed.** Both are recorded in
+  `docs/DECISIONS.md`:
+  1. *The app quits on launch.* `NetworkMonitor` delivered its
+     `ConnectivityManager` callbacks on a background thread and called
+     `MethodChannel.invokeMethod` from there; Flutter throws
+     "Methods marked with @UiThread must be executed on the main thread" and the
+     process dies ~40 ms after launch. Every callback is now posted to the main
+     looper.
+  2. *Every text was underlined in yellow.* The app rendered its screens outside a
+     `Material` widget, so each `Text` inherited Flutter's fallback style — which is
+     yellow and double-underlined — and the composer raised "No Material widget
+     found". The shell now provides a `Material`, the app wraps the navigator in one,
+     and the type scale sets `decoration: none` so a stray fallback can never
+     underline the UI again. `app/test/theme_material_test.dart` guards it.
+- A physical Android phone (POCO X5 Pro 5G, Android 16) is now attached, so the
+  device-only checks are no longer blocked: the share sheet, the share panel, the
+  adb share intent and the pairing are all verified on the device (see the table
+  above). The keep-alive foreground service and the reboot restart are still
+  untested.
 - Only one Linux desktop session is available (Fedora GNOME Wayland), so the Ubuntu GNOME
   and KDE tray checks are **BLOCKED**.
 - The release APK is unsigned: no keystore has been provided. It installs with

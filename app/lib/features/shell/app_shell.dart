@@ -71,8 +71,11 @@ class AppShell extends StatelessWidget {
       builder: (context, constraints) {
         final wide =
             showSidebar && constraints.maxWidth >= TdBreakpoint.phoneMax;
+        // A Material, not a ColoredBox: a `Text` below a Material-less tree
+        // inherits Flutter's fallback style, which is yellow and underlined,
+        // and a `TextField` (the composer) throws without one.
         if (wide) {
-          return ColoredBox(
+          return Material(
             color: tokens.bg,
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -94,12 +97,13 @@ class AppShell extends StatelessWidget {
           );
         }
         final bottomInset = MediaQuery.paddingOf(context).bottom;
-        return ColoredBox(
+        return Material(
           color: tokens.bg,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              Expanded(child: child),
+              // The phone layout draws under the status bar without this.
+              Expanded(child: SafeArea(bottom: false, child: child)),
               const TdHairline(),
               Padding(
                 padding: EdgeInsets.only(bottom: bottomInset),

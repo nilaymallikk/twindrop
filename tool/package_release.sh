@@ -38,12 +38,17 @@ cp -f INSTALL.md "$STAGE/TwinDrop-$VERSION/"
 cp -f README.md "$STAGE/TwinDrop-$VERSION/"
 cat > "$STAGE/TwinDrop-$VERSION/VERSION" <<EOF
 TwinDrop $VERSION
-built $(date -u +%Y-%m-%dT%H:%M:%SZ)
 EOF
 
 TARBALL="$DIST/TwinDrop-v$VERSION-linux-x86_64.tar.gz"
 echo "==> building $TARBALL"
-tar -czf "$TARBALL" -C "$STAGE" "TwinDrop-$VERSION"
+# Byte-reproducible: fixed mtime/owner and a gzip header without a timestamp,
+# so the same inputs always give the same checksum.
+tar --sort=name \
+    --mtime='UTC 2020-01-01' \
+    --owner=0 --group=0 --numeric-owner \
+    -cf - -C "$STAGE" "TwinDrop-$VERSION" \
+  | gzip -n -9 > "$TARBALL"
 rm -rf "$STAGE"
 
 APK_OUT="$DIST/TwinDrop-v$VERSION-android.apk"

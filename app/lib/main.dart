@@ -235,6 +235,12 @@ class StartupFailureApp extends StatelessWidget {
     return MaterialApp(
       title: 'TwinDrop',
       debugShowCheckedModeBanner: false,
+      // A Material, so the text does not inherit Flutter's yellow fallback
+      // style.
+      builder: (context, child) => Material(
+        color: Theme.of(context).scaffoldBackgroundColor,
+        child: child ?? const SizedBox.shrink(),
+      ),
       home: Scaffold(
         body: Center(
           child: Padding(

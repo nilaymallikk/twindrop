@@ -53,7 +53,10 @@ class TdType extends ThemeExtension<TdType> {
 
   /// Builds the scale for a resolved [TdTokens] set.
   factory TdType.fromTokens(TdTokens tokens) {
-    final base = TextStyle(color: tokens.text);
+    // `decoration: none` is explicit on purpose. A `Text` outside a `Material`
+    // inherits Flutter's fallback style, which is yellow and double-underlined;
+    // without this the whole app renders underlined.
+    final base = TextStyle(color: tokens.text, decoration: TextDecoration.none);
     TextStyle sans({
       required double size,
       required double height,

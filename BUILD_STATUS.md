@@ -94,7 +94,7 @@ rather than only the flattering one.
 | APK | `dist/twindrop.apk` | 81 169 578 | `7b0241c89caf4a5af4079ee5118f430bb08df92809a9add49dc0bec9e4294cf9` | **no** — no device attached |
 | Release bundle | `dist/TwinDrop-v1.0.0-linux-x86_64.tar.gz` | 81 395 070 | `2e2a78ecdf7124939d2a62942bf89f3302a67c12ccae5129d8a9a1833b4e9d7e` | — |
 | Release APK copy | `dist/TwinDrop-v1.0.0-android.apk` | 81 169 578 | `7b0241c89caf4a5af4079ee5118f430bb08df92809a9add49dc0bec9e4294cf9` | — |
-| Checksum list | `dist/SHA256SUMS` | — | — | `sha256sum -c SHA256SUMS` → all 4 **OK** |
+| Checksum list | `dist/SHA256SUMS` | — | — | `sha256sum -c SHA256SUMS` → all 3 published files **OK** |
 
 Published as the GitHub release **v1.0.0**:
 <https://github.com/nilaymallikk/twindrop/releases/tag/v1.0.0>
